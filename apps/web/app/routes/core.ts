@@ -13,7 +13,11 @@ export const coreRoutes: RouteConfigEntry[] = [
   // ========================================================================
 
   // Home - Sign In
-  layout("./(home)/layout.tsx", [index("./(home)/page.tsx")]),
+  layout("./(home)/layout.tsx", [
+    index("./(home)/page.tsx"),
+    route("terms", "./(home)/terms/page.tsx"),
+    route("privacy", "./(home)/privacy/page.tsx"),
+  ]),
 
   // Sign Up
   layout("./(all)/sign-up/layout.tsx", [route("sign-up", "./(all)/sign-up/page.tsx")]),
