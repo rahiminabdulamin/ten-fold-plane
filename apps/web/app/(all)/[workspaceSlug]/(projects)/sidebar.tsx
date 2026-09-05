@@ -38,6 +38,14 @@ export const AppSidebar = observer(function AppSidebar() {
       {canPerformWorkspaceMemberActions && !isFavoriteEmpty && <SidebarFavoritesMenu />}
       {/* Projects List */}
       <SidebarProjectsList />
+      <div className="text-xs mt-auto flex items-center gap-3 px-2 pb-2 text-tertiary">
+        <a href="/terms" className="hover:text-primary hover:underline">
+          Terms of Service
+        </a>
+        <a href="/privacy" className="hover:text-primary hover:underline">
+          Privacy Policy
+        </a>
+      </div>
     </SidebarWrapper>
   );
 });
