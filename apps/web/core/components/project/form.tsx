@@ -13,7 +13,6 @@ import { NETWORK_CHOICES } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 // plane imports
 import { Button } from "@plane/propel/button";
-import { EmojiPicker, EmojiIconPickerTypes, Logo } from "@plane/propel/emoji-icon-picker";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import { EFileAssetType } from "@plane/types";
@@ -45,7 +44,6 @@ export function ProjectDetailsForm(props: IProjectDetailsForm) {
   const { project, workspaceSlug, projectId, isAdmin } = props;
   const { t } = useTranslation();
   // states
-  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   // store hooks
   const { updateProject } = useProject();
@@ -160,7 +158,6 @@ export function ProjectDetailsForm(props: IProjectDetailsForm) {
       identifier: formData.identifier,
       description: formData.description,
 
-      logo_props: formData.logo_props,
       timezone: formData.timezone,
     };
 
@@ -202,59 +199,23 @@ export function ProjectDetailsForm(props: IProjectDetailsForm) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="relative h-44 w-full">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        <CoverImage src={coverImage} alt="Project cover image" className="h-44 w-full rounded-md" />
+      <div className="relative h-20 w-full">
+        <div className="hidden" />
+        <CoverImage src={coverImage} alt="Project cover image" className="hidden" />
         <div className="absolute bottom-4 z-5 flex w-full items-end justify-between gap-3 px-4">
-          <div className="flex flex-grow gap-3 truncate">
-            <Controller
-              control={control}
-              name="logo_props"
-              render={({ field: { value, onChange } }) => (
-                <EmojiPicker
-                  iconType="material"
-                  closeOnSelect={false}
-                  isOpen={isOpen}
-                  handleToggle={(val: boolean) => setIsOpen(val)}
-                  className="flex items-center justify-center"
-                  buttonClassName="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-lg bg-white/10"
-                  label={<Logo logo={value} size={28} />}
-                  // TODO: fix types
-                  onChange={(val: any) => {
-                    let logoValue = {};
-
-                    if (val?.type === "emoji")
-                      logoValue = {
-                        value: val.value,
-                      };
-                    else if (val?.type === "icon") logoValue = val.value;
-
-                    onChange({
-                      in_use: val?.type,
-                      [val?.type]: logoValue,
-                    });
-                    setIsOpen(false);
-                  }}
-                  defaultIconColor={value?.in_use && value.in_use === "icon" ? value?.icon?.color : undefined}
-                  defaultOpen={
-                    value.in_use && value.in_use === "emoji" ? EmojiIconPickerTypes.EMOJI : EmojiIconPickerTypes.ICON
-                  }
-                  disabled={!isAdmin}
-                />
-              )}
-            />
-            <div className="flex flex-col gap-1 truncate text-on-color">
+          <div className="flex flex-grow truncate">
+            <div className="flex flex-col gap-1 truncate text-primary">
               <span className="truncate text-16 font-semibold">{watch("name")}</span>
               <span className="flex items-center gap-2 text-13">
                 <span>{watch("identifier")} .</span>
                 <span className="flex items-center gap-1.5">
-                  {project.network === 0 && <LockOutline className="h-2.5 w-2.5 text-on-color" />}
+                  {project.network === 0 && <LockOutline className="h-2.5 w-2.5 text-secondary" />}
                   {currentNetwork && t(currentNetwork?.i18n_label)}
                 </span>
               </span>
             </div>
           </div>
-          <div className="flex flex-shrink-0 justify-center">
+          <div className="hidden">
             <div>
               <Controller
                 control={control}

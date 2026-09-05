@@ -15,8 +15,7 @@ import { CustomizeNavigationDialog } from "@/components/navigation/customize-nav
 // hooks
 import { useAppTheme } from "@/hooks/store/use-app-theme";
 import useSize from "@/hooks/use-window-size";
-// plane web components
-import { WorkspaceEditionBadge } from "@/components/workspace/edition-badge";
+import { WorkspaceMenuRoot } from "@/components/workspace/sidebar/workspace-menu-root";
 import { AppSidebarToggleButton } from "./sidebar-toggle-button";
 import { IconButton } from "@plane/propel/icon-button";
 
@@ -55,7 +54,13 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
           {/* Workspace switcher and settings */}
 
           <div className="flex items-center justify-between gap-2 px-2">
-            <span className="pt-1 text-16 font-medium text-primary">{title}</span>
+            {title === "Projects" ? (
+              <div className="min-w-0 flex-1 py-1 text-16 font-medium text-primary">
+                <WorkspaceMenuRoot variant="top-navigation" />
+              </div>
+            ) : (
+              <span className="pt-1 text-16 font-medium text-primary">{title}</span>
+            )}
             <div className="flex items-center gap-2">
               {title === "Projects" && (
                 <IconButton
@@ -81,14 +86,14 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
         >
           {children}
         </ScrollArea>
-        {/* Help Section */}
-        <div className="flex h-12 items-center justify-between border-t border-subtle bg-surface-1 p-3">
-          <WorkspaceEditionBadge />
-          {/* TODO: To be checked if we need this */}
-          {/* <div className="flex items-center gap-2">
-          {!shouldRenderAppRail && <HelpMenu />}
-          {!isAppRailEnabled && <AppSidebarToggleButton />}
-        </div> */}
+        <div className="flex h-12 items-center justify-center gap-1.5 border-t border-subtle bg-surface-1 px-2 text-[10px] whitespace-nowrap text-tertiary">
+          <a href="/terms" className="hover:text-primary hover:underline">
+            Terms of Service
+          </a>
+          <span aria-hidden>·</span>
+          <a href="/privacy" className="hover:text-primary hover:underline">
+            Privacy Policy
+          </a>
         </div>
       </div>
     </>

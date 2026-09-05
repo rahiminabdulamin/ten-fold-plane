@@ -27,6 +27,7 @@ import { useAppTheme } from "@/hooks/store/use-app-theme";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useProject } from "@/hooks/store/use-project";
 import { useUserPermissions } from "@/hooks/store/user";
+import { FEATURE_VISIBILITY } from "@/constants/feature-visibility";
 
 export type TNavigationItem = {
   name: string;
@@ -94,7 +95,7 @@ export const ProjectNavigation = observer(function ProjectNavigation(props: TPro
         href: `/${workspaceSlug}/projects/${projectId}/cycles`,
         icon: CyclesOutline,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER],
-        shouldRender: project?.cycle_view ?? false,
+        shouldRender: FEATURE_VISIBILITY.CYCLES && (project?.cycle_view ?? false),
         sortOrder: 2,
       },
       {
@@ -104,7 +105,7 @@ export const ProjectNavigation = observer(function ProjectNavigation(props: TPro
         href: `/${workspaceSlug}/projects/${projectId}/modules`,
         icon: ModuleOutline,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER],
-        shouldRender: project?.module_view ?? false,
+        shouldRender: FEATURE_VISIBILITY.MODULES && (project?.module_view ?? false),
         sortOrder: 3,
       },
       {

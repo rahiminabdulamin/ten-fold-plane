@@ -72,7 +72,7 @@ def read_seed_file(filename):
 def create_project_and_member(workspace: Workspace, bot_user: User) -> Dict[int, uuid.UUID]:
     """Creates a project and associated members for a workspace.
 
-    Creates a new project using the workspace name and sets up all necessary
+    Creates a new Tutorial project and sets up all necessary
     member associations and user properties.
 
     Args:
@@ -95,14 +95,14 @@ def create_project_and_member(workspace: Workspace, bot_user: User) -> Dict[int,
 
     for project_seed in project_seeds:
         project_id = project_seed.pop("id")
-        # Remove the name from seed data since we want to use workspace name
+        # Use a predictable instructional project name for every new workspace.
         project_seed.pop("name", None)
         project_seed.pop("identifier", None)
 
         project = Project(
             **project_seed,
             workspace=workspace,
-            name=workspace.name,  # Use workspace name
+            name="Tutorial",
             identifier=project_identifier,
             created_by_id=bot_user.id,
             # Enable all views in seed data
@@ -540,7 +540,7 @@ def workspace_seed(workspace_id: uuid.UUID) -> None:
             company_role="",
         )
 
-        # Create a project with the same name as workspace
+        # Create the instructional project.
         project_map = create_project_and_member(workspace, bot_user)
 
         # Create project states

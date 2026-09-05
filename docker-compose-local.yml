@@ -77,6 +77,9 @@ services:
     command: ./bin/docker-entrypoint-api-local.sh
     env_file:
       - ./apps/api/.env
+    environment:
+      # Browser uploads bypass the API and must use the host-published MinIO port.
+      MINIO_PUBLIC_ENDPOINT_URL: http://localhost:9000
     depends_on:
       - plane-db
       - plane-redis

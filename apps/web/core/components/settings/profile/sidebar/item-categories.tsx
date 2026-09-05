@@ -47,6 +47,8 @@ export const ProfileSettingsSidebarItemCategories = observer(function ProfileSet
   return (
     <div className="mt-4 flex flex-col gap-y-4">
       {PROFILE_SETTINGS_CATEGORIES.map((category) => {
+        if (category === "developer") return null;
+
         const categoryItems = GROUPED_PROFILE_SETTINGS[category];
 
         if (categoryItems.length === 0) return null;

@@ -213,12 +213,8 @@ export const GeneralProfileSettingsForm = observer(function GeneralProfileSettin
       />
       <form onSubmit={handleSubmit(onSubmit)} className="w-full">
         <div className="flex w-full flex-col gap-7">
-          <div className="relative h-44 w-full">
-            <CoverImage
-              src={userCover}
-              className="h-44 w-full rounded-lg"
-              alt={currentUser?.first_name ?? "Cover image"}
-            />
+          <div className="relative h-16 w-full">
+            <CoverImage src={userCover} className="hidden" alt={currentUser?.first_name ?? "Cover image"} />
             <div className="absolute -bottom-6 left-6 flex items-end justify-between">
               <div className="flex gap-3">
                 <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-surface-2">
@@ -242,7 +238,7 @@ export const GeneralProfileSettingsForm = observer(function GeneralProfileSettin
                 </div>
               </div>
             </div>
-            <div className="absolute right-3 bottom-3 flex">
+            <div className="hidden">
               <Controller
                 control={control}
                 name="cover_image_url"

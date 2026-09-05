@@ -138,8 +138,8 @@ export class CoreRootStore {
   }
 
   resetOnSignOut() {
-    // handling the system theme when user logged out from the app
-    localStorage.setItem("theme", "system");
+    // Preserve the Ten-Fold default for signed-out screens.
+    localStorage.setItem("theme", "light");
     void setLanguage(FALLBACK_LANGUAGE);
     this.router = new RouterStore();
     this.commandPalette = new CommandPaletteStore();

@@ -80,15 +80,15 @@ export const UserMenuRoot = observer(function UserMenuRoot() {
       optionsClassName="w-72 p-3 flex flex-col gap-y-3"
       closeOnSelect
     >
-      <div className="relative h-29 w-full rounded-lg">
+      <div className="relative flex w-full justify-center py-2">
         <CoverImage
           src={currentUser?.cover_image_url ?? undefined}
           alt={currentUser?.display_name}
-          className="h-29 w-full rounded-lg"
+          className="hidden"
           showDefaultWhenEmpty
         />
-        <div className="absolute inset-0 bg-layer-1/50" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="hidden" />
+        <div>
           <div className="flex flex-col items-center gap-y-2">
             <div>
               <Avatar

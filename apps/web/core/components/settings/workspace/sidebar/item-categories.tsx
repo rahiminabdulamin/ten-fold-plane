@@ -35,9 +35,13 @@ export const WorkspaceSettingsSidebarItemCategories = observer(function Workspac
   return (
     <div className="mt-3 flex flex-col divide-y divide-subtle px-3">
       {WORKSPACE_SETTINGS_CATEGORIES.map((category) => {
+        if (category === "developer") return null;
+
         const categoryItems = GROUPED_WORKSPACE_SETTINGS[category];
-        const accessibleItems = categoryItems.filter((item) =>
-          allowPermissions(item.access, EUserPermissionsLevel.WORKSPACE, workspaceSlug)
+        const accessibleItems = categoryItems.filter(
+          (item) =>
+            !["billing-and-plans", "webhooks"].includes(item.key) &&
+            allowPermissions(item.access, EUserPermissionsLevel.WORKSPACE, workspaceSlug)
         );
 
         if (accessibleItems.length === 0) return null;

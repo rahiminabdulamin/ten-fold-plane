@@ -147,14 +147,6 @@ export const ANALYTICS_X_AXIS_VALUES: { value: ChartXAxisProperty; label: string
     label: "Estimate point",
   },
   {
-    value: ChartXAxisProperty.CYCLES,
-    label: "Cycle",
-  },
-  {
-    value: ChartXAxisProperty.MODULES,
-    label: "Module",
-  },
-  {
     value: ChartXAxisProperty.COMPLETED_AT,
     label: "Completed date",
   },

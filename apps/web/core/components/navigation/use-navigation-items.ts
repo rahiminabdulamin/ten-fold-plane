@@ -17,6 +17,7 @@ import {
 } from "@makeplane/propel/icons";
 import type { EUserProjectRoles, IPartialProject } from "@plane/types";
 import type { TNavigationItem } from "@/components/navigation/tab-navigation-root";
+import { FEATURE_VISIBILITY } from "@/constants/feature-visibility";
 
 type UseNavigationItemsProps = {
   workspaceSlug: string;
@@ -57,7 +58,7 @@ export const useNavigationItems = ({
         href: `/${workspaceSlug}/projects/${projectId}/cycles`,
         icon: CyclesOutline,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER],
-        shouldRender: !!project?.cycle_view,
+        shouldRender: FEATURE_VISIBILITY.CYCLES && !!project?.cycle_view,
         sortOrder: 2,
       },
       {
@@ -67,7 +68,7 @@ export const useNavigationItems = ({
         href: `/${workspaceSlug}/projects/${projectId}/modules`,
         icon: ModuleOutline,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER],
-        shouldRender: !!project?.module_view,
+        shouldRender: FEATURE_VISIBILITY.MODULES && !!project?.module_view,
         sortOrder: 3,
       },
       {

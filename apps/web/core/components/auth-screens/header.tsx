@@ -8,7 +8,6 @@ import React from "react";
 import { observer } from "mobx-react";
 import Link from "next/link";
 import { useTranslation } from "@plane/i18n";
-import { PlaneLockup } from "@plane/propel/icons";
 import { PageHead } from "@/components/core/page-title";
 import { EAuthModes } from "@/helpers/authentication.helper";
 import { useInstance } from "@/hooks/store/use-instance";
@@ -30,9 +29,10 @@ const authContentMap = {
 
 type AuthHeaderProps = {
   type: EAuthModes;
+  hideLogoOnDesktop?: boolean;
 };
 
-export const AuthHeader = observer(function AuthHeader({ type }: AuthHeaderProps) {
+export const AuthHeader = observer(function AuthHeader({ type, hideLogoOnDesktop = false }: AuthHeaderProps) {
   const { t } = useTranslation();
   // store
   const { config } = useInstance();
@@ -42,6 +42,7 @@ export const AuthHeader = observer(function AuthHeader({ type }: AuthHeaderProps
   return (
     <AuthHeaderBase
       pageTitle={t(authContentMap[type].pageTitle)}
+      hideLogoOnDesktop={hideLogoOnDesktop}
       additionalAction={
         enableSignUpConfig && (
           <div className="flex flex-col items-end text-center text-13 font-medium text-tertiary sm:flex-row sm:items-center sm:gap-2">
@@ -62,16 +63,17 @@ export const AuthHeader = observer(function AuthHeader({ type }: AuthHeaderProps
 type TAuthHeaderBase = {
   pageTitle: string;
   additionalAction?: React.ReactNode;
+  hideLogoOnDesktop?: boolean;
 };
 
 export function AuthHeaderBase(props: TAuthHeaderBase) {
-  const { pageTitle, additionalAction } = props;
+  const { pageTitle, additionalAction, hideLogoOnDesktop = false } = props;
   return (
     <>
-      <PageHead title={pageTitle + " - Plane"} />
+      <PageHead title={pageTitle + " - Ten-Fold"} />
       <div className="sticky top-0 flex w-full flex-shrink-0 items-center justify-between gap-6">
-        <Link href="/">
-          <PlaneLockup height={20} width={95} className="text-primary" />
+        <Link href="/" className={hideLogoOnDesktop ? "lg:hidden" : undefined}>
+          <img src="/branding/tenfold-logo-long-rebrand-v2.png" alt="Ten-Fold" className="h-5 w-auto" />
         </Link>
         {additionalAction}
       </div>

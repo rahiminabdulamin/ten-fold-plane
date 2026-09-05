@@ -44,6 +44,22 @@
 }
 
 /* Lock icon animations */
+@keyframes tenfoldShimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: brightness(0.9);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.3);
+  }
+}
+
+.animate-shimmer {
+  animation: tenfoldShimmer 1.5s ease-in-out infinite;
+}
+
 @keyframes textSlideIn {
   0% {
     opacity: 0;

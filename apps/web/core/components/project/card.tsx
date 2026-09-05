@@ -23,7 +23,6 @@ import { EUserPermissions, EUserPermissionsLevel, IS_FAVORITE_MENU_OPEN } from "
 import { useLocalStorage } from "@plane/hooks";
 import { Avatar } from "@makeplane/propel/components/avatar";
 import { Button } from "@plane/propel/button";
-import { Logo } from "@plane/propel/emoji-icon-picker";
 import { setPromiseToast, setToast, TOAST_TYPE } from "@plane/propel/toast";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import type { IProject } from "@plane/types";
@@ -220,26 +219,18 @@ export const ProjectCard = observer(function ProjectCard(props: Props) {
         )}
       >
         <ContextMenu parentRef={projectCardRef} items={MENU_ITEMS} />
-        <div className="relative h-[118px] w-full rounded-t">
-          <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="relative h-[118px] w-full rounded-t bg-layer-1">
+          <div className="hidden" />
 
-          <CoverImage
-            src={project.cover_image_url}
-            alt={project.name}
-            className="absolute top-0 left-0 h-full w-full rounded-t"
-          />
+          <CoverImage src={project.cover_image_url} alt={project.name} className="hidden" />
 
           <div className="absolute bottom-4 z-[1] flex h-10 w-full items-center justify-between gap-3 px-4">
-            <div className="flex flex-grow items-center gap-2.5 truncate">
-              <div className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-sm bg-white/10">
-                <Logo logo={project.logo_props} size={18} />
-              </div>
-
+            <div className="flex flex-grow items-center truncate">
               <div className="flex w-full flex-col justify-between gap-0.5 truncate">
-                <h3 className="truncate font-semibold text-on-color">{project.name}</h3>
+                <h3 className="truncate font-semibold text-primary">{project.name}</h3>
                 <span className="flex items-center gap-1.5">
-                  <p className="text-11 font-medium text-on-color">{project.identifier} </p>
-                  {project.network === 0 && <LockOutline className="h-2.5 w-2.5 text-on-color" />}
+                  <p className="text-11 font-medium text-secondary">{project.identifier} </p>
+                  {project.network === 0 && <LockOutline className="h-2.5 w-2.5 text-secondary" />}
                 </span>
               </div>
             </div>
@@ -247,20 +238,20 @@ export const ProjectCard = observer(function ProjectCard(props: Props) {
             {!isArchived && (
               <div data-prevent-progress className="flex h-full flex-shrink-0 items-center gap-2">
                 <button
-                  className="flex h-6 w-6 items-center justify-center rounded-sm bg-white/10"
+                  className="flex h-6 w-6 items-center justify-center rounded-sm bg-layer-transparent-hover"
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
                     handleCopyText();
                   }}
                 >
-                  <LinkOutline className="h-3 w-3 text-on-color" />
+                  <LinkOutline className="h-3 w-3 text-secondary" />
                 </button>
                 {shouldRenderFavorite && (
                   <FavoriteStar
-                    buttonClassName="h-6 w-6 bg-white/10 rounded-sm"
+                    buttonClassName="h-6 w-6 rounded-sm bg-layer-transparent-hover"
                     iconClassName={cn("h-3 w-3", {
-                      "text-on-color": !project.is_favorite,
+                      "text-secondary": !project.is_favorite,
                     })}
                     onClick={(e) => {
                       e.preventDefault();

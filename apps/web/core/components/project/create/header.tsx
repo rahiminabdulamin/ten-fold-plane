@@ -4,12 +4,10 @@
  * See the LICENSE file for details.
  */
 
-import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 // plane imports
 import { ETabIndices } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
-import { EmojiPicker, EmojiIconPickerTypes, Logo } from "@plane/propel/emoji-icon-picker";
 import { CloseOutline } from "@makeplane/propel/icons";
 // plane types
 import type { IProject } from "@plane/types";
@@ -30,29 +28,24 @@ type Props = {
 
 function ProjectCreateHeader(props: Props) {
   const { handleClose, isMobile = false, handleFormOnChange, isClosable = true } = props;
-  const { watch, control, setValue } = useFormContext<IProject>();
+  const { watch, control } = useFormContext<IProject>();
   const { t } = useTranslation();
   // derived values
   const coverImage = watch("cover_image_url");
 
-  const [isOpen, setIsOpen] = useState(false);
   const { getIndex } = getTabIndex(ETabIndices.PROJECT_CREATE, isMobile);
 
   return (
-    <div className="group relative h-44 w-full rounded-lg">
-      <CoverImage
-        src={coverImage}
-        alt={t("project_cover_image_alt")}
-        className="absolute top-0 left-0 h-full w-full rounded-lg"
-      />
+    <div className="group relative h-12 w-full rounded-lg">
+      <CoverImage src={coverImage} alt={t("project_cover_image_alt")} className="hidden" />
       {isClosable && (
         <div className="absolute top-2 right-2 p-2">
           <button type="button" onClick={handleClose} tabIndex={getIndex("close")}>
-            <CloseOutline className="h-5 w-5 text-on-color" />
+            <CloseOutline className="h-5 w-5 text-primary" />
           </button>
         </div>
       )}
-      <div className="absolute right-2 bottom-2">
+      <div className="hidden">
         <Controller
           name="cover_image_url"
           control={control}
@@ -66,50 +59,6 @@ function ProjectCreateHeader(props: Props) {
               control={control}
               value={value ?? null}
               tabIndex={getIndex("cover_image")}
-            />
-          )}
-        />
-      </div>
-      <div className="absolute -bottom-[22px] left-3">
-        <Controller
-          name="logo_props"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <EmojiPicker
-              iconType="material"
-              isOpen={isOpen}
-              handleToggle={(val: boolean) => setIsOpen(val)}
-              className="flex items-center justify-center"
-              buttonClassName="flex items-center justify-center"
-              label={
-                <span className="grid h-11 w-11 place-items-center rounded-md border border-subtle bg-layer-2">
-                  <Logo logo={value} size={20} />
-                </span>
-              }
-              onChange={(val: any) => {
-                let logoValue = {};
-
-                if (val?.type === "emoji")
-                  logoValue = {
-                    value: val.value,
-                  };
-                else if (val?.type === "icon") logoValue = val.value;
-
-                const newLogoProps = {
-                  in_use: val?.type,
-                  [val?.type]: logoValue,
-                };
-                setValue("logo_props", newLogoProps, {
-                  shouldDirty: true,
-                });
-                onChange(newLogoProps);
-                handleFormOnChange?.();
-                setIsOpen(false);
-              }}
-              defaultIconColor={value?.in_use && value.in_use === "icon" ? value.icon?.color : undefined}
-              defaultOpen={
-                value?.in_use && value.in_use === "emoji" ? EmojiIconPickerTypes.EMOJI : EmojiIconPickerTypes.ICON
-              }
             />
           )}
         />

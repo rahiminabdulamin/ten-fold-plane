@@ -17,6 +17,7 @@ import { EIssueLayoutTypes, EIssuesStoreType } from "@plane/types";
 import { useIssues } from "@/hooks/store/use-issues";
 // plane web imports
 import type { TProject } from "@plane/types";
+import { FEATURE_VISIBILITY } from "@/constants/feature-visibility";
 // local imports
 import { WorkItemsModal } from "../analytics/work-items/modal";
 import { WorkItemFiltersToggle } from "../work-item-filters/filters-toggle";
@@ -120,8 +121,8 @@ export const HeaderFilters = observer(function HeaderFilters(props: Props) {
           handleDisplayFiltersUpdate={handleDisplayFilters}
           displayProperties={issueFilters?.displayProperties ?? {}}
           handleDisplayPropertiesUpdate={handleDisplayProperties}
-          cycleViewDisabled={!currentProjectDetails?.cycle_view}
-          moduleViewDisabled={!currentProjectDetails?.module_view}
+          cycleViewDisabled={!FEATURE_VISIBILITY.CYCLES || !currentProjectDetails?.cycle_view}
+          moduleViewDisabled={!FEATURE_VISIBILITY.MODULES || !currentProjectDetails?.module_view}
           isEpic={storeType === EIssuesStoreType.EPIC}
         />
       </FiltersDropdown>

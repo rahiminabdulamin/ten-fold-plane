@@ -28,7 +28,6 @@ import { Disclosure, Transition } from "@headlessui/react";
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useOutsideClickDetector } from "@plane/hooks";
 import { useTranslation } from "@plane/i18n";
-import { Logo } from "@plane/propel/emoji-icon-picker";
 import { IconButton } from "@plane/propel/icon-button";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import { CustomMenu, DropIndicator, DragHandle, ControlLink } from "@plane/ui";
@@ -167,9 +166,6 @@ export const SidebarProjectsListItem = observer(function SidebarProjectsListItem
               const root = createRoot(container);
               root.render(
                 <div className="flex items-center rounded-sm bg-surface-1 p-1 pr-2 text-13">
-                  <div className="grid size-4 flex-shrink-0 place-items-center">
-                    {project && <Logo logo={project?.logo_props} />}
-                  </div>
                   <p className="truncate text-secondary">{project?.name}</p>
                 </div>
               );
@@ -342,16 +338,10 @@ export const SidebarProjectsListItem = observer(function SidebarProjectsListItem
                         : t("aria_labels.projects_sidebar.open_project_menu")
                     }
                   >
-                    <div className="grid size-4 flex-shrink-0 place-items-center">
-                      <Logo logo={project.logo_props} size={16} />
-                    </div>
                     <p className="truncate text-13 font-medium text-secondary">{project.name}</p>
                   </Disclosure.Button>
                 ) : (
                   <div className="flex w-full flex-grow items-center gap-1.5 text-left select-none">
-                    <div className="grid size-4 flex-shrink-0 place-items-center">
-                      <Logo logo={project.logo_props} size={16} />
-                    </div>
                     <p className="truncate text-13 font-medium text-secondary">{project.name}</p>
                   </div>
                 )}
