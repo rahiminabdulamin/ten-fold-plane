@@ -33,3 +33,9 @@ test("uses Ten-Fold legal links in authentication and the workspace sidebar", as
   assert.match(sidebar, /Terms of Service/);
   assert.match(sidebar, /Privacy Policy/);
 });
+
+test("keeps long legal content scrollable inside the fixed application shell", async () => {
+  const layout = await readAppFile("core/components/legal/legal-page-layout.tsx");
+
+  assert.match(layout, /h-screen[^"]*overflow-y-auto/);
+});
