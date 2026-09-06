@@ -7,7 +7,14 @@ import { useParams } from "react-router";
 import { IssueService } from "@/services/issue";
 import { ProjectService } from "@/services/project";
 
-import { findProjectMatches, toolError, toolResult } from "./tool-contracts";
+import {
+  buildWorkItemQuery,
+  findProjectMatches,
+  toWorkItemRecords,
+  toolError,
+  toolResult,
+  WORK_ITEM_STATE_GROUPS,
+} from "./tool-contracts";
 
 const projectService = new ProjectService();
 const issueService = new IssueService();
@@ -257,18 +264,19 @@ function PlaneTools() {
     {
       name: "list_work_items",
       description:
-        "List up to 20 work items. Use the current project by default, or pass a canonical project ID returned by find_project.",
-      parameters: z.object({ projectId: z.string().uuid().optional() }),
-      handler: async ({ projectId: requestedProjectId }) => {
+        "List up to 20 work items, optionally limited to one state bucket. Use the current project by default, or pass a canonical project ID returned by find_project.",
+      parameters: z.object({
+        projectId: z.string().uuid().optional(),
+        stateGroup: z.enum(WORK_ITEM_STATE_GROUPS).optional(),
+      }),
+      handler: async ({ projectId: requestedProjectId, stateGroup }) => {
         const targetProjectId = requestedProjectId ?? projectId;
         if (!workspace || !targetProjectId)
           return { ok: false, message: "Find a project first, then provide its project ID.", retryable: false };
         try {
-          const response = await issueService.getIssues(workspace, targetProjectId, { per_page: "20" });
+          const response = await issueService.getIssues(workspace, targetProjectId, buildWorkItemQuery(stateGroup));
           const issues = Array.isArray(response.results) ? response.results : [];
-          const data = issues
-            .slice(0, 20)
-            .map((issue) => ({ id: issue.id, name: issue.name, sequence_id: issue.sequence_id }));
+          const data = toWorkItemRecords(issues);
           return { ...toolResult("list_work_items", `Found ${data.length} work items.`), data };
         } catch (error) {
           return toolError("list_work_items", error);
