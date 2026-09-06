@@ -40,4 +40,9 @@ test("the assistant exposes the complete editable work-item schema and live proj
   assert.match(root, /EstimateService/);
   assert.match(runtime, /get_work_item_schema/);
   assert.match(runtime, /Never invent IDs/);
+  assert.match(runtime, /Leave unspecified work-item fields unset without follow-up questions/);
+  assert.match(
+    runtime,
+    /Put task details that do not fit a supported field, including a time of day, in the description/
+  );
 });
