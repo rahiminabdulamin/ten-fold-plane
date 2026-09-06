@@ -115,22 +115,45 @@ function PlaneTools() {
   }, []);
 
   useEffect(() => {
-    const panel = document.querySelector<HTMLElement>("[data-copilot-sidebar]");
-    if (!panel) return;
-    let wasOpen = panel.getAttribute("aria-hidden") === "false";
-    const observer = new MutationObserver(() => {
-      const isOpen = panel.getAttribute("aria-hidden") === "false";
-      if (isOpen) {
-        preserveSidebarOpen.current = true;
-      } else if (wasOpen && preserveSidebarOpen.current) {
-        document.querySelector<HTMLButtonElement>('[data-slot="chat-toggle-button"]')?.click();
-      } else if (wasOpen) {
-        resetLauncherPosition();
-      }
-      wasOpen = isOpen;
-    });
-    observer.observe(panel, { attributes: true, attributeFilter: ["aria-hidden"] });
-    return () => observer.disconnect();
+    let panel: HTMLElement | null = null;
+    let wasOpen = false;
+    let panelObserver: MutationObserver | undefined;
+    const reopen = () => {
+      window.requestAnimationFrame(() => {
+        if (preserveSidebarOpen.current && panel?.getAttribute("aria-hidden") === "true") {
+          document.querySelector<HTMLButtonElement>('[data-slot="chat-toggle-button"]')?.click();
+        }
+      });
+    };
+    const observePanel = () => {
+      const nextPanel = document.querySelector<HTMLElement>("[data-copilot-sidebar]");
+      if (nextPanel === panel) return;
+      panelObserver?.disconnect();
+      panel = nextPanel;
+      if (!panel) return;
+      wasOpen = panel.getAttribute("aria-hidden") === "false";
+      if (wasOpen) preserveSidebarOpen.current = true;
+      else if (preserveSidebarOpen.current) reopen();
+      panelObserver = new MutationObserver(() => {
+        const isOpen = panel?.getAttribute("aria-hidden") === "false";
+        if (isOpen) {
+          preserveSidebarOpen.current = true;
+        } else if (wasOpen && preserveSidebarOpen.current) {
+          reopen();
+        } else if (wasOpen) {
+          resetLauncherPosition();
+        }
+        wasOpen = isOpen;
+      });
+      panelObserver.observe(panel, { attributes: true, attributeFilter: ["aria-hidden"] });
+    };
+    const documentObserver = new MutationObserver(observePanel);
+    documentObserver.observe(document.body, { childList: true, subtree: true });
+    observePanel();
+    return () => {
+      panelObserver?.disconnect();
+      documentObserver.disconnect();
+    };
   }, [resetLauncherPosition]);
 
   const startResize = (event: React.PointerEvent<HTMLDivElement>) => {

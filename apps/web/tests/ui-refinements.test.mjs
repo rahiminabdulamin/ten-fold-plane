@@ -52,6 +52,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /targetDate: z\.string\(\)\.date\(\)\.optional\(\)/);
   assert.match(copilot, /MutationObserver/);
   assert.match(copilot, /const preserveSidebarOpen = useRef\(false\)/);
+  assert.match(copilot, /childList:\s*true/);
   assert.match(copilot, /data-testid="copilot-close-button"/);
   assert.match(copilot, /querySelector<HTMLButtonElement>\('\[data-slot="chat-toggle-button"\]'\)\?\.click\(\)/);
   assert.match(copilot, /catch \{[\s\S]*window\.setTimeout\(refresh, 5_000\)/);
