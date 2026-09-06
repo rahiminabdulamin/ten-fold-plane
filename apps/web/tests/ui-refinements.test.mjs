@@ -24,6 +24,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     topNavigation,
     topNavPowerK,
     sidebarWrapper,
+    dateDropdown,
+    memberOptions,
   ] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
     read("core/components/copilot/root.tsx"),
@@ -43,6 +45,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     read("core/components/navigation/top-navigation-root.tsx"),
     read("core/components/navigation/top-nav-power-k.tsx"),
     read("core/components/sidebar/sidebar-wrapper.tsx"),
+    read("core/components/dropdowns/date.tsx"),
+    read("core/components/dropdowns/member/member-options.tsx"),
   ]);
 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
@@ -91,6 +95,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(styles, /resize:\s*none !important/);
   assert.match(select, /ref={setReferenceElement}/);
   assert.match(select, /strategy:\s*"fixed"/);
+  assert.match(dateDropdown, /strategy:\s*"fixed"/);
+  assert.match(memberOptions, /strategy:\s*"fixed"/);
   assert.match(auth, /items-center justify-center/);
   assert.doesNotMatch(workspaceLogo, /rounded-md object-cover/);
   assert.doesNotMatch(workspaceDropdown, /rounded-sm object-cover/);

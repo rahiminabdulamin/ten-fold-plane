@@ -83,6 +83,7 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",

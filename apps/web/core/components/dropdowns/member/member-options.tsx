@@ -64,6 +64,7 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",
