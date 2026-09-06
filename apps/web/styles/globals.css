@@ -61,6 +61,7 @@
   }
 
   [data-copilot-sidebar] {
+    --sidebar-width: var(--copilot-panel-width) !important;
     top: 40px !important;
     height: calc(100dvh - 40px) !important;
   }
@@ -80,6 +81,10 @@
   body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-resize-handle {
     display: block;
   }
+}
+
+body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-button"] {
+  display: none !important;
 }
 
 [data-copilotkit] {

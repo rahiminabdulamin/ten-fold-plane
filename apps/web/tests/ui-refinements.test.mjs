@@ -40,6 +40,11 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /onPointerDown:\s*startLauncherDrag/);
   assert.match(styles, /--copilot-panel-width/);
   assert.match(styles, /margin-inline-end:\s*0 !important/);
+  assert.match(styles, /--sidebar-width:\s*var\(--copilot-panel-width\) !important/);
+  assert.match(
+    styles,
+    /body:has\(\[data-copilot-sidebar\]\[aria-hidden="false"\]\) \[data-slot="chat-toggle-button"\]/
+  );
   assert.match(styles, /\[data-sidebar-chat\] > \[data-copilotkit\] > div/);
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
   assert.match(select, /ref={setReferenceElement}/);
