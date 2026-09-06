@@ -24,8 +24,8 @@ rsync -az --delete \
   -e "ssh -i $DEPLOY_SSH_KEY" \
   "$REPOSITORY_ROOT/" "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
-echo "Rebuilding web and proxy on the Droplet..."
+echo "Rebuilding Plane and CopilotKit services on the Droplet..."
 ssh -i "$DEPLOY_SSH_KEY" "${DEPLOY_USER}@${DEPLOY_HOST}" \
-  "cd '$DEPLOY_PATH' && docker compose up -d --build web proxy"
+  "cd '$DEPLOY_PATH' && docker compose up -d --build api copilot web proxy"
 
 echo "Deployment complete: https://ten-fold.co"
