@@ -20,6 +20,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     powerKCreation,
     powerKNavigation,
     powerKHelp,
+    sidebar,
+    topNavigation,
+    topNavPowerK,
   ] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
     read("core/components/copilot/root.tsx"),
@@ -35,6 +38,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     read("core/components/power-k/config/creation/root.ts"),
     read("core/components/power-k/config/navigation/root.ts"),
     read("core/components/power-k/config/help-commands.ts"),
+    read("core/components/sidebar/resizable-sidebar.tsx"),
+    read("core/components/navigation/top-navigation-root.tsx"),
+    read("core/components/navigation/top-nav-power-k.tsx"),
   ]);
 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
@@ -71,4 +77,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.doesNotMatch(powerKCreation, /create_(?:cycle|module)/);
   assert.doesNotMatch(powerKNavigation, /(?:open|nav)_project_(?:cycle|module)/);
   assert.doesNotMatch(powerKHelp, /open_plane_documentation|join_forum|report_bug/);
+  assert.match(sidebar, /isMobile && "fixed top-10 bottom-0 left-0 z-\[40\]"/);
+  assert.match(topNavigation, /tenfold-logo-square-rebrand-blackblack-v3\.png/);
+  assert.match(topNavigation, /sm:hidden/);
+  assert.match(topNavigation, /min-w-0 flex-1/);
+  assert.match(topNavPowerK, /w-full items-center[^"]*sm:w-\[364px\]/);
 });

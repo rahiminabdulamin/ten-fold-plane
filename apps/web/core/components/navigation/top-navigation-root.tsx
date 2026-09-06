@@ -43,21 +43,29 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
 
   return (
     <div
-      className={cn("z-[27] flex min-h-10 w-full items-center bg-canvas px-3.5 transition-all duration-300", {
-        "px-2": !showLabel,
-      })}
+      className={cn(
+        "z-[27] flex min-h-10 w-full items-center gap-2 bg-canvas px-2 transition-all duration-300 sm:px-3.5",
+        {
+          "sm:px-2": !showLabel,
+        }
+      )}
     >
-      <div className="flex flex-1 shrink-0 items-center">
+      <div className="flex shrink-0 items-center">
         <Link href="/" aria-label="Go to Home">
-          <img src="/branding/tenfold-logo-long-rebrand-v3.png" alt="Ten-Fold" className="h-7 w-auto" />
+          <img
+            src="/branding/tenfold-logo-square-rebrand-blackblack-v3.png"
+            alt="Ten-Fold"
+            className="size-7 object-contain sm:hidden"
+          />
+          <img src="/branding/tenfold-logo-long-rebrand-v3.png" alt="Ten-Fold" className="hidden h-7 w-auto sm:block" />
         </Link>
       </div>
       {/* Power K Search */}
-      <div className="shrink-0">
+      <div className="min-w-0 flex-1">
         <TopNavPowerK />
       </div>
       {/* Additional Actions */}
-      <div className="flex flex-1 shrink-0 items-center justify-end gap-1">
+      <div className="flex shrink-0 items-center justify-end gap-1">
         <Tooltip label="Inbox" side="bottom">
           <AppSidebarItem
             variant="link"
