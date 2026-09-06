@@ -88,27 +88,34 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 }
 
 [data-copilotkit] {
-  --cpk-default-font-family: var(--font-family-body);
+  --cpk-default-font-family: "Inter Variable", sans-serif;
   --foreground: var(--text-color-primary);
   --muted-foreground: var(--text-color-tertiary);
   --primary: var(--text-color-primary);
   --border: var(--border-color-subtle);
-  font-size: 13px;
+  font-family: "Inter Variable", sans-serif;
+  font-size: 14px;
 }
 
 [data-copilotkit] [data-streamdown] {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
 [data-copilotkit] [data-streamdown^="heading-"] {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.35;
 }
 
 [data-copilotkit] textarea,
 [data-copilotkit] input {
-  font-size: 13px;
+  font-family: "Inter Variable", sans-serif;
+  font-size: 14px;
+}
+
+[data-copilotkit] [class*="text-xs"] {
+  font-family: "Inter Variable", sans-serif;
+  font-size: 12px;
 }
 
 [data-copilotkit] textarea {
@@ -129,6 +136,7 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 }
 
 [data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
+  margin-block: 0.375rem !important;
   border-radius: 0.5rem !important;
 }
 
