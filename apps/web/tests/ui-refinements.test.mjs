@@ -52,6 +52,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /const panelWidthRef = useRef\(DEFAULT_COPILOT_PANEL_WIDTH\)/);
   assert.match(copilot, /width="var\(--copilot-panel-width\)"/);
   assert.match(copilot, /panelWidthRef\.current = width/);
+  assert.match(copilot, /const stopResize = \(releaseEvent: PointerEvent\)/);
+  assert.match(copilot, /releaseEvent\.stopPropagation\(\)/);
+  assert.match(copilot, /window\.addEventListener\("pointerup", stopResize, true\)/);
   assert.match(copilot, /onPointerDown:\s*startLauncherDrag/);
   assert.match(styles, /--copilot-panel-width/);
   assert.match(styles, /margin-inline-end:\s*0 !important/);
@@ -62,6 +65,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   );
   assert.match(styles, /\[data-sidebar-chat\] > \[data-copilotkit\] > div/);
   assert.match(styles, /\.cpk\\:px-8\.cpk\\:pb-4/);
+  assert.match(styles, /padding-inline:\s*0\.5rem !important/);
+  assert.match(styles, /\.cpk\\:max-w-3xl\.cpk\\:mx-auto/);
+  assert.match(styles, /margin-inline:\s*0 !important/);
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
   assert.match(select, /ref={setReferenceElement}/);
   assert.match(select, /strategy:\s*"fixed"/);

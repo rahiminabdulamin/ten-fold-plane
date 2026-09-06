@@ -101,15 +101,17 @@ function PlaneTools() {
       panelWidthRef.current = width;
       document.documentElement.style.setProperty("--copilot-panel-width", `${width}px`);
     };
-    const stopResize = () => {
+    const stopResize = (releaseEvent: PointerEvent) => {
+      if (releaseEvent.pointerId !== event.pointerId) return;
+      releaseEvent.stopPropagation();
       const width = panelWidthRef.current;
       window.localStorage.setItem(COPILOT_PANEL_WIDTH_STORAGE_KEY, `${width}`);
       setPanelWidth(width);
       window.removeEventListener("pointermove", resize);
-      window.removeEventListener("pointerup", stopResize);
+      window.removeEventListener("pointerup", stopResize, true);
     };
     window.addEventListener("pointermove", resize);
-    window.addEventListener("pointerup", stopResize);
+    window.addEventListener("pointerup", stopResize, true);
   };
 
   const startLauncherDrag = (event: React.PointerEvent<HTMLButtonElement>) => {

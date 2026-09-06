@@ -128,7 +128,13 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 }
 
 [data-copilot-sidebar] .cpk\:px-8.cpk\:pb-4 {
-  padding-inline: 1rem !important;
+  padding-inline: 0.5rem !important;
+}
+
+[data-copilot-sidebar] .cpk\:px-8.cpk\:pb-4 > .cpk\:max-w-3xl.cpk\:mx-auto {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
 }
 
 /* CopilotKit's unlicensed banner has no stable selector in v1.69. */
