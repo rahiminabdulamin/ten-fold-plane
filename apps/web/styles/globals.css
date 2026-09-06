@@ -127,6 +127,10 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   max-width: none !important;
 }
 
+[data-copilot-sidebar] .cpk\:px-8.cpk\:pb-4 {
+  padding-inline: 1rem !important;
+}
+
 /* CopilotKit's unlicensed banner has no stable selector in v1.69. */
 div[style*="z-index: 99999"] {
   display: none !important;
