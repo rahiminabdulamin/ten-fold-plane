@@ -32,19 +32,24 @@ test("new workspaces use Singapore time and omit restricted settings links", asy
   assert.match(sidebar, /"billing-and-plans", "webhooks"/);
 });
 
-test("Ten-Fold logos use web-public URLs that survive Docker pruning", async () => {
-  const [spinner, authBase, header, topNavigation] = await Promise.all([
+test("Ten-Fold brand marks link home, use the long workspace logo, and label loading states", async () => {
+  const [spinner, authBase, header, topNavigation, createWorkspace] = await Promise.all([
     read("core/components/common/logo-spinner.tsx"),
     read("core/components/auth-screens/auth-base.tsx"),
     read("core/components/auth-screens/header.tsx"),
     read("core/components/navigation/top-navigation-root.tsx"),
+    read("app/(all)/create-workspace/page.tsx"),
   ]);
 
   assert.match(spinner, /src="\/branding\/tenfold-logo-square-rebrand-loader-v3\.png"/);
   assert.match(authBase, /src="\/branding\/tenfold-logo-long-rebrand-white-v3\.png"/);
   assert.match(header, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
   assert.match(topNavigation, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
+  assert.match(topNavigation, /<Link href="\/"[^>]*>[\s\S]*tenfold-logo-long-rebrand-v3\.png/);
+  assert.match(createWorkspace, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
   assert.match(spinner, /animate-shimmer/);
+  assert.match(spinner, /Please wait\.\.\./);
+  assert.match(spinner, /text-\[#BFBFBF\]/);
 });
 
 test("Ten-Fold removes unavailable onboarding and profile surfaces", async () => {

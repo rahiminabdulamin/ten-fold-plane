@@ -6,6 +6,7 @@
 
 // components
 import { observer } from "mobx-react";
+import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { cn } from "@plane/utils";
 import { TopNavPowerK } from "@/components/navigation";
@@ -47,7 +48,9 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
       })}
     >
       <div className="flex flex-1 shrink-0 items-center">
-        <img src="/branding/tenfold-logo-long-rebrand-v3.png" alt="Ten-Fold" className="h-7 w-auto" />
+        <Link href="/" aria-label="Go to Home">
+          <img src="/branding/tenfold-logo-long-rebrand-v3.png" alt="Ten-Fold" className="h-7 w-auto" />
+        </Link>
       </div>
       {/* Power K Search */}
       <div className="shrink-0">

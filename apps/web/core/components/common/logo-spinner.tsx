@@ -6,7 +6,7 @@
 
 export function LogoSpinner() {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center gap-3">
       <div className="animate-shimmer rounded-lg">
         <img
           src="/branding/tenfold-logo-square-rebrand-loader-v3.png"
@@ -14,6 +14,7 @@ export function LogoSpinner() {
           className="h-[66px] w-auto object-contain sm:h-[132px]"
         />
       </div>
+      <p className="animate-shimmer text-sm text-[#BFBFBF]">Please wait...</p>
     </div>
   );
 }
