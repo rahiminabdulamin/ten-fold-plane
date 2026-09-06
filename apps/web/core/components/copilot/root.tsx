@@ -37,13 +37,17 @@ function PlaneTools() {
   const { workspaceSlug, projectId } = useParams();
   const workspace = typeof workspaceSlug === "string" ? workspaceSlug : "";
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
+  const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
   const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
   const dragStart = useRef<{ x: number; y: number; pointerX: number; pointerY: number; moved: boolean } | null>(null);
 
   useEffect(() => {
     const storedWidth = Number(window.localStorage.getItem(COPILOT_PANEL_WIDTH_STORAGE_KEY));
-    if (Number.isFinite(storedWidth))
-      setPanelWidth(clamp(storedWidth, MIN_COPILOT_PANEL_WIDTH, MAX_COPILOT_PANEL_WIDTH));
+    if (Number.isFinite(storedWidth)) {
+      const width = clamp(storedWidth, MIN_COPILOT_PANEL_WIDTH, MAX_COPILOT_PANEL_WIDTH);
+      panelWidthRef.current = width;
+      setPanelWidth(width);
+    }
     const storedPosition = window.localStorage.getItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
     if (storedPosition) {
       try {
@@ -57,6 +61,7 @@ function PlaneTools() {
   }, []);
 
   useEffect(() => {
+    panelWidthRef.current = panelWidth;
     document.documentElement.style.setProperty("--copilot-panel-width", `${panelWidth}px`);
     window.localStorage.setItem(COPILOT_PANEL_WIDTH_STORAGE_KEY, `${panelWidth}`);
   }, [panelWidth]);
@@ -90,10 +95,16 @@ function PlaneTools() {
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
     const startX = event.clientX;
-    const startWidth = panelWidth;
-    const resize = (moveEvent: PointerEvent) =>
-      setPanelWidth(clamp(startWidth + startX - moveEvent.clientX, MIN_COPILOT_PANEL_WIDTH, MAX_COPILOT_PANEL_WIDTH));
+    const startWidth = panelWidthRef.current;
+    const resize = (moveEvent: PointerEvent) => {
+      const width = clamp(startWidth + startX - moveEvent.clientX, MIN_COPILOT_PANEL_WIDTH, MAX_COPILOT_PANEL_WIDTH);
+      panelWidthRef.current = width;
+      document.documentElement.style.setProperty("--copilot-panel-width", `${width}px`);
+    };
     const stopResize = () => {
+      const width = panelWidthRef.current;
+      window.localStorage.setItem(COPILOT_PANEL_WIDTH_STORAGE_KEY, `${width}`);
+      setPanelWidth(width);
       window.removeEventListener("pointermove", resize);
       window.removeEventListener("pointerup", stopResize);
     };
@@ -460,7 +471,7 @@ function PlaneTools() {
         }}
         labels={{ modalHeaderTitle: "Ten-Fold Assistant" }}
         position="right"
-        width={panelWidth}
+        width="var(--copilot-panel-width)"
         toggleButton={{
           onPointerDown: startLauncherDrag,
           onClick: (event) => {
