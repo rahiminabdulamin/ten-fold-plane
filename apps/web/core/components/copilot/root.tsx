@@ -5,11 +5,17 @@ import { z } from "zod";
 import { useParams } from "react-router";
 
 import { IssueService } from "@/services/issue";
+import { IssueLabelService } from "@/services/issue/issue_label.service";
+import { EstimateService } from "@/services/estimate.service";
+import { ProjectMemberService } from "@/services/project/project-member.service";
+import { ProjectStateService } from "@/services/project/project-state.service";
 import { ProjectService } from "@/services/project";
+import { WorkspaceService } from "@/services/workspace.service";
 
 import {
   buildWorkItemQuery,
   findProjectMatches,
+  toWorkItemPayload,
   toWorkItemRecords,
   toolError,
   toolResult,
@@ -18,6 +24,11 @@ import {
 
 const projectService = new ProjectService();
 const issueService = new IssueService();
+const stateService = new ProjectStateService();
+const labelService = new IssueLabelService();
+const memberService = new ProjectMemberService();
+const estimateService = new EstimateService();
+const workspaceService = new WorkspaceService();
 const COPILOT_PANEL_WIDTH_STORAGE_KEY = "tenfold-copilot-panel-width";
 const COPILOT_LAUNCHER_POSITION_STORAGE_KEY = "tenfold-copilot-launcher-position";
 const DEFAULT_COPILOT_PANEL_WIDTH = 360;
@@ -27,6 +38,22 @@ const LAUNCHER_SIZE = 56;
 const LAUNCHER_GUTTER = 24;
 
 type LauncherPosition = { x: number; y: number };
+
+const dateSchema = z.string().date();
+const workItemMutationSchema = z.object({
+  title: z.string().min(1).max(255).optional(),
+  description: z.string().max(100_000).nullable().optional(),
+  priority: z.enum(["urgent", "high", "medium", "low", "none"]).optional(),
+  startDate: dateSchema.nullable().optional(),
+  targetDate: dateSchema.nullable().optional(),
+  stateId: z.string().uuid().nullable().optional(),
+  labelIds: z.array(z.string().uuid()).max(100).optional(),
+  assigneeIds: z.array(z.string().uuid()).max(100).optional(),
+  parentId: z.string().uuid().nullable().optional(),
+  point: z.number().int().min(0).max(12).nullable().optional(),
+  estimatePointId: z.string().uuid().nullable().optional(),
+  workItemTypeId: z.string().uuid().nullable().optional(),
+});
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), maximum);
 
@@ -148,6 +175,51 @@ function PlaneTools() {
     window.addEventListener("pointermove", drag);
     window.addEventListener("pointerup", stopDrag);
   };
+
+  useFrontendTool(
+    {
+      name: "get_work_item_schema",
+      description:
+        "Get the current project's assignable work-item states, labels, members, estimate points, and available work-item types. Use before resolving a name to an ID.",
+      parameters: z.object({ projectId: z.string().uuid().optional() }),
+      handler: async ({ projectId: requestedProjectId }) => {
+        const targetProjectId = requestedProjectId ?? projectId;
+        if (!workspace || !targetProjectId)
+          return { ok: false, message: "Find a project first, then provide its project ID.", retryable: false };
+        try {
+          const [states, labels, members, workspaceMembers, estimates, project] = await Promise.all([
+            stateService.getStates(workspace, targetProjectId),
+            labelService.getProjectLabels(workspace, targetProjectId),
+            memberService.fetchProjectMembers(workspace, targetProjectId),
+            workspaceService.fetchWorkspaceMembers(workspace),
+            estimateService.fetchProjectEstimates(workspace, targetProjectId),
+            projectService.getProject(workspace, targetProjectId),
+          ]);
+          const projectTypes = (project as { issue_types?: { id: string; name: string }[] }).issue_types ?? [];
+          const workspaceMembersById = new Map(
+            workspaceMembers.map(({ member, display_name }) => [member.id, display_name])
+          );
+          const data = {
+            states: states.slice(0, 100).map(({ id, name, group }) => ({ id, name, group })),
+            labels: labels.slice(0, 100).map(({ id, name }) => ({ id, name })),
+            members: members
+              .slice(0, 100)
+              .map(({ member }) => ({ id: member, name: workspaceMembersById.get(member) ?? member })),
+            estimatePoints: (estimates ?? [])
+              .flatMap((estimate) => estimate.points ?? [])
+              .filter((point) => point.id && point.value)
+              .slice(0, 100)
+              .map((point) => ({ id: point.id!, value: point.value! })),
+            workItemTypes: projectTypes.slice(0, 100).map(({ id, name }) => ({ id, name })),
+          };
+          return { ...toolResult("get_work_item_schema", "Retrieved work-item schema.", [targetProjectId]), data };
+        } catch (error) {
+          return toolError("get_work_item_schema", error);
+        }
+      },
+    },
+    [workspace, projectId]
+  );
 
   useFrontendTool(
     {
@@ -289,12 +361,12 @@ function PlaneTools() {
   useFrontendTool(
     {
       name: "create_work_item",
-      description: "Create one work item in the current project.",
-      parameters: z.object({ title: z.string().min(1).max(255) }),
-      handler: async ({ title }) => {
+      description: "Create one work item in the current project with any supported editable fields.",
+      parameters: workItemMutationSchema.extend({ title: z.string().min(1).max(255) }),
+      handler: async (input) => {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
         try {
-          const issue = await issueService.createIssue(workspace, projectId, { name: title });
+          const issue = await issueService.createIssue(workspace, projectId, toWorkItemPayload(input));
           return {
             ...toolResult("create_work_item", `Created ${issue.name}.`, [issue.id]),
             data: { id: issue.id, name: issue.name },
@@ -316,7 +388,7 @@ function PlaneTools() {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
         try {
           const issue = await issueService.retrieve(workspace, projectId, issueId);
-          const data = { id: issue.id, name: issue.name, sequence_id: issue.sequence_id };
+          const data = toWorkItemRecords([issue])[0];
           return { ...toolResult("get_work_item", `Found ${issue.name}.`, [issue.id]), data };
         } catch (error) {
           return toolError("get_work_item", error);
@@ -344,15 +416,23 @@ function PlaneTools() {
   useFrontendTool(
     {
       name: "update_work_item",
-      description: "Update the title of one work item in the current project.",
-      parameters: z.object({ issueId: z.string().uuid(), title: z.string().min(1).max(255) }),
-      handler: async ({ issueId, title }) => {
+      description: "Update one work item in the current project with any supported editable fields.",
+      parameters: workItemMutationSchema
+        .extend({ issueId: z.string().uuid() })
+        .refine(({ issueId: _issueId, ...changes }) => Object.values(changes).some((value) => value !== undefined), {
+          message: "Provide at least one work-item field to update.",
+        }),
+      handler: async ({ issueId, ...changes }) => {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
-        const issue = await issueService.patchIssue(workspace, projectId, issueId, { name: title });
-        return {
-          ...toolResult("update_work_item", `Updated ${issue.name}.`, [issue.id]),
-          data: { id: issue.id, name: issue.name },
-        };
+        try {
+          const issue = await issueService.patchIssue(workspace, projectId, issueId, toWorkItemPayload(changes));
+          return {
+            ...toolResult("update_work_item", `Updated ${issue.name}.`, [issue.id]),
+            data: toWorkItemRecords([issue])[0],
+          };
+        } catch (error) {
+          return toolError("update_work_item", error);
+        }
       },
     },
     [workspace, projectId]

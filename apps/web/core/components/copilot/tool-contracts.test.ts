@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildWorkItemQuery, toWorkItemRecords } from "./tool-contracts";
+import { buildWorkItemQuery, toWorkItemPayload, toWorkItemRecords } from "./tool-contracts";
 
 describe("work-item tool contracts", () => {
   it("sends the requested Backlog bucket to the Plane API", () => {
@@ -10,6 +10,79 @@ describe("work-item tool contracts", () => {
   it("preserves a returned work item's state bucket", () => {
     expect(
       toWorkItemRecords([{ id: "issue-1", name: "Invite your team", sequence_id: 3, state__group: "backlog" }])
-    ).toEqual([{ id: "issue-1", name: "Invite your team", sequence_id: 3, state_group: "backlog" }]);
+    ).toMatchObject([{ id: "issue-1", name: "Invite your team", sequence_id: 3, state_group: "backlog" }]);
+  });
+
+  it("maps the complete editable work-item contract to the Plane API", () => {
+    expect(
+      toWorkItemPayload({
+        title: "Plan launch",
+        description: "First line\nSecond line <script>",
+        priority: "high",
+        startDate: "2026-09-07",
+        targetDate: "2026-09-10",
+        stateId: "state-1",
+        labelIds: ["label-1"],
+        assigneeIds: ["member-1"],
+        parentId: "issue-1",
+        point: 5,
+        estimatePointId: "estimate-1",
+        workItemTypeId: "type-1",
+      })
+    ).toEqual({
+      name: "Plan launch",
+      description_html: "<p>First line<br />Second line &lt;script&gt;</p>",
+      priority: "high",
+      start_date: "2026-09-07",
+      target_date: "2026-09-10",
+      state_id: "state-1",
+      labels: ["label-1"],
+      assignees: ["member-1"],
+      parent_id: "issue-1",
+      point: 5,
+      estimate_point: "estimate-1",
+      type_id: "type-1",
+    });
+  });
+
+  it("preserves clear values and editable fields returned by the API", () => {
+    expect(
+      toWorkItemRecords([
+        {
+          id: "issue-1",
+          name: "Invite your team",
+          sequence_id: 3,
+          description_html: "<p>Invite everyone</p>",
+          priority: "medium",
+          start_date: "2026-09-07",
+          target_date: null,
+          state_id: "state-1",
+          labels: ["label-1"],
+          assignees: ["member-1"],
+          parent_id: null,
+          point: 5,
+          estimate_point: "estimate-1",
+          type_id: "type-1",
+        },
+      ])
+    ).toEqual([
+      {
+        id: "issue-1",
+        name: "Invite your team",
+        sequence_id: 3,
+        state_group: null,
+        description_html: "<p>Invite everyone</p>",
+        priority: "medium",
+        start_date: "2026-09-07",
+        target_date: null,
+        state_id: "state-1",
+        label_ids: ["label-1"],
+        assignee_ids: ["member-1"],
+        parent_id: null,
+        point: 5,
+        estimate_point_id: "estimate-1",
+        work_item_type_id: "type-1",
+      },
+    ]);
   });
 });
