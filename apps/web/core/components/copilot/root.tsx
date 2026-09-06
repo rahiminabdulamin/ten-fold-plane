@@ -11,10 +11,12 @@ import { ProjectMemberService } from "@/services/project/project-member.service"
 import { ProjectStateService } from "@/services/project/project-state.service";
 import { ProjectService } from "@/services/project";
 import { WorkspaceService } from "@/services/workspace.service";
+import { useUser } from "@/hooks/store/user";
 
 import {
   buildWorkItemQuery,
   findProjectMatches,
+  getUserLocalDateTime,
   toWorkItemPayload,
   toWorkItemRecords,
   toolError,
@@ -68,6 +70,7 @@ const clampLauncherPosition = ({ x, y }: LauncherPosition): LauncherPosition => 
 
 function PlaneTools() {
   const { workspaceSlug, projectId } = useParams();
+  const { data: user } = useUser();
   const workspace = typeof workspaceSlug === "string" ? workspaceSlug : "";
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
   const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
@@ -181,6 +184,21 @@ function PlaneTools() {
     window.addEventListener("pointermove", drag);
     window.addEventListener("pointerup", stopDrag);
   };
+
+  useFrontendTool(
+    {
+      name: "get_current_datetime",
+      description:
+        "Get the user's current local date, time, and timezone. Use before resolving relative dates or times.",
+      parameters: z.object({}),
+      handler: async () => {
+        const timeZone = user?.user_timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
+        const data = getUserLocalDateTime(timeZone);
+        return { ...toolResult("get_current_datetime", "Retrieved the user's current local date and time."), data };
+      },
+    },
+    [user?.user_timezone]
+  );
 
   useFrontendTool(
     {

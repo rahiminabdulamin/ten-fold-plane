@@ -28,6 +28,7 @@ test("the assistant exposes the complete editable work-item schema and live proj
   }
 
   assert.match(root, /name:\s*"get_work_item_schema"/);
+  assert.match(root, /name:\s*"get_current_datetime"/);
   assert.match(root, /toWorkItemPayload\(/);
   const mutationSchema = root.match(/const workItemMutationSchema = z\.object\(\{[\s\S]*?\n\}\);/)?.[0] ?? "";
   assert.match(mutationSchema, /description: z\.string\(\)\.max\(100_000\)\.optional\(\),/);
@@ -45,4 +46,5 @@ test("the assistant exposes the complete editable work-item schema and live proj
     runtime,
     /Put task details that do not fit a supported field, including a time of day, in the description/
   );
+  assert.match(runtime, /call get_current_datetime before resolving it/);
 });

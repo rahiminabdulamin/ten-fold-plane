@@ -75,6 +75,28 @@ export function buildWorkItemQuery(stateGroup?: WorkItemStateGroup) {
   return { per_page: "20", ...(stateGroup ? { state_group: stateGroup } : {}) };
 }
 
+export function getUserLocalDateTime(timeZone: string, now: Date = new Date()) {
+  const values = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(now)
+      .filter(({ type }) => type !== "literal")
+      .map(({ type, value }) => [type, value])
+  );
+  return {
+    date: `${values.year}-${values.month}-${values.day}`,
+    time: `${values.hour}:${values.minute}`,
+    timeZone,
+  };
+}
+
 const toDescriptionHtml = (description: string | null) => {
   if (!description) return "<p></p>";
   const escaped = description.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { buildWorkItemQuery, toWorkItemPayload, toWorkItemRecords } from "./tool-contracts";
+import { buildWorkItemQuery, getUserLocalDateTime, toWorkItemPayload, toWorkItemRecords } from "./tool-contracts";
 
 describe("work-item tool contracts", () => {
   it("sends the requested Backlog bucket to the Plane API", () => {
     expect(buildWorkItemQuery("backlog")).toEqual({ per_page: "20", state_group: "backlog" });
+  });
+
+  it("reports the current date and time in the user's timezone", () => {
+    expect(getUserLocalDateTime("Asia/Singapore", new Date("2026-09-07T16:30:00Z"))).toEqual({
+      date: "2026-09-08",
+      time: "00:30",
+      timeZone: "Asia/Singapore",
+    });
   });
 
   it("preserves a returned work item's state bucket", () => {
