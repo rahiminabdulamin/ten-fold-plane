@@ -16,12 +16,14 @@ from plane.app.views import (
     UserIssueCompletedGraphEndpoint,
     UserWorkspaceDashboardEndpoint,
     UserSessionEndpoint,
+    CopilotIdentityEndpoint,
     ## End User
     ## Workspaces
     UserWorkSpacesEndpoint,
 )
 
 urlpatterns = [
+    path("users/me/copilot-identity/", CopilotIdentityEndpoint.as_view(), name="copilot-identity"),
     # User Profile
     path(
         "users/me/",

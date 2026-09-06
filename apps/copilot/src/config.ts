@@ -5,13 +5,17 @@ const DEFAULT_REQUESTS_PER_MINUTE = 60;
 export interface CopilotConfig {
   openAiApiKey: string;
   intelligenceApiKey: string;
+  identityTokenSecret: string;
   allowedOrigins: string[];
   port: number;
   requestTimeoutMs: number;
   maxRequestsPerMinute: number;
 }
 
-function required(environment: NodeJS.ProcessEnv, key: "OPENAI_API_KEY" | "CPK_INTELLIGENCE_API_KEY"): string {
+function required(
+  environment: NodeJS.ProcessEnv,
+  key: "OPENAI_API_KEY" | "CPK_INTELLIGENCE_API_KEY" | "COPILOT_IDENTITY_TOKEN_SECRET"
+): string {
   const value = environment[key]?.trim();
   if (!value) throw new Error(`${key} is required`);
   return value;
@@ -33,6 +37,7 @@ export function readConfig(environment: NodeJS.ProcessEnv): CopilotConfig {
   return {
     openAiApiKey: required(environment, "OPENAI_API_KEY"),
     intelligenceApiKey: required(environment, "CPK_INTELLIGENCE_API_KEY"),
+    identityTokenSecret: required(environment, "COPILOT_IDENTITY_TOKEN_SECRET"),
     allowedOrigins: [...new Set(origins)],
     port: positiveInteger(environment.COPILOT_PORT, DEFAULT_PORT),
     requestTimeoutMs: positiveInteger(environment.COPILOT_REQUEST_TIMEOUT_MS, DEFAULT_TIMEOUT_MS),

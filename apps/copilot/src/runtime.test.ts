@@ -8,6 +8,7 @@ describe("createRuntime", () => {
       createRuntime({
         openAiApiKey: "test",
         intelligenceApiKey: "cpk_test",
+        identityTokenSecret: "test-secret",
         allowedOrigins: ["http://localhost:3000"],
         port: 8200,
         requestTimeoutMs: 30_000,

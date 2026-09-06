@@ -1,4 +1,6 @@
 import { CopilotKit, CopilotSidebar, useFrontendTool, useHumanInTheLoop } from "@copilotkit/react-core/v2";
+import { API_BASE_URL } from "@plane/constants";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useParams } from "react-router";
 
@@ -241,8 +243,29 @@ function PlaneTools() {
 
 export function PlaneCopilot() {
   const runtimeUrl = import.meta.env.VITE_COPILOTKIT_RUNTIME_URL || "http://localhost:8200/api/copilotkit";
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    let refreshTimer: number | undefined;
+    const refresh = async () => {
+      const response = await fetch(`${API_BASE_URL}/api/users/me/copilot-identity/`, { credentials: "include" });
+      if (!response.ok) return;
+      const identity = (await response.json()) as { token: string; expires_at: string };
+      if (cancelled) return;
+      setToken(identity.token);
+      refreshTimer = window.setTimeout(refresh, Math.max(Date.parse(identity.expires_at) - Date.now() - 30_000, 1_000));
+    };
+    void refresh();
+    return () => {
+      cancelled = true;
+      if (refreshTimer) window.clearTimeout(refreshTimer);
+    };
+  }, []);
+
+  if (!token) return null;
   return (
-    <CopilotKit runtimeUrl={runtimeUrl} credentials="omit">
+    <CopilotKit runtimeUrl={runtimeUrl} credentials="omit" headers={() => ({ Authorization: `Bearer ${token}` })}>
       <PlaneTools />
     </CopilotKit>
   );

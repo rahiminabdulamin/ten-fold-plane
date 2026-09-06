@@ -11,8 +11,9 @@ export function createRuntime(config: CopilotConfig) {
       }),
     },
     intelligence: new CopilotKitIntelligence({ apiKey: config.intelligenceApiKey }),
-    // The SPA cannot prove a Plane identity to this separate runtime yet. Local
-    // development has one explicit identity; production deployment must replace it.
-    identifyUser: () => ({ id: "plane-local-user", name: "Plane local user" }),
+    identifyUser: (request) => ({
+      id: request.headers.get("x-plane-copilot-user-id")!,
+      name: request.headers.get("x-plane-copilot-user-name") ?? "Plane user",
+    }),
   });
 }

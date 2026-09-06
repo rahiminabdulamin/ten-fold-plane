@@ -17,6 +17,7 @@ describe("readConfig", () => {
       readConfig({
         OPENAI_API_KEY: "test",
         CPK_INTELLIGENCE_API_KEY: "cpk_test",
+        COPILOT_IDENTITY_TOKEN_SECRET: "test-secret",
         COPILOT_ALLOWED_ORIGINS: "http://localhost:3000, http://localhost:3000/",
       })
     ).toMatchObject({
