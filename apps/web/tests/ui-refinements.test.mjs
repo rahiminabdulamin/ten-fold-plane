@@ -48,6 +48,10 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
   assert.match(copilot, /COPILOT_PANEL_WIDTH_STORAGE_KEY/);
   assert.match(copilot, /MutationObserver/);
+  assert.match(copilot, /const preserveSidebarOpen = useRef\(false\)/);
+  assert.match(copilot, /data-testid="copilot-close-button"/);
+  assert.match(copilot, /querySelector<HTMLButtonElement>\('\[data-slot="chat-toggle-button"\]'\)\?\.click\(\)/);
+  assert.match(copilot, /catch \{[\s\S]*window\.setTimeout\(refresh, 5_000\)/);
   assert.match(copilot, /onPointerDown={startResize}/);
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
   assert.match(copilot, /event\.stopPropagation\(\)/);
@@ -57,7 +61,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /const stopResize = \(releaseEvent: PointerEvent\)/);
   assert.match(copilot, /releaseEvent\.stopPropagation\(\)/);
   assert.match(copilot, /window\.addEventListener\("pointerup", stopResize, true\)/);
-  assert.match(copilot, /<header className="flex h-\[51px\] items-center justify-between/);
+  assert.match(copilot, /<header[\s\S]*className="flex h-\[51px\] items-center justify-between/);
   assert.match(copilot, /onPointerDown:\s*startLauncherDrag/);
   assert.match(styles, /--copilot-panel-width/);
   assert.match(styles, /margin-inline-end:\s*0 !important/);
@@ -74,6 +78,13 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(styles, /\[data-testid="copilot-chat-input"\][\s\S]*border-radius:\s*0\.5rem !important/);
   assert.match(styles, /\[data-testid\^="copilot-"\]\[data-testid\$="-message"\] > div/);
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
+  assert.match(
+    styles,
+    /\[data-copilotkit\] \[data-testid\^="copilot-"\]\[data-testid\$="-message"\][\s\S]*font-size:\s*14px/
+  );
+  assert.match(styles, /min-height:\s*40px !important/);
+  assert.match(styles, /max-height:\s*160px !important/);
+  assert.match(styles, /resize:\s*none !important/);
   assert.match(select, /ref={setReferenceElement}/);
   assert.match(select, /strategy:\s*"fixed"/);
   assert.match(auth, /items-center justify-center/);

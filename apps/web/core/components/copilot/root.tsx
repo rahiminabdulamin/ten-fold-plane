@@ -74,6 +74,7 @@ function PlaneTools() {
   const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
   const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
   const dragStart = useRef<{ x: number; y: number; pointerX: number; pointerY: number; moved: boolean } | null>(null);
+  const preserveSidebarOpen = useRef(false);
 
   useEffect(() => {
     const storedWidth = Number(window.localStorage.getItem(COPILOT_PANEL_WIDTH_STORAGE_KEY));
@@ -117,7 +118,13 @@ function PlaneTools() {
     let wasOpen = panel.getAttribute("aria-hidden") === "false";
     const observer = new MutationObserver(() => {
       const isOpen = panel.getAttribute("aria-hidden") === "false";
-      if (wasOpen && !isOpen) resetLauncherPosition();
+      if (isOpen) {
+        preserveSidebarOpen.current = true;
+      } else if (wasOpen && preserveSidebarOpen.current) {
+        document.querySelector<HTMLButtonElement>('[data-slot="chat-toggle-button"]')?.click();
+      } else if (wasOpen) {
+        resetLauncherPosition();
+      }
       wasOpen = isOpen;
     });
     observer.observe(panel, { attributes: true, attributeFilter: ["aria-hidden"] });
@@ -542,7 +549,14 @@ function PlaneTools() {
         defaultOpen={false}
         header={{
           children: ({ closeButton, titleContent }) => (
-            <header className="flex h-[51px] items-center justify-between border-b border-subtle bg-surface-1 px-4">
+            <header
+              className="flex h-[51px] items-center justify-between border-b border-subtle bg-surface-1 px-4"
+              onClickCapture={(event) => {
+                if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
+                  preserveSidebarOpen.current = false;
+                }
+              }}
+            >
               <div className="flex items-center gap-2 text-primary">
                 <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
                   <path
@@ -591,12 +605,19 @@ export function PlaneCopilot() {
     let cancelled = false;
     let refreshTimer: number | undefined;
     const refresh = async () => {
-      const response = await fetch(`${API_BASE_URL}/api/users/me/copilot-identity/`, { credentials: "include" });
-      if (!response.ok) return;
-      const identity = (await response.json()) as { token: string; expires_at: string };
-      if (cancelled) return;
-      setToken(identity.token);
-      refreshTimer = window.setTimeout(refresh, Math.max(Date.parse(identity.expires_at) - Date.now() - 30_000, 1_000));
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/users/me/copilot-identity/`, { credentials: "include" });
+        if (!response.ok) throw new Error("Copilot identity refresh failed");
+        const identity = (await response.json()) as { token: string; expires_at: string };
+        if (cancelled) return;
+        setToken(identity.token);
+        refreshTimer = window.setTimeout(
+          refresh,
+          Math.max(Date.parse(identity.expires_at) - Date.now() - 30_000, 1_000)
+        );
+      } catch {
+        if (!cancelled) refreshTimer = window.setTimeout(refresh, 5_000);
+      }
     };
     void refresh();
     return () => {
