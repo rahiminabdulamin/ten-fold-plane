@@ -81,6 +81,8 @@ const toDescriptionHtml = (description: string | null) => {
   return `<p>${escaped.replace(/\n/g, "<br />")}</p>`;
 };
 
+const toPlaneDate = (value: string | null | undefined) => value?.match(/^\d{4}-\d{2}-\d{2}/)?.[0] ?? value;
+
 export function toWorkItemPayload({
   title,
   description,
@@ -99,8 +101,8 @@ export function toWorkItemPayload({
     ...(title !== undefined ? { name: title } : {}),
     ...(description !== undefined ? { description_html: toDescriptionHtml(description) } : {}),
     ...(priority !== undefined ? { priority } : {}),
-    ...(startDate !== undefined ? { start_date: startDate } : {}),
-    ...(targetDate !== undefined ? { target_date: targetDate } : {}),
+    ...(startDate !== undefined ? { start_date: toPlaneDate(startDate) } : {}),
+    ...(targetDate !== undefined ? { target_date: toPlaneDate(targetDate) } : {}),
     ...(stateId !== undefined ? { state_id: stateId } : {}),
     ...(labelIds !== undefined ? { labels: labelIds } : {}),
     ...(assigneeIds !== undefined ? { assignees: assigneeIds } : {}),

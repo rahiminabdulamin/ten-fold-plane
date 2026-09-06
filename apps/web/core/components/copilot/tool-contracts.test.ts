@@ -45,6 +45,13 @@ describe("work-item tool contracts", () => {
     });
   });
 
+  it("sends timestamps as Plane date-only fields", () => {
+    expect(toWorkItemPayload({ startDate: "2026-09-08T14:00:00", targetDate: "2026-09-08T14:00:00" })).toEqual({
+      start_date: "2026-09-08",
+      target_date: "2026-09-08",
+    });
+  });
+
   it("preserves clear values and editable fields returned by the API", () => {
     expect(
       toWorkItemRecords([
