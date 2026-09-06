@@ -48,8 +48,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
   assert.match(copilot, /COPILOT_PANEL_WIDTH_STORAGE_KEY/);
   assert.doesNotMatch(copilot, /const dateSchema = z\.string\(\)\.date\(\)/);
-  assert.match(copilot, /startDate: z\.string\(\)\.date\(\)\.nullable\(\)\.optional\(\)/);
-  assert.match(copilot, /targetDate: z\.string\(\)\.date\(\)\.nullable\(\)\.optional\(\)/);
+  assert.match(copilot, /startDate: z\.string\(\)\.date\(\)\.nullable\(\)/);
+  assert.match(copilot, /targetDate: z\.string\(\)\.date\(\)\.nullable\(\)/);
   assert.match(copilot, /MutationObserver/);
   assert.match(copilot, /const preserveSidebarOpen = useRef\(false\)/);
   assert.match(copilot, /data-testid="copilot-close-button"/);
