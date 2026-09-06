@@ -33,15 +33,17 @@ test("new workspaces use Singapore time and omit restricted settings links", asy
 });
 
 test("Ten-Fold logos use web-public URLs that survive Docker pruning", async () => {
-  const [workspace, spinner, header] = await Promise.all([
-    read("app/(all)/create-workspace/page.tsx"),
+  const [spinner, authBase, header, topNavigation] = await Promise.all([
     read("core/components/common/logo-spinner.tsx"),
+    read("core/components/auth-screens/auth-base.tsx"),
     read("core/components/auth-screens/header.tsx"),
+    read("core/components/navigation/top-navigation-root.tsx"),
   ]);
 
-  assert.match(workspace, /src="\/branding\/tenfold-logo-square-rebrand-v2\.png"/);
-  assert.match(spinner, /src="\/branding\/tenfold-logo-square-rebrand-v2\.png"/);
-  assert.match(header, /src="\/branding\/tenfold-logo-long-rebrand-v2\.png"/);
+  assert.match(spinner, /src="\/branding\/tenfold-logo-square-rebrand-loader-v3\.png"/);
+  assert.match(authBase, /src="\/branding\/tenfold-logo-long-rebrand-white-v3\.png"/);
+  assert.match(header, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
+  assert.match(topNavigation, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
   assert.match(spinner, /animate-shimmer/);
 });
 
@@ -64,7 +66,7 @@ test("Ten-Fold removes unavailable onboarding and profile surfaces", async () =>
 
 test("Ten-Fold loader shimmers the square logo instead of spinning", async () => {
   const spinner = await read("core/components/common/logo-spinner.tsx");
-  assert.match(spinner, /tenfold-logo-square-rebrand-v2\.png/);
+  assert.match(spinner, /tenfold-logo-square-rebrand-loader-v3\.png/);
   assert.match(spinner, /animate-shimmer/);
   assert.doesNotMatch(spinner, /animate-spin/);
 });
@@ -76,10 +78,13 @@ test("authentication surfaces use Ten-Fold branding without a compact-layout pro
   ]);
 
   assert.match(authBase, /lg:grid-cols-2/);
-  assert.match(authBase, /tenfold-logo-long-rebrand-white\.png/);
+  assert.match(authBase, /tenfold-logo-long-rebrand-white-v3\.png/);
+  assert.match(authBase, /bg-\[#00364C\]/);
+  assert.match(authBase, /rgba\(79,190,226,0\.32\)/);
   assert.match(authBase, /h-16/);
   assert.match(authFormHeader, /Welcome back to Ten-Fold\./);
   assert.match(authFormHeader, /Create your Ten-Fold account\./);
+  assert.doesNotMatch(authFormHeader, /Work in all dimensions\./);
   assert.doesNotMatch(authFormHeader, /(?:Welcome back to|Create your) Plane/);
   assert.doesNotMatch(authBase, /AuthFooter/);
   assert.doesNotMatch(authBase, /Join 10,000\+ teams building with Ten-Fold/);

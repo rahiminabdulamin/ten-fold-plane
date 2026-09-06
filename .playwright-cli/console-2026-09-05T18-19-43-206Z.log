@@ -1,0 +1,11 @@
+[    1234ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/date-fns.js?v=a6bf406c:0
+[    1237ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/date-fns_differenceInCalendarDays.js?v=0d1dbc7e:0
+[    1270ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/rehype-parse.js?v=3963e7b9:0
+[    1270ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/rehype-remark.js?v=920e6a97:0
+[    1271ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/remark-gfm.js?v=2dfa3eb0:0
+[    1271ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/remark-stringify.js?v=8ec55e28:0
+[    1271ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/unified.js?v=b66e6041:0
+[    1276ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/lucide-react.js?v=1a19cbad:0
+[    1276ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/sanitize-html.js?v=5c473c65:0
+[    1277ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/uuid.js?v=d8dbadc5:0
+[    1277ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://127.0.0.1:3000/node_modules/.vite/deps/chroma-js.js?v=c343caf8:0

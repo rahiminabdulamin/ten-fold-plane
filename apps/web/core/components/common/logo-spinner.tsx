@@ -9,7 +9,7 @@ export function LogoSpinner() {
     <div className="flex items-center justify-center">
       <div className="animate-shimmer rounded-lg">
         <img
-          src="/branding/tenfold-logo-square-rebrand-v2.png"
+          src="/branding/tenfold-logo-square-rebrand-loader-v3.png"
           alt="Ten-Fold"
           className="h-[66px] w-auto object-contain sm:h-[132px]"
         />

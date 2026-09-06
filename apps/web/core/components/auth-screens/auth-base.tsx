@@ -16,9 +16,9 @@ type AuthBaseProps = {
 export function AuthBase({ authType }: AuthBaseProps) {
   return (
     <div className="min-h-dvh bg-surface-1 lg:grid lg:grid-cols-2">
-      <aside className="hidden bg-[#0A4968] bg-[radial-gradient(circle_at_top_right,rgba(79,190,226,0.24),transparent_42%)] p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
+      <aside className="hidden bg-[#00364C] bg-[radial-gradient(circle_at_top_right,rgba(79,190,226,0.32),transparent_46%)] p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
         <img
-          src="/branding/tenfold-logo-long-rebrand-white.png"
+          src="/branding/tenfold-logo-long-rebrand-white-v3.png"
           alt="Ten-Fold"
           className="h-16 w-auto self-start xl:h-20"
         />

@@ -27,29 +27,23 @@ type TAuthHeader = {
 const Titles = {
   [EAuthModes.SIGN_IN]: {
     [EAuthSteps.EMAIL]: {
-      header: "Work in all dimensions.",
       subHeader: "Welcome back to Ten-Fold.",
     },
     [EAuthSteps.PASSWORD]: {
-      header: "Work in all dimensions.",
       subHeader: "Welcome back to Ten-Fold.",
     },
     [EAuthSteps.UNIQUE_CODE]: {
-      header: "Work in all dimensions.",
       subHeader: "Welcome back to Ten-Fold.",
     },
   },
   [EAuthModes.SIGN_UP]: {
     [EAuthSteps.EMAIL]: {
-      header: "Work in all dimensions.",
       subHeader: "Create your Ten-Fold account.",
     },
     [EAuthSteps.PASSWORD]: {
-      header: "Work in all dimensions.",
       subHeader: "Create your Ten-Fold account.",
     },
     [EAuthSteps.UNIQUE_CODE]: {
-      header: "Work in all dimensions.",
       subHeader: "Create your Ten-Fold account.",
     },
   },
@@ -74,11 +68,11 @@ export const AuthHeader = observer(function AuthHeader(props: TAuthHeader) {
   const getHeaderSubHeader = (
     step: EAuthSteps,
     mode: EAuthModes,
-    invitation: IWorkspaceMemberInvitation | undefined,
+    workspaceInvitation: IWorkspaceMemberInvitation | undefined,
     email: string | undefined
-  ) => {
-    if (invitation && email && invitation.email === email && invitation.workspace) {
-      const workspace = invitation.workspace;
+  ): TAuthHeaderBase => {
+    if (workspaceInvitation && email && workspaceInvitation.email === email && workspaceInvitation.workspace) {
+      const workspace = workspaceInvitation.workspace;
       return {
         header: (
           <div className="relative inline-flex items-center gap-2">
@@ -110,14 +104,14 @@ export const AuthHeader = observer(function AuthHeader(props: TAuthHeader) {
 });
 
 type TAuthHeaderBase = {
-  header: React.ReactNode;
+  header?: React.ReactNode;
   subHeader: string;
 };
 
 export function AuthHeaderBase(props: TAuthHeaderBase) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-h4-semibold text-primary">{props.header}</span>
+      {props.header && <span className="text-h4-semibold text-primary">{props.header}</span>}
       <span className="text-h4-semibold text-placeholder">{props.subHeader}</span>
     </div>
   );

@@ -47,7 +47,7 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
       })}
     >
       <div className="flex flex-1 shrink-0 items-center">
-        <img src="/branding/tenfold-logo-long-rebrand-v2.png" alt="Ten-Fold" className="h-7 w-auto" />
+        <img src="/branding/tenfold-logo-long-rebrand-v3.png" alt="Ten-Fold" className="h-7 w-auto" />
       </div>
       {/* Power K Search */}
       <div className="shrink-0">
