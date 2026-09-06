@@ -12,6 +12,7 @@ test("Ten-Fold defaults to light mode and hides optional planning features", asy
   ]);
 
   assert.match(root, /defaultTheme="light"/);
+  assert.doesNotMatch(root, /typeof window === "undefined" \|\| resolvedTheme === undefined/);
   assert.match(reset, /localStorage\.setItem\("theme", "light"\)/);
   assert.match(flags, /CYCLES: false/);
   assert.match(flags, /MODULES: false/);
