@@ -141,7 +141,8 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 
 [data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
   margin-block: 0.25rem !important;
-  padding: 0.5rem 0.625rem !important;
+  padding-block: 8px !important;
+  padding-inline: 0.625rem !important;
   border-radius: 0.5rem !important;
 }
 
