@@ -10,6 +10,7 @@ import { WorkspaceContentWrapper } from "@/components/workspace/content-wrapper"
 import { AppRailVisibilityProvider } from "@/lib/app-rail";
 import { GlobalModals } from "@/components/common/modal/global";
 import { WorkspaceAuthWrapper } from "@/layouts/auth-layout/workspace-wrapper";
+import { PlaneCopilot } from "@/components/copilot/root";
 import type { Route } from "./+types/layout";
 
 export default function WorkspaceLayout(props: Route.ComponentProps) {
@@ -22,6 +23,7 @@ export default function WorkspaceLayout(props: Route.ComponentProps) {
           <WorkspaceContentWrapper>
             <GlobalModals workspaceSlug={workspaceSlug} />
             <Outlet />
+            <PlaneCopilot />
           </WorkspaceContentWrapper>
         </AppRailVisibilityProvider>
       </WorkspaceAuthWrapper>

@@ -270,6 +270,7 @@ allowBuilds:
   msgpackr-extract: true
   turbo: true
   sharp: false
+  "@scarf/scarf": false
 
 minimumReleaseAgeExclude:
   - "@storybook/addon-docs@10.4.6"
