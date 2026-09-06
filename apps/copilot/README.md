@@ -22,4 +22,9 @@ Set `VITE_COPILOTKIT_RUNTIME_URL` for `apps/web`; the local default is
 `http://localhost:8200/api/copilotkit`. Configure `COPILOT_ALLOWED_ORIGINS`
 for deployed web origins.
 
+For Docker Compose, `copilot` is an internal service reached through the proxy
+at `/api/copilotkit`. Set `OPENAI_API_KEY`, `CPK_INTELLIGENCE_API_KEY`,
+`COPILOT_IDENTITY_TOKEN_SECRET`, and the public `COPILOT_ALLOWED_ORIGINS` value
+in the root `.env`; set the same identity secret in `apps/api/.env`.
+
 The runtime never receives Plane browser cookies or calls Plane CRUD APIs.

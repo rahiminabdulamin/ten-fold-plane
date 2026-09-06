@@ -6,7 +6,19 @@ services:
       dockerfile: ./apps/web/Dockerfile.web
       args:
         DOCKER_BUILDKIT: 1
+        VITE_COPILOTKIT_RUNTIME_URL: ${VITE_COPILOTKIT_RUNTIME_URL:-/api/copilotkit}
     restart: always
+    depends_on:
+      - api
+
+  copilot:
+    container_name: copilot
+    build:
+      context: .
+      dockerfile: ./apps/copilot/Dockerfile
+    restart: always
+    env_file:
+      - .env
     depends_on:
       - api
 
@@ -170,6 +182,7 @@ services:
       BUCKET_NAME: ${AWS_S3_BUCKET_NAME:-uploads}
     depends_on:
       - web
+      - copilot
       - api
       - space
       - admin
