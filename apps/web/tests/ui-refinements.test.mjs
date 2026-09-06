@@ -90,6 +90,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(topNavigation, /tenfold-logo-square-rebrand-blackblack-v3\.png/);
   assert.match(topNavigation, /sm:hidden/);
   assert.match(topNavigation, /min-w-0 flex-1/);
+  assert.match(topNavigation, /flex shrink-0 items-center sm:flex-1/);
+  assert.match(topNavigation, /min-w-0 flex-1 sm:flex-none/);
   assert.match(topNavPowerK, /w-full items-center[^"]*sm:w-\[364px\]/);
   assert.match(sidebarWrapper, /text-\[12px\] whitespace-nowrap text-tertiary/);
 });
