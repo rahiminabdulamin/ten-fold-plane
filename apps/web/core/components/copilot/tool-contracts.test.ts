@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { buildWorkItemQuery, getUserLocalDateTime, toWorkItemPayload, toWorkItemRecords } from "./tool-contracts";
+import {
+  createWorkItemsSequentially,
+  buildWorkItemQuery,
+  getUserLocalDateTime,
+  toWorkItemPayload,
+  toWorkItemRecords,
+} from "./tool-contracts";
 
 describe("work-item tool contracts", () => {
   it("sends the requested Backlog bucket to the Plane API", () => {
@@ -57,6 +63,21 @@ describe("work-item tool contracts", () => {
     expect(toWorkItemPayload({ startDate: "2026-09-08T14:00:00", targetDate: "2026-09-08T14:00:00" })).toEqual({
       start_date: "2026-09-08",
       target_date: "2026-09-08",
+    });
+  });
+
+  it("continues a batch after an individual work-item creation fails", async () => {
+    const result = await createWorkItemsSequentially(["First", "Broken", "Last"], async (title) => {
+      if (title === "Broken") throw new Error("Request failed");
+      return { id: title.toLowerCase() };
+    });
+
+    expect(result).toEqual({
+      created: [
+        { item: "First", value: { id: "first" } },
+        { item: "Last", value: { id: "last" } },
+      ],
+      failed: [{ item: "Broken", message: "Request failed" }],
     });
   });
 

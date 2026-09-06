@@ -49,6 +49,27 @@ export type WorkItemMutation = {
   workItemTypeId?: string | null;
 };
 
+export async function createWorkItemsSequentially<TItem, TValue>(
+  items: TItem[],
+  create: (item: TItem) => Promise<TValue>
+): Promise<{
+  created: { item: TItem; value: TValue }[];
+  failed: { item: TItem; message: string }[];
+}> {
+  const created: { item: TItem; value: TValue }[] = [];
+  const failed: { item: TItem; message: string }[] = [];
+
+  for (const item of items) {
+    try {
+      created.push({ item, value: await create(item) });
+    } catch (error) {
+      failed.push({ item, message: error instanceof Error ? error.message : "Request failed" });
+    }
+  }
+
+  return { created, failed };
+}
+
 export function toolResult(operation: string, message: string, affectedIds: string[] = []): ToolResult {
   return { ok: true, operation, affectedIds, message, retryable: false };
 }

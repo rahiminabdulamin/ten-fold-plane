@@ -15,6 +15,7 @@ import { useUser } from "@/hooks/store/user";
 
 import {
   buildWorkItemQuery,
+  createWorkItemsSequentially,
   findProjectMatches,
   getUserLocalDateTime,
   toWorkItemPayload,
@@ -54,6 +55,14 @@ const workItemMutationSchema = z.object({
   point: z.number().int().min(0).max(12).optional(),
   estimatePointId: z.string().uuid().optional(),
   workItemTypeId: z.string().uuid().optional(),
+});
+
+const createWorkItemsSchema = z.object({
+  projectId: z.string().uuid().optional(),
+  items: z
+    .array(workItemMutationSchema.extend({ title: z.string().min(1).max(255) }))
+    .min(1)
+    .max(25),
 });
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), maximum);
@@ -415,7 +424,8 @@ function PlaneTools() {
   useFrontendTool(
     {
       name: "create_work_item",
-      description: "Create one work item in the current project with any supported editable fields.",
+      description:
+        "Create one work item in the current project with any supported editable fields. Use create_work_items for multiple items.",
       parameters: workItemMutationSchema.extend({ title: z.string().min(1).max(255) }),
       handler: async (input) => {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
@@ -428,6 +438,39 @@ function PlaneTools() {
         } catch (error) {
           return toolError("create_work_item", error);
         }
+      },
+    },
+    [workspace, projectId]
+  );
+
+  useFrontendTool(
+    {
+      name: "create_work_items",
+      description:
+        "Create multiple work items in one project. Use this for a list of two or more items. For a named project, pass the canonical projectId returned by find_project. Each item is attempted independently; include time and location in description when supplied.",
+      parameters: createWorkItemsSchema,
+      handler: async ({ projectId: requestedProjectId, items }) => {
+        const targetProjectId = requestedProjectId ?? projectId;
+        if (!workspace || !targetProjectId)
+          return { ok: false, message: "Find a project first, then provide its project ID.", retryable: false };
+
+        const results = await createWorkItemsSequentially(items, async (item) =>
+          issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(item))
+        );
+        const created = results.created.map(({ item, value }) => ({ id: value.id, name: item.title }));
+        const failed = results.failed.map(({ item, message }) => ({ name: item.title, message }));
+        const message = failed.length
+          ? `Created ${created.length} of ${items.length} work items. ${failed.length} item(s) failed.`
+          : `Created ${created.length} work items.`;
+
+        return {
+          ok: failed.length === 0,
+          operation: "create_work_items",
+          affectedIds: created.map(({ id }) => id),
+          message,
+          retryable: false,
+          data: { created, failed },
+        };
       },
     },
     [workspace, projectId]
