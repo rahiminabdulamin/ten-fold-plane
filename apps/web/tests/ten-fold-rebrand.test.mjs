@@ -79,8 +79,7 @@ test("authentication surfaces use Ten-Fold branding without a compact-layout pro
 
   assert.match(authBase, /lg:grid-cols-2/);
   assert.match(authBase, /tenfold-logo-long-rebrand-white-v3\.png/);
-  assert.match(authBase, /bg-\[#00364C\]/);
-  assert.match(authBase, /rgba\(79,190,226,0\.32\)/);
+  assert.match(authBase, /#00364c/);
   assert.match(authBase, /h-16/);
   assert.match(authFormHeader, /Welcome back to Ten-Fold\./);
   assert.match(authFormHeader, /Create your Ten-Fold account\./);
@@ -90,20 +89,21 @@ test("authentication surfaces use Ten-Fold branding without a compact-layout pro
   assert.doesNotMatch(authBase, /Join 10,000\+ teams building with Ten-Fold/);
 });
 
-test("CopilotKit is a compact Ten-Fold panel below the viewport-wide navigation", async () => {
+test("CopilotKit is a compact resizable Ten-Fold panel below the viewport-wide navigation", async () => {
   const [copilot, contentWrapper, styles] = await Promise.all([
     read("core/components/copilot/root.tsx"),
     read("core/components/workspace/content-wrapper.tsx"),
     read("styles/globals.css"),
   ]);
 
-  assert.match(copilot, /position="left"/);
-  assert.match(copilot, /width=\{360\}/);
+  assert.match(copilot, /position="right"/);
+  assert.match(copilot, /width=\{panelWidth\}/);
   assert.match(copilot, /Ten-Fold Assistant/);
   assert.match(copilot, /header=\{\{/);
   assert.match(copilot, /<svg/);
   assert.match(contentWrapper, /copilot-panel-layout/);
   assert.match(styles, /\.copilot-panel-layout/);
+  assert.match(styles, /--copilot-panel-width/);
   assert.match(styles, /\[data-copilotkit\]/);
   assert.match(styles, /z-index: 99999/);
 });

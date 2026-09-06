@@ -52,6 +52,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
+    strategy: "fixed",
   });
 
   const filteredOptions =

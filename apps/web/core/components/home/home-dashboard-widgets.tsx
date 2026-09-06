@@ -58,14 +58,15 @@ export const HOME_WIDGETS_LIST: {
   },
 };
 
+const HOME_WIDGET_ORDER: THomeWidgetKeys[] = ["recents", "my_stickies", "quick_links"];
+
 export const DashboardWidgets = observer(function DashboardWidgets() {
   // router
   const { workspaceSlug } = useParams();
   // theme hook
   const { resolvedTheme } = useTheme();
   // store hooks
-  const { toggleWidgetSettings, widgetsMap, showWidgetSettings, orderedWidgets, isAnyWidgetEnabled, loading } =
-    useHome();
+  const { toggleWidgetSettings, widgetsMap, showWidgetSettings, isAnyWidgetEnabled, loading } = useHome();
   const { loader } = useProject();
   // plane hooks
   const { t } = useTranslation();
@@ -86,7 +87,7 @@ export const DashboardWidgets = observer(function DashboardWidgets() {
 
       {isAnyWidgetEnabled ? (
         <div className="flex flex-col">
-          {orderedWidgets.map((key) => {
+          {HOME_WIDGET_ORDER.map((key) => {
             const WidgetComponent = HOME_WIDGETS_LIST[key]?.component;
             const isEnabled = widgetsMap[key]?.is_enabled;
             if (!WidgetComponent || !isEnabled) return null;

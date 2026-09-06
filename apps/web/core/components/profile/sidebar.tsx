@@ -6,25 +6,18 @@
 
 import { useEffect, useRef } from "react";
 import { observer } from "mobx-react";
-import { useParams } from "next/navigation";
 import { Disclosure, Transition } from "@headlessui/react";
 // plane imports
 import { useOutsideClickDetector } from "@plane/hooks";
 import { useTranslation } from "@plane/i18n";
-import { Logo } from "@plane/propel/emoji-icon-picker";
-import { IconButton } from "@plane/propel/icon-button";
-import { ChevronDownOutline, EditOutline } from "@makeplane/propel/icons";
+import { ChevronDownOutline } from "@makeplane/propel/icons";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import type { IUserProfileProjectSegregation } from "@plane/types";
 import { Loader } from "@plane/ui";
 import { cn, renderFormattedDate, getFileURL } from "@plane/utils";
-// components
-import { CoverImage } from "@/components/common/cover-image";
 // hooks
 import { useAppTheme } from "@/hooks/store/use-app-theme";
-import { useCommandPalette } from "@/hooks/store/use-command-palette";
 import { useProject } from "@/hooks/store/use-project";
-import { useUser } from "@/hooks/store/user";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // components
 import { ProfileSidebarTime } from "./time";
@@ -38,13 +31,9 @@ export const ProfileSidebar = observer(function ProfileSidebar(props: TProfileSi
   const { userProjectsData, className = "" } = props;
   // refs
   const ref = useRef<HTMLDivElement>(null);
-  // router
-  const { userId } = useParams();
   // store hooks
-  const { data: currentUser } = useUser();
   const { profileSidebarCollapsed, toggleProfileSidebar } = useAppTheme();
   const { getProjectById } = useProject();
-  const { toggleProfileSettingsModal } = useCommandPalette();
   const { isMobile } = usePlatformOS();
   const { t } = useTranslation();
   // derived values
@@ -94,28 +83,8 @@ export const ProfileSidebar = observer(function ProfileSidebar(props: TProfileSi
     >
       {userProjectsData ? (
         <>
-          <div className="relative h-[110px]">
-            {currentUser?.id === userId && (
-              <div className="absolute top-3.5 right-3.5">
-                <IconButton
-                  variant="secondary"
-                  icon={EditOutline}
-                  onClick={() =>
-                    toggleProfileSettingsModal({
-                      activeTab: "general",
-                      isOpen: true,
-                    })
-                  }
-                />
-              </div>
-            )}
-            <CoverImage
-              src={userData?.cover_image_url ?? undefined}
-              alt={userData?.display_name}
-              className="h-[110px] w-full"
-              showDefaultWhenEmpty
-            />
-            <div className="absolute -bottom-[26px] left-5 h-[52px] w-[52px] rounded-sm">
+          <div className="relative pt-5">
+            <div className="h-[52px] w-[52px] rounded-sm">
               {userData?.avatar_url && userData?.avatar_url !== "" ? (
                 <img
                   src={getFileURL(userData?.avatar_url)}
@@ -130,7 +99,7 @@ export const ProfileSidebar = observer(function ProfileSidebar(props: TProfileSi
             </div>
           </div>
           <div className="px-5">
-            <div className="mt-[38px]">
+            <div className="mt-4">
               <h4 className="text-16 font-semibold">
                 {userData?.first_name} {userData?.last_name}
               </h4>
@@ -164,9 +133,6 @@ export const ProfileSidebar = observer(function ProfileSidebar(props: TProfileSi
                       <div className="w-full">
                         <Disclosure.Button className="flex w-full items-center justify-between gap-2">
                           <div className="flex w-3/4 items-center gap-2">
-                            <span className="grid h-7 w-7 flex-shrink-0 place-items-center">
-                              <Logo logo={projectDetails.logo_props} />
-                            </span>
                             <div className="truncate text-13 font-medium break-words">{projectDetails.name}</div>
                           </div>
                           <div className="flex flex-shrink-0 items-center gap-2">

@@ -13,6 +13,7 @@
  * background colors solely under [data-theme*="light"] / [data-theme*="dark"],
  * so without this they are undefined until a theme lands on the element. */
 :root {
+  --copilot-panel-width: 360px;
   --editor-colors-gray-background: #d6d6d8;
   --editor-colors-peach-background: #ffd5d7;
   --editor-colors-pink-background: #fdd4e3;
@@ -53,13 +54,29 @@
   }
 
   body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-layout {
-    margin-inline-end: 360px;
+    margin-inline-end: var(--copilot-panel-width);
     transition: margin-inline-end 260ms ease;
   }
 
   [data-copilot-sidebar] {
     top: 40px !important;
     height: calc(100dvh - 40px) !important;
+  }
+
+  .copilot-panel-resize-handle {
+    position: fixed;
+    top: 40px;
+    right: calc(var(--copilot-panel-width) - 3px);
+    z-index: 1201;
+    display: none;
+    width: 6px;
+    height: calc(100dvh - 40px);
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-resize-handle {
+    display: block;
   }
 }
 
@@ -85,6 +102,11 @@
 [data-copilotkit] textarea,
 [data-copilotkit] input {
   font-size: 13px;
+}
+
+[data-copilotkit] textarea {
+  width: 100%;
+  max-width: none;
 }
 
 /* CopilotKit's unlicensed banner has no stable selector in v1.69. */

@@ -28,6 +28,7 @@ import { DisplayFiltersSelection, FiltersDropdown } from "@/components/issues/is
 import { IssueLayoutIcon } from "@/components/issues/issue-layouts/layout-icon";
 // hooks
 import { useIssues } from "@/hooks/store/use-issues";
+import { FEATURE_VISIBILITY } from "@/constants/feature-visibility";
 
 export const ProfileIssuesMobileHeader = observer(function ProfileIssuesMobileHeader() {
   // plane i18n
@@ -133,6 +134,8 @@ export const ProfileIssuesMobileHeader = observer(function ProfileIssuesMobileHe
             handleDisplayFiltersUpdate={handleDisplayFilters}
             displayProperties={issueFilters?.displayProperties ?? {}}
             handleDisplayPropertiesUpdate={handleDisplayProperties}
+            cycleViewDisabled={!FEATURE_VISIBILITY.CYCLES}
+            moduleViewDisabled={!FEATURE_VISIBILITY.MODULES}
           />
         </FiltersDropdown>
       </div>

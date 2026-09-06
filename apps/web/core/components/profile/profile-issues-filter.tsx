@@ -17,6 +17,7 @@ import { EIssuesStoreType, EIssueLayoutTypes } from "@plane/types";
 // components
 import { DisplayFiltersSelection, FiltersDropdown, LayoutSelection } from "@/components/issues/issue-layouts/filters";
 import { WorkItemFiltersToggle } from "@/components/work-item-filters/filters-toggle";
+import { FEATURE_VISIBILITY } from "@/constants/feature-visibility";
 // hooks
 import { useIssues } from "@/hooks/store/use-issues";
 
@@ -80,6 +81,8 @@ export const ProfileIssuesFilter = observer(function ProfileIssuesFilter() {
           handleDisplayFiltersUpdate={handleDisplayFilters}
           displayProperties={issueFilters?.displayProperties ?? {}}
           handleDisplayPropertiesUpdate={handleDisplayProperties}
+          cycleViewDisabled={!FEATURE_VISIBILITY.CYCLES}
+          moduleViewDisabled={!FEATURE_VISIBILITY.MODULES}
         />
       </FiltersDropdown>
     </div>

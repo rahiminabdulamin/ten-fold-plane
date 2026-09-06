@@ -39,7 +39,7 @@ export function AuthBase({ authType }: AuthBaseProps) {
         </div>
         <p className="text-13 text-white/80">Copyright © 2026 Kognitif AI Enterprise. All rights reserved.</p>
       </aside>
-      <main className="relative flex min-h-dvh flex-col overflow-y-auto px-6 py-6 sm:px-10 sm:py-8 lg:items-center lg:justify-center lg:px-12 xl:px-20">
+      <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-y-auto px-6 py-6 sm:px-10 sm:py-8 lg:px-12 xl:px-20">
         <details className="group absolute top-6 right-6 z-10 sm:top-8 sm:right-10">
           <summary
             aria-label="Support options"
@@ -65,8 +65,10 @@ export function AuthBase({ authType }: AuthBaseProps) {
             </a>
           </div>
         </details>
-        <div className="w-full max-w-xs">
+        <div className="absolute top-6 left-6 z-10 sm:top-8 sm:left-10">
           <AuthHeader type={authType} hideLogoOnDesktop hideAdditionalAction />
+        </div>
+        <div className="w-full max-w-xs">
           <AuthRoot authMode={authType} />
         </div>
       </main>

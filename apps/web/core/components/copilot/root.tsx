@@ -1,6 +1,6 @@
 import { CopilotKit, CopilotSidebar, useFrontendTool, useHumanInTheLoop } from "@copilotkit/react-core/v2";
 import { API_BASE_URL } from "@plane/constants";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useParams } from "react-router";
 
@@ -11,10 +11,121 @@ import { findProjectMatches, toolError, toolResult } from "./tool-contracts";
 
 const projectService = new ProjectService();
 const issueService = new IssueService();
+const COPILOT_PANEL_WIDTH_STORAGE_KEY = "tenfold-copilot-panel-width";
+const COPILOT_LAUNCHER_POSITION_STORAGE_KEY = "tenfold-copilot-launcher-position";
+const DEFAULT_COPILOT_PANEL_WIDTH = 360;
+const MIN_COPILOT_PANEL_WIDTH = 280;
+const MAX_COPILOT_PANEL_WIDTH = 560;
+const LAUNCHER_SIZE = 56;
+const LAUNCHER_GUTTER = 24;
+
+type LauncherPosition = { x: number; y: number };
+
+const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), maximum);
+
+const getDefaultLauncherPosition = (): LauncherPosition => ({
+  x: Math.max(LAUNCHER_GUTTER, window.innerWidth - LAUNCHER_SIZE - LAUNCHER_GUTTER),
+  y: Math.max(LAUNCHER_GUTTER, window.innerHeight - LAUNCHER_SIZE - LAUNCHER_GUTTER),
+});
+
+const clampLauncherPosition = ({ x, y }: LauncherPosition): LauncherPosition => ({
+  x: clamp(x, LAUNCHER_GUTTER, Math.max(LAUNCHER_GUTTER, window.innerWidth - LAUNCHER_SIZE - LAUNCHER_GUTTER)),
+  y: clamp(y, LAUNCHER_GUTTER, Math.max(LAUNCHER_GUTTER, window.innerHeight - LAUNCHER_SIZE - LAUNCHER_GUTTER)),
+});
 
 function PlaneTools() {
   const { workspaceSlug, projectId } = useParams();
   const workspace = typeof workspaceSlug === "string" ? workspaceSlug : "";
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
+  const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
+  const dragStart = useRef<{ x: number; y: number; pointerX: number; pointerY: number; moved: boolean } | null>(null);
+
+  useEffect(() => {
+    const storedWidth = Number(window.localStorage.getItem(COPILOT_PANEL_WIDTH_STORAGE_KEY));
+    if (Number.isFinite(storedWidth))
+      setPanelWidth(clamp(storedWidth, MIN_COPILOT_PANEL_WIDTH, MAX_COPILOT_PANEL_WIDTH));
+    const storedPosition = window.localStorage.getItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
+    if (storedPosition) {
+      try {
+        setLauncherPosition(clampLauncherPosition(JSON.parse(storedPosition) as LauncherPosition));
+        return;
+      } catch {
+        window.localStorage.removeItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
+      }
+    }
+    setLauncherPosition(getDefaultLauncherPosition());
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty("--copilot-panel-width", `${panelWidth}px`);
+    window.localStorage.setItem(COPILOT_PANEL_WIDTH_STORAGE_KEY, `${panelWidth}`);
+  }, [panelWidth]);
+
+  useEffect(() => {
+    if (!launcherPosition) return;
+    window.localStorage.setItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY, JSON.stringify(launcherPosition));
+  }, [launcherPosition]);
+
+  const resetLauncherPosition = useCallback(() => {
+    const position = getDefaultLauncherPosition();
+    window.localStorage.removeItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
+    setLauncherPosition(position);
+  }, []);
+
+  useEffect(() => {
+    const panel = document.querySelector<HTMLElement>("[data-copilot-sidebar]");
+    if (!panel) return;
+    let wasOpen = panel.getAttribute("aria-hidden") === "false";
+    const observer = new MutationObserver(() => {
+      const isOpen = panel.getAttribute("aria-hidden") === "false";
+      if (wasOpen && !isOpen) resetLauncherPosition();
+      wasOpen = isOpen;
+    });
+    observer.observe(panel, { attributes: true, attributeFilter: ["aria-hidden"] });
+    return () => observer.disconnect();
+  }, [resetLauncherPosition]);
+
+  const startResize = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = panelWidth;
+    const resize = (moveEvent: PointerEvent) =>
+      setPanelWidth(clamp(startWidth + startX - moveEvent.clientX, MIN_COPILOT_PANEL_WIDTH, MAX_COPILOT_PANEL_WIDTH));
+    const stopResize = () => {
+      window.removeEventListener("pointermove", resize);
+      window.removeEventListener("pointerup", stopResize);
+    };
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", stopResize);
+  };
+
+  const startLauncherDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!launcherPosition) return;
+    dragStart.current = {
+      x: launcherPosition.x,
+      y: launcherPosition.y,
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      moved: false,
+    };
+    const drag = (moveEvent: PointerEvent) => {
+      const start = dragStart.current;
+      if (!start) return;
+      start.moved ||= Math.abs(moveEvent.clientX - start.pointerX) + Math.abs(moveEvent.clientY - start.pointerY) > 4;
+      setLauncherPosition(
+        clampLauncherPosition({
+          x: start.x + moveEvent.clientX - start.pointerX,
+          y: start.y + moveEvent.clientY - start.pointerY,
+        })
+      );
+    };
+    const stopDrag = () => {
+      window.removeEventListener("pointermove", drag);
+      window.removeEventListener("pointerup", stopDrag);
+    };
+    window.addEventListener("pointermove", drag);
+    window.addEventListener("pointerup", stopDrag);
+  };
 
   useFrontendTool(
     {
@@ -323,31 +434,49 @@ function PlaneTools() {
   );
 
   return (
-    <CopilotSidebar
-      defaultOpen={false}
-      header={{
-        children: ({ closeButton, titleContent }) => (
-          <header className="flex items-center justify-between border-b border-subtle bg-surface-1 px-4 py-3">
-            <div className="flex items-center gap-2 text-primary">
-              <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeWidth="1.75"
-                />
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
-              </svg>
-              <div className="text-13 font-medium">{titleContent}</div>
-            </div>
-            {closeButton}
-          </header>
-        ),
-      }}
-      labels={{ modalHeaderTitle: "Ten-Fold Assistant" }}
-      position="right"
-      width={360}
-    />
+    <>
+      <CopilotSidebar
+        defaultOpen={false}
+        header={{
+          children: ({ closeButton, titleContent }) => (
+            <header className="flex items-center justify-between border-b border-subtle bg-surface-1 px-4 py-3">
+              <div className="flex items-center gap-2 text-primary">
+                <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+                  <path
+                    d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeWidth="1.75"
+                  />
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+                </svg>
+                <div className="text-13 font-medium">{titleContent}</div>
+              </div>
+              {closeButton}
+            </header>
+          ),
+        }}
+        labels={{ modalHeaderTitle: "Ten-Fold Assistant" }}
+        position="right"
+        width={panelWidth}
+        toggleButton={{
+          onPointerDown: startLauncherDrag,
+          onClick: (event) => {
+            if (dragStart.current?.moved) event?.preventDefault();
+            dragStart.current = null;
+          },
+          style: launcherPosition
+            ? { left: launcherPosition.x, top: launcherPosition.y, right: "auto", bottom: "auto", touchAction: "none" }
+            : undefined,
+        }}
+      />
+      <div
+        className="copilot-panel-resize-handle"
+        onPointerDown={startResize}
+        role="separator"
+        aria-orientation="vertical"
+      />
+    </>
   );
 }
 

@@ -41,6 +41,7 @@ import { useProjectState } from "@/hooks/store/use-project-state";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useIssueStoreType } from "@/hooks/use-issue-layout-store";
 import { usePlatformOS } from "@/hooks/use-platform-os";
+import { FEATURE_VISIBILITY } from "@/constants/feature-visibility";
 // local components
 import { IssuePropertyLabels } from "./labels";
 import { WithDisplayPropertiesHOC } from "./with-display-properties-HOC";
@@ -341,7 +342,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
         {!isEpic && (
           <>
             {/* modules */}
-            {projectDetails?.module_view && (
+            {FEATURE_VISIBILITY.MODULES && projectDetails?.module_view && (
               <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="modules">
                 {/* oxlint-disable-next-line jsx_a11y/click-events-have-key-events oxlint-disable-next-line jsx_a11y/no-static-element-interactions */}
                 <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
@@ -362,7 +363,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             )}
 
             {/* cycles */}
-            {projectDetails?.cycle_view && (
+            {FEATURE_VISIBILITY.CYCLES && projectDetails?.cycle_view && (
               <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="cycle">
                 {/* oxlint-disable-next-line jsx_a11y/click-events-have-key-events oxlint-disable-next-line jsx_a11y/no-static-element-interactions */}
                 <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
