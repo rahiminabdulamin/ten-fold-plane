@@ -454,7 +454,7 @@ function PlaneTools() {
         defaultOpen={false}
         header={{
           children: ({ closeButton, titleContent }) => (
-            <header className="flex items-center justify-between border-b border-subtle bg-surface-1 px-4 py-3">
+            <header className="flex h-[51px] items-center justify-between border-b border-subtle bg-surface-1 px-4">
               <div className="flex items-center gap-2 text-primary">
                 <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
                   <path
