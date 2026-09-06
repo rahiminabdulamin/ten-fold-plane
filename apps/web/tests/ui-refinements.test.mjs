@@ -35,8 +35,12 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /COPILOT_PANEL_WIDTH_STORAGE_KEY/);
   assert.match(copilot, /MutationObserver/);
   assert.match(copilot, /onPointerDown={startResize}/);
+  assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
+  assert.match(copilot, /event\.stopPropagation\(\)/);
   assert.match(copilot, /onPointerDown:\s*startLauncherDrag/);
   assert.match(styles, /--copilot-panel-width/);
+  assert.match(styles, /margin-inline-end:\s*0 !important/);
+  assert.match(styles, /\[data-sidebar-chat\] > \[data-copilotkit\] > div/);
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
   assert.match(select, /ref={setReferenceElement}/);
   assert.match(select, /strategy:\s*"fixed"/);
@@ -44,6 +48,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.doesNotMatch(workspaceLogo, /rounded-md object-cover/);
   assert.doesNotMatch(workspaceDropdown, /rounded-sm object-cover/);
   assert.doesNotMatch(profileSidebar, /CoverImage|Logo logo=/);
+  assert.match(profileSidebar, /relative px-5 pt-5/);
   assert.match(profileFilters, /cycleViewDisabled={!FEATURE_VISIBILITY\.CYCLES}/);
   assert.match(profileMobile, /moduleViewDisabled={!FEATURE_VISIBILITY\.MODULES}/);
   assert.match(issueProperties, /FEATURE_VISIBILITY\.MODULES && projectDetails\?\.module_view/);

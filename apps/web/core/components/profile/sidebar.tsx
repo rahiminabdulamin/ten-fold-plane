@@ -71,7 +71,7 @@ export const ProfileSidebar = observer(function ProfileSidebar(props: TProfileSi
     window.addEventListener("resize", handleToggleProfileSidebar);
     handleToggleProfileSidebar();
     return () => window.removeEventListener("resize", handleToggleProfileSidebar);
-  }, []);
+  }, [profileSidebarCollapsed, toggleProfileSidebar]);
 
   return (
     <div
@@ -83,7 +83,7 @@ export const ProfileSidebar = observer(function ProfileSidebar(props: TProfileSi
     >
       {userProjectsData ? (
         <>
-          <div className="relative pt-5">
+          <div className="relative px-5 pt-5">
             <div className="h-[52px] w-[52px] rounded-sm">
               {userData?.avatar_url && userData?.avatar_url !== "" ? (
                 <img

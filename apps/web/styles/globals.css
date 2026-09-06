@@ -51,6 +51,8 @@
 @media (min-width: 768px) {
   body:has([data-copilot-sidebar][aria-hidden="false"]) {
     margin-inline-start: 0 !important;
+    margin-inline-end: 0 !important;
+    transition: none !important;
   }
 
   body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-layout {
@@ -107,6 +109,17 @@
 [data-copilotkit] textarea {
   width: 100%;
   max-width: none;
+}
+
+[data-copilot-sidebar] [data-sidebar-chat] > [data-copilotkit] > div {
+  width: 100% !important;
+  max-width: none !important;
+  padding-inline: 1rem !important;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-chat-input"] {
+  width: 100% !important;
+  max-width: none !important;
 }
 
 /* CopilotKit's unlicensed banner has no stable selector in v1.69. */

@@ -87,6 +87,8 @@ function PlaneTools() {
 
   const startResize = (event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
     const startX = event.clientX;
     const startWidth = panelWidth;
     const resize = (moveEvent: PointerEvent) =>
