@@ -12,9 +12,7 @@ import { ThemeProvider, useTheme } from "next-themes";
 import { SITE_DESCRIPTION, SITE_NAME } from "@plane/constants";
 // types
 // assets
-import favicon16 from "@/app/assets/favicon/favicon-16x16.png?url";
-import favicon32 from "@/app/assets/favicon/favicon-32x32.png?url";
-import faviconIco from "@/app/assets/favicon/favicon.ico?url";
+import favicon from "@/public/branding/tenfold-logo-square-rebrand-black-v3.png?url";
 import icon180 from "@/app/assets/icons/icon-180x180.png?url";
 import icon512 from "@/app/assets/icons/icon-512x512.png?url";
 import ogImage from "@/app/assets/og-image.png?url";
@@ -27,17 +25,19 @@ import { isStaleAssetError, recoverFromStaleAsset } from "@/lib/stale-asset-erro
 // local
 import { CustomErrorComponent } from "./error";
 // fonts
+// oxlint-disable-next-line eslint-plugin-import(no-unassigned-import) -- loads the global Inter font stylesheet
 import "@fontsource-variable/inter";
 import interVariableWoff2 from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+// oxlint-disable-next-line eslint-plugin-import(no-unassigned-import) -- loads the global Material Symbols stylesheet
 import "@fontsource/material-symbols-rounded";
+// oxlint-disable-next-line eslint-plugin-import(no-unassigned-import) -- loads the global IBM Plex Mono stylesheet
 import "@fontsource/ibm-plex-mono";
 
 const APP_TITLE = "Ten-Fold | Project management";
 
 export const links: LinksFunction = () => [
-  { rel: "icon", type: "image/png", sizes: "32x32", href: favicon32 },
-  { rel: "icon", type: "image/png", sizes: "16x16", href: favicon16 },
-  { rel: "shortcut icon", href: faviconIco },
+  { rel: "icon", type: "image/png", href: favicon },
+  { rel: "shortcut icon", type: "image/png", href: favicon },
   { rel: "manifest", href: "/site.webmanifest.json" },
   { rel: "apple-touch-icon", href: icon512 },
   { rel: "apple-touch-icon", sizes: "180x180", href: icon180 },

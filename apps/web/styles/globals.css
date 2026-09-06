@@ -53,8 +53,8 @@
   }
 
   body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-layout {
-    margin-inline-start: 360px;
-    transition: margin-inline-start 260ms ease;
+    margin-inline-end: 360px;
+    transition: margin-inline-end 260ms ease;
   }
 
   [data-copilot-sidebar] {

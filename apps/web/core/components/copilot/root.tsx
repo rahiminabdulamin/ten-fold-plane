@@ -345,7 +345,7 @@ function PlaneTools() {
         ),
       }}
       labels={{ modalHeaderTitle: "Ten-Fold Assistant" }}
-      position="left"
+      position="right"
       width={360}
     />
   );
