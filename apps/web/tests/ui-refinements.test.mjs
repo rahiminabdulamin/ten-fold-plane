@@ -17,6 +17,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     profileFilters,
     profileMobile,
     issueProperties,
+    powerKCreation,
+    powerKNavigation,
+    powerKHelp,
   ] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
     read("core/components/copilot/root.tsx"),
@@ -29,6 +32,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     read("core/components/profile/profile-issues-filter.tsx"),
     read("app/(all)/[workspaceSlug]/(projects)/profile/[userId]/mobile-header.tsx"),
     read("core/components/issues/issue-layouts/properties/all-properties.tsx"),
+    read("core/components/power-k/config/creation/root.ts"),
+    read("core/components/power-k/config/navigation/root.ts"),
+    read("core/components/power-k/config/help-commands.ts"),
   ]);
 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
@@ -58,4 +64,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(profileMobile, /moduleViewDisabled={!FEATURE_VISIBILITY\.MODULES}/);
   assert.match(issueProperties, /FEATURE_VISIBILITY\.MODULES && projectDetails\?\.module_view/);
   assert.match(issueProperties, /FEATURE_VISIBILITY\.CYCLES && projectDetails\?\.cycle_view/);
+  assert.doesNotMatch(powerKCreation, /create_(?:cycle|module)/);
+  assert.doesNotMatch(powerKNavigation, /(?:open|nav)_project_(?:cycle|module)/);
+  assert.doesNotMatch(powerKHelp, /open_plane_documentation|join_forum|report_bug/);
 });
