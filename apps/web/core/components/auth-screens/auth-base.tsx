@@ -35,7 +35,7 @@ export function AuthBase({ authType }: AuthBaseProps) {
           <img
             src="/branding/screenshot-landing.png"
             alt="Ten-Fold workspace overview"
-            className="mt-8 w-full max-w-md rounded-lg shadow-[12px_12px_0_rgba(23,109,136,0.45)]"
+            className="mt-8 w-full max-w-md rounded-lg"
           />
           <p className="text-lg mt-10 max-w-md leading-7 text-white/90">
             A focused place for teams to plan, build, and move work forward. Made for teams that think beyond the next
