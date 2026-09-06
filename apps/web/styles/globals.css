@@ -139,6 +139,14 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   border-radius: 0.5rem !important;
 }
 
+[data-copilot-sidebar] .copilot-user-toolbar {
+  display: none !important;
+}
+
+[data-copilot-sidebar] .copilot-user-message {
+  padding-top: 8px !important;
+}
+
 [data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
   margin-block: 0.25rem !important;
   padding-block: 8px !important;
