@@ -69,11 +69,10 @@ test("Ten-Fold loader shimmers the square logo instead of spinning", async () =>
   assert.doesNotMatch(spinner, /animate-spin/);
 });
 
-test("authentication surfaces use Ten-Fold branding in a split layout", async () => {
-  const [authBase, authFormHeader, authFooter] = await Promise.all([
+test("authentication surfaces use Ten-Fold branding without a compact-layout promotion", async () => {
+  const [authBase, authFormHeader] = await Promise.all([
     read("core/components/auth-screens/auth-base.tsx"),
     read("core/components/account/auth-forms/auth-header.tsx"),
-    read("core/components/auth-screens/footer.tsx"),
   ]);
 
   assert.match(authBase, /lg:grid-cols-2/);
@@ -81,9 +80,27 @@ test("authentication surfaces use Ten-Fold branding in a split layout", async ()
   assert.match(authBase, /h-16/);
   assert.match(authFormHeader, /Welcome back to Ten-Fold\./);
   assert.match(authFormHeader, /Create your Ten-Fold account\./);
-  assert.match(authFooter, /Join 10,000\+ teams building with Ten-Fold/);
   assert.doesNotMatch(authFormHeader, /(?:Welcome back to|Create your) Plane/);
-  assert.doesNotMatch(authFooter, /building with Plane/);
+  assert.doesNotMatch(authBase, /AuthFooter/);
+  assert.doesNotMatch(authBase, /Join 10,000\+ teams building with Ten-Fold/);
+});
+
+test("CopilotKit is a compact Ten-Fold panel below the viewport-wide navigation", async () => {
+  const [copilot, contentWrapper, styles] = await Promise.all([
+    read("core/components/copilot/root.tsx"),
+    read("core/components/workspace/content-wrapper.tsx"),
+    read("styles/globals.css"),
+  ]);
+
+  assert.match(copilot, /position="left"/);
+  assert.match(copilot, /width=\{360\}/);
+  assert.match(copilot, /Ten-Fold Assistant/);
+  assert.match(copilot, /header=\{\{/);
+  assert.match(copilot, /<svg/);
+  assert.match(contentWrapper, /copilot-panel-layout/);
+  assert.match(styles, /\.copilot-panel-layout/);
+  assert.match(styles, /\[data-copilotkit\]/);
+  assert.match(styles, /z-index: 99999/);
 });
 
 test("sidebar legal links replace Community and project presentation omits editable emoji", async () => {

@@ -44,6 +44,54 @@
   @apply text-placeholder!;
 }
 
+/* CopilotKit's sidebar normally shifts the body, including the global nav.
+ * Keep that shift local to the lower application row so all three panels share
+ * the space beneath the viewport-wide top navigation. */
+@media (min-width: 768px) {
+  body:has([data-copilot-sidebar][aria-hidden="false"]) {
+    margin-inline-start: 0 !important;
+  }
+
+  body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-layout {
+    margin-inline-start: 360px;
+    transition: margin-inline-start 260ms ease;
+  }
+
+  [data-copilot-sidebar] {
+    top: 40px !important;
+    height: calc(100dvh - 40px) !important;
+  }
+}
+
+[data-copilotkit] {
+  --cpk-default-font-family: var(--font-family-body);
+  --foreground: var(--text-color-primary);
+  --muted-foreground: var(--text-color-tertiary);
+  --primary: var(--text-color-primary);
+  --border: var(--border-color-subtle);
+  font-size: 13px;
+}
+
+[data-copilotkit] [data-streamdown] {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+[data-copilotkit] [data-streamdown^="heading-"] {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+[data-copilotkit] textarea,
+[data-copilotkit] input {
+  font-size: 13px;
+}
+
+/* CopilotKit's unlicensed banner has no stable selector in v1.69. */
+div[style*="z-index: 99999"] {
+  display: none !important;
+}
+
 /* Lock icon animations */
 @keyframes tenfoldShimmer {
   0%,

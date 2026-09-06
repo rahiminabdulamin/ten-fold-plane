@@ -238,7 +238,33 @@ function PlaneTools() {
     [workspace]
   );
 
-  return <CopilotSidebar defaultOpen={false} />;
+  return (
+    <CopilotSidebar
+      defaultOpen={false}
+      header={{
+        children: ({ closeButton, titleContent }) => (
+          <header className="flex items-center justify-between border-b border-subtle bg-surface-1 px-4 py-3">
+            <div className="flex items-center gap-2 text-primary">
+              <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="1.75"
+                />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+              </svg>
+              <div className="text-13 font-medium">{titleContent}</div>
+            </div>
+            {closeButton}
+          </header>
+        ),
+      }}
+      labels={{ modalHeaderTitle: "Ten-Fold Assistant" }}
+      position="left"
+      width={360}
+    />
+  );
 }
 
 export function PlaneCopilot() {

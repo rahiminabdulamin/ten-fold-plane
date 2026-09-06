@@ -7,7 +7,6 @@
 import React from "react";
 import { AuthRoot } from "@/components/account/auth-forms/auth-root";
 import type { EAuthModes } from "@/helpers/authentication.helper";
-import { AuthFooter } from "./footer";
 import { AuthHeader } from "./header";
 
 type AuthBaseProps = {
@@ -39,9 +38,6 @@ export function AuthBase({ authType }: AuthBaseProps) {
       <main className="flex min-h-dvh flex-col overflow-y-auto px-6 py-6 sm:px-10 sm:py-8 lg:px-12 xl:px-20">
         <AuthHeader type={authType} hideLogoOnDesktop />
         <AuthRoot authMode={authType} />
-        <div className="mt-8 lg:hidden">
-          <AuthFooter />
-        </div>
       </main>
     </div>
   );
