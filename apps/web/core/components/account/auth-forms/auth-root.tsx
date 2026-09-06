@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 // plane imports
 import { OAuthOptions } from "@plane/ui";
@@ -53,6 +54,9 @@ export const AuthRoot = observer(function AuthRoot(props: TAuthRoot) {
   const { isOAuthEnabled, oAuthOptions } = useOAuthConfig(oAuthActionText);
   const isEmailBasedAuthEnabled = config?.is_email_password_enabled || config?.is_magic_login_enabled;
   const noAuthMethodsAvailable = !isOAuthEnabled && !isEmailBasedAuthEnabled;
+  const authSwitchText = authMode === EAuthModes.SIGN_UP ? "Already have an account?" : "New to Ten-Fold?";
+  const authSwitchLink = authMode === EAuthModes.SIGN_UP ? "/sign-in" : "/sign-up";
+  const authSwitchLabel = authMode === EAuthModes.SIGN_UP ? "Sign in" : "Sign up";
 
   useEffect(() => {
     if (!authMode && currentAuthMode) setAuthMode(currentAuthMode);
@@ -137,14 +141,24 @@ export const AuthRoot = observer(function AuthRoot(props: TAuthRoot) {
           authStep={authStep}
           authMode={authMode}
           email={email}
-          setEmail={(email) => setEmail(email)}
-          setAuthMode={(authMode) => setAuthMode(authMode)}
-          setAuthStep={(authStep) => setAuthStep(authStep)}
-          setErrorInfo={(errorInfo) => setErrorInfo(errorInfo)}
+          setEmail={(nextEmail) => setEmail(nextEmail)}
+          setAuthMode={(nextAuthMode) => setAuthMode(nextAuthMode)}
+          setAuthStep={(nextAuthStep) => setAuthStep(nextAuthStep)}
+          setErrorInfo={(nextErrorInfo) => setErrorInfo(nextErrorInfo)}
           currentAuthMode={currentAuthMode}
         />
       )}
-      <TermsAndConditions authType={authMode} />
+      {config?.enable_signup && (
+        <div className="pt-6 text-center text-body-sm-regular text-tertiary">
+          {authSwitchText}{" "}
+          <Link href={authSwitchLink} className="text-body-sm-semibold text-accent-primary hover:underline">
+            {authSwitchLabel}
+          </Link>
+        </div>
+      )}
+      <div className="lg:fixed lg:bottom-6 lg:left-3/4 lg:w-80 lg:-translate-x-1/2">
+        <TermsAndConditions authType={authMode} />
+      </div>
     </AuthContainer>
   );
 });

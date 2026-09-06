@@ -30,9 +30,14 @@ const authContentMap = {
 type AuthHeaderProps = {
   type: EAuthModes;
   hideLogoOnDesktop?: boolean;
+  hideAdditionalAction?: boolean;
 };
 
-export const AuthHeader = observer(function AuthHeader({ type, hideLogoOnDesktop = false }: AuthHeaderProps) {
+export const AuthHeader = observer(function AuthHeader({
+  type,
+  hideLogoOnDesktop = false,
+  hideAdditionalAction = false,
+}: AuthHeaderProps) {
   const { t } = useTranslation();
   // store
   const { config } = useInstance();
@@ -44,6 +49,7 @@ export const AuthHeader = observer(function AuthHeader({ type, hideLogoOnDesktop
       pageTitle={t(authContentMap[type].pageTitle)}
       hideLogoOnDesktop={hideLogoOnDesktop}
       additionalAction={
+        !hideAdditionalAction &&
         enableSignUpConfig && (
           <div className="flex flex-col items-end text-center text-13 font-medium text-tertiary sm:flex-row sm:items-center sm:gap-2">
             <span className="text-body-sm-regular text-tertiary">{t(authContentMap[type].text)}</span>

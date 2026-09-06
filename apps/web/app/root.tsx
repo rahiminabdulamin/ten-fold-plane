@@ -12,7 +12,6 @@ import { ThemeProvider, useTheme } from "next-themes";
 import { SITE_DESCRIPTION, SITE_NAME } from "@plane/constants";
 // types
 // assets
-import favicon from "@/public/branding/tenfold-logo-square-rebrand-black-v3.png?url";
 import icon180 from "@/app/assets/icons/icon-180x180.png?url";
 import icon512 from "@/app/assets/icons/icon-512x512.png?url";
 import ogImage from "@/app/assets/og-image.png?url";
@@ -36,8 +35,8 @@ import "@fontsource/ibm-plex-mono";
 const APP_TITLE = "Ten-Fold | Project management";
 
 export const links: LinksFunction = () => [
-  { rel: "icon", type: "image/png", href: favicon },
-  { rel: "shortcut icon", type: "image/png", href: favicon },
+  { rel: "icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v3.png" },
+  { rel: "shortcut icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v3.png" },
   { rel: "manifest", href: "/site.webmanifest.json" },
   { rel: "apple-touch-icon", href: icon512 },
   { rel: "apple-touch-icon", sizes: "180x180", href: icon180 },

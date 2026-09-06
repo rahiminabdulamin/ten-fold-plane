@@ -110,7 +110,7 @@ type TAuthHeaderBase = {
 
 export function AuthHeaderBase(props: TAuthHeaderBase) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="mb-4 flex flex-col gap-1 text-center">
       {props.header && <span className="text-h4-semibold text-primary">{props.header}</span>}
       <span className="text-h4-semibold text-placeholder">{props.subHeader}</span>
     </div>
