@@ -137,12 +137,12 @@ export const BaseCalendarRoot = observer(function BaseCalendarRoot(props: IBaseC
 
   const getPaginationData = useCallback(
     (groupId: string | undefined) => issues?.getPaginationData(groupId, undefined),
-    [issues?.getPaginationData]
+    [issues]
   );
 
   const getGroupIssueCount = useCallback(
     (groupId: string | undefined) => issues?.getGroupIssueCount(groupId, undefined, false),
-    [issues?.getGroupIssueCount]
+    [issues]
   );
 
   const canEditProperties = useCallback(
@@ -163,7 +163,7 @@ export const BaseCalendarRoot = observer(function BaseCalendarRoot(props: IBaseC
           issues={issueMap}
           groupedIssueIds={groupedIssueIds}
           layout={displayFilters?.calendar?.layout}
-          showWeekends={displayFilters?.calendar?.show_weekends ?? false}
+          showWeekends={displayFilters?.calendar?.show_weekends ?? true}
           issueCalendarView={issueCalendarView}
           quickActions={({ issue, parentRef, customActionButton, placement }) => (
             <QuickActions
