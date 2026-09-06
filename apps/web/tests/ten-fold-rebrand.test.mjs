@@ -86,6 +86,7 @@ test("authentication surfaces use Ten-Fold branding without a compact-layout pro
   assert.match(authBase, /tenfold-logo-long-rebrand-white-v3\.png/);
   assert.match(authBase, /#00364c/);
   assert.match(authBase, /h-16/);
+  assert.match(authBase, /dimensions[\s\S]*screenshot-landing\.png[\s\S]*A focused place for teams/);
   assert.match(authFormHeader, /Welcome back to Ten-Fold\./);
   assert.match(authFormHeader, /Create your Ten-Fold account\./);
   assert.doesNotMatch(authFormHeader, /Work in all dimensions\./);
