@@ -30,9 +30,8 @@ test("the assistant exposes the complete editable work-item schema and live proj
   assert.match(root, /name:\s*"get_work_item_schema"/);
   assert.match(root, /toWorkItemPayload\(/);
   const mutationSchema = root.match(/const workItemMutationSchema = z\.object\(\{[\s\S]*?\n\}\);/)?.[0] ?? "";
-  assert.match(mutationSchema, /description: z\.string\(\)\.max\(100_000\)\.nullable\(\),/);
-  assert.doesNotMatch(mutationSchema, /\.optional\(\)/);
-  assert.doesNotMatch(root, /parameters:\s*z\.object\(\{[\s\S]{0,250}\.optional\(\)/);
+  assert.match(mutationSchema, /description: z\.string\(\)\.max\(100_000\)\.optional\(\),/);
+  assert.doesNotMatch(root, /\.nullable\(\)/);
   assert.match(root, /z\.string\(\)\.date\(\)/);
   assert.match(root, /ProjectStateService/);
   assert.match(root, /IssueLabelService/);
