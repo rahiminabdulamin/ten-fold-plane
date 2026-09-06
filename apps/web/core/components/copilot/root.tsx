@@ -7,16 +7,10 @@ import { useParams } from "react-router";
 import { IssueService } from "@/services/issue";
 import { ProjectService } from "@/services/project";
 
+import { findProjectMatches, toolError, toolResult } from "./tool-contracts";
+
 const projectService = new ProjectService();
 const issueService = new IssueService();
-
-const result = (operation: string, message: string, affectedIds: string[] = []) => ({
-  ok: true,
-  operation,
-  affectedIds,
-  message,
-  retryable: false,
-});
 
 function PlaneTools() {
   const { workspaceSlug, projectId } = useParams();
@@ -29,11 +23,44 @@ function PlaneTools() {
       parameters: z.object({}),
       handler: async () => {
         if (!workspace) return { ok: false, message: "A workspace is required.", retryable: false };
-        const projects = await projectService.getProjectsLite(workspace);
-        return {
-          ...result("list_projects", `Found ${Math.min(projects.length, 20)} projects.`),
-          data: projects.slice(0, 20),
-        };
+        try {
+          const projects = await projectService.getProjectsLite(workspace);
+          const data = projects.slice(0, 20).map(({ id, name, identifier }) => ({ id, name, identifier }));
+          return { ...toolResult("list_projects", `Found ${data.length} projects.`), data };
+        } catch (error) {
+          return toolError("list_projects", error);
+        }
+      },
+    },
+    [workspace]
+  );
+
+  useFrontendTool(
+    {
+      name: "find_project",
+      description:
+        "Find up to 20 projects in the current workspace by name or identifier. Use this before work-item operations when the user names a project.",
+      parameters: z.object({ query: z.string().min(1).max(255) }),
+      handler: async ({ query }) => {
+        if (!workspace) return { ok: false, message: "A workspace is required.", retryable: false };
+        try {
+          const projects = await projectService.getProjectsLite(workspace);
+          const data = findProjectMatches(
+            projects.map(({ id, name, identifier }) => ({ id, name, identifier })),
+            query
+          );
+          const message = data.length === 1 ? `Found ${data[0].name}.` : `Found ${data.length} matching projects.`;
+          return {
+            ...toolResult(
+              "find_project",
+              message,
+              data.map(({ id }) => id)
+            ),
+            data,
+          };
+        } catch (error) {
+          return toolError("find_project", error);
+        }
       },
     },
     [workspace]
@@ -46,11 +73,15 @@ function PlaneTools() {
       parameters: z.object({ name: z.string().min(1).max(255), identifier: z.string().min(1).max(20).optional() }),
       handler: async ({ name, identifier }) => {
         if (!workspace) return { ok: false, message: "A workspace is required.", retryable: false };
-        const project = await projectService.createProject(workspace, { name, identifier });
-        return {
-          ...result("create_project", `Created ${project.name}.`, [project.id]),
-          data: { id: project.id, name: project.name },
-        };
+        try {
+          const project = await projectService.createProject(workspace, { name, identifier });
+          return {
+            ...toolResult("create_project", `Created ${project.name}.`, [project.id]),
+            data: { id: project.id, name: project.name },
+          };
+        } catch (error) {
+          return toolError("create_project", error);
+        }
       },
     },
     [workspace]
@@ -63,11 +94,34 @@ function PlaneTools() {
       parameters: z.object({ projectId: z.string().uuid(), name: z.string().min(1).max(255) }),
       handler: async ({ projectId: targetProjectId, name }) => {
         if (!workspace) return { ok: false, message: "A workspace is required.", retryable: false };
-        const project = await projectService.updateProject(workspace, targetProjectId, { name });
-        return {
-          ...result("update_project", `Updated ${project.name}.`, [project.id]),
-          data: { id: project.id, name: project.name },
-        };
+        try {
+          const project = await projectService.updateProject(workspace, targetProjectId, { name });
+          return {
+            ...toolResult("update_project", `Updated ${project.name}.`, [project.id]),
+            data: { id: project.id, name: project.name },
+          };
+        } catch (error) {
+          return toolError("update_project", error);
+        }
+      },
+    },
+    [workspace]
+  );
+
+  useFrontendTool(
+    {
+      name: "get_project",
+      description: "Get one project by its canonical project ID.",
+      parameters: z.object({ projectId: z.string().uuid() }),
+      handler: async ({ projectId: targetProjectId }) => {
+        if (!workspace) return { ok: false, message: "A workspace is required.", retryable: false };
+        try {
+          const project = await projectService.getProject(workspace, targetProjectId);
+          const data = { id: project.id, name: project.name, identifier: project.identifier };
+          return { ...toolResult("get_project", `Found ${project.name}.`, [project.id]), data };
+        } catch (error) {
+          return toolError("get_project", error);
+        }
       },
     },
     [workspace]
@@ -76,16 +130,23 @@ function PlaneTools() {
   useFrontendTool(
     {
       name: "list_work_items",
-      description: "List up to 20 work items in the current project.",
-      parameters: z.object({}),
-      handler: async () => {
-        if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
-        const response = await issueService.getIssues(workspace, projectId, { per_page: "20" });
-        const issues = Array.isArray(response.results) ? response.results : [];
-        const workItems = issues
-          .slice(0, 20)
-          .map((issue) => ({ id: issue.id, name: issue.name, sequence_id: issue.sequence_id }));
-        return { ...result("list_work_items", `Found ${workItems.length} work items.`), data: workItems };
+      description:
+        "List up to 20 work items. Use the current project by default, or pass a canonical project ID returned by find_project.",
+      parameters: z.object({ projectId: z.string().uuid().optional() }),
+      handler: async ({ projectId: requestedProjectId }) => {
+        const targetProjectId = requestedProjectId ?? projectId;
+        if (!workspace || !targetProjectId)
+          return { ok: false, message: "Find a project first, then provide its project ID.", retryable: false };
+        try {
+          const response = await issueService.getIssues(workspace, targetProjectId, { per_page: "20" });
+          const issues = Array.isArray(response.results) ? response.results : [];
+          const data = issues
+            .slice(0, 20)
+            .map((issue) => ({ id: issue.id, name: issue.name, sequence_id: issue.sequence_id }));
+          return { ...toolResult("list_work_items", `Found ${data.length} work items.`), data };
+        } catch (error) {
+          return toolError("list_work_items", error);
+        }
       },
     },
     [workspace, projectId]
@@ -98,11 +159,34 @@ function PlaneTools() {
       parameters: z.object({ title: z.string().min(1).max(255) }),
       handler: async ({ title }) => {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
-        const issue = await issueService.createIssue(workspace, projectId, { name: title });
-        return {
-          ...result("create_work_item", `Created ${issue.name}.`, [issue.id]),
-          data: { id: issue.id, name: issue.name },
-        };
+        try {
+          const issue = await issueService.createIssue(workspace, projectId, { name: title });
+          return {
+            ...toolResult("create_work_item", `Created ${issue.name}.`, [issue.id]),
+            data: { id: issue.id, name: issue.name },
+          };
+        } catch (error) {
+          return toolError("create_work_item", error);
+        }
+      },
+    },
+    [workspace, projectId]
+  );
+
+  useFrontendTool(
+    {
+      name: "get_work_item",
+      description: "Get one work item in the current project by its canonical work-item ID.",
+      parameters: z.object({ issueId: z.string().uuid() }),
+      handler: async ({ issueId }) => {
+        if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
+        try {
+          const issue = await issueService.retrieve(workspace, projectId, issueId);
+          const data = { id: issue.id, name: issue.name, sequence_id: issue.sequence_id };
+          return { ...toolResult("get_work_item", `Found ${issue.name}.`, [issue.id]), data };
+        } catch (error) {
+          return toolError("get_work_item", error);
+        }
       },
     },
     [workspace, projectId]
@@ -116,7 +200,7 @@ function PlaneTools() {
       handler: async ({ issueId }) => {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
         window.location.assign(`/${workspace}/projects/${projectId}/issues/${issueId}`);
-        return result("open_work_item", "Opening work item.", [issueId]);
+        return toolResult("open_work_item", "Opening work item.", [issueId]);
       },
       followUp: false,
     },
@@ -132,7 +216,7 @@ function PlaneTools() {
         if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
         const issue = await issueService.patchIssue(workspace, projectId, issueId, { name: title });
         return {
-          ...result("update_work_item", `Updated ${issue.name}.`, [issue.id]),
+          ...toolResult("update_work_item", `Updated ${issue.name}.`, [issue.id]),
           data: { id: issue.id, name: issue.name },
         };
       },
@@ -150,7 +234,7 @@ function PlaneTools() {
           if (!workspace || !projectId || !respond) return;
           try {
             await issueService.deleteIssue(workspace, projectId, args.issueId);
-            respond(result("delete_work_item", `Deleted ${args.name}.`, [args.issueId]));
+            respond(toolResult("delete_work_item", `Deleted ${args.name}.`, [args.issueId]));
           } catch {
             respond({
               ok: false,
@@ -199,7 +283,7 @@ function PlaneTools() {
           if (!workspace || !respond) return;
           try {
             await projectService.deleteProject(workspace, args.projectId);
-            respond(result("delete_project", `Deleted ${args.name}.`, [args.projectId]));
+            respond(toolResult("delete_project", `Deleted ${args.name}.`, [args.projectId]));
           } catch {
             respond({
               ok: false,
