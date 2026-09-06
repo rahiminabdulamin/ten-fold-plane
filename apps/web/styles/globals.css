@@ -125,6 +125,11 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 [data-copilot-sidebar] [data-testid="copilot-chat-input"] {
   width: 100% !important;
   max-width: none !important;
+  border-radius: 0.5rem !important;
+}
+
+[data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
+  border-radius: 0.5rem !important;
 }
 
 [data-copilot-sidebar] .cpk\:px-8.cpk\:pb-4 {

@@ -71,6 +71,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(styles, /padding-inline:\s*0\.5rem !important/);
   assert.match(styles, /\.cpk\\:max-w-3xl\.cpk\\:mx-auto/);
   assert.match(styles, /margin-inline:\s*0 !important/);
+  assert.match(styles, /\[data-testid="copilot-chat-input"\][\s\S]*border-radius:\s*0\.5rem !important/);
+  assert.match(styles, /\[data-testid\^="copilot-"\]\[data-testid\$="-message"\] > div/);
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
   assert.match(select, /ref={setReferenceElement}/);
   assert.match(select, /strategy:\s*"fixed"/);
