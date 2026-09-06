@@ -151,7 +151,7 @@ test("project UI polish hides disabled chrome and keeps select popovers anchored
   assert.doesNotMatch(settingsHeader, /<Logo /);
   assert.match(settingsItems, /FEATURE_VISIBILITY\.CYCLES/);
   assert.match(settingsItems, /FEATURE_VISIBILITY\.MODULES/);
-  assert.match(sidebarWrapper, /text-\[10px\]/);
+  assert.match(sidebarWrapper, /text-\[12px\]/);
   assert.match(sidebarWrapper, /gap-1\.5/);
   assert.match(customSelect, /<Combobox\.Button[\s\S]*ref=\{setReferenceElement\}/);
   assert.match(customSearchSelect, /<Combobox\.Button[\s\S]*ref=\{setReferenceElement\}/);

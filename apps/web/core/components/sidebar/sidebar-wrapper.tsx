@@ -86,7 +86,7 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
         >
           {children}
         </ScrollArea>
-        <div className="flex h-12 items-center justify-center gap-1.5 border-t border-subtle bg-surface-1 px-2 text-[10px] whitespace-nowrap text-tertiary">
+        <div className="flex h-12 items-center justify-center gap-1.5 border-t border-subtle bg-surface-1 px-2 text-[12px] whitespace-nowrap text-tertiary">
           <a href="/terms" className="hover:text-primary hover:underline">
             Terms of Service
           </a>

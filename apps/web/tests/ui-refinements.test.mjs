@@ -23,6 +23,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     sidebar,
     topNavigation,
     topNavPowerK,
+    sidebarWrapper,
   ] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
     read("core/components/copilot/root.tsx"),
@@ -41,6 +42,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     read("core/components/sidebar/resizable-sidebar.tsx"),
     read("core/components/navigation/top-navigation-root.tsx"),
     read("core/components/navigation/top-nav-power-k.tsx"),
+    read("core/components/sidebar/sidebar-wrapper.tsx"),
   ]);
 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
@@ -89,4 +91,5 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(topNavigation, /sm:hidden/);
   assert.match(topNavigation, /min-w-0 flex-1/);
   assert.match(topNavPowerK, /w-full items-center[^"]*sm:w-\[364px\]/);
+  assert.match(sidebarWrapper, /text-\[12px\] whitespace-nowrap text-tertiary/);
 });
