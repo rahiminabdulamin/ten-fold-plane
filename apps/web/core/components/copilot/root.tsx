@@ -39,13 +39,12 @@ const LAUNCHER_GUTTER = 24;
 
 type LauncherPosition = { x: number; y: number };
 
-const dateSchema = z.string().date();
 const workItemMutationSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   description: z.string().max(100_000).nullable().optional(),
   priority: z.enum(["urgent", "high", "medium", "low", "none"]).optional(),
-  startDate: dateSchema.nullable().optional(),
-  targetDate: dateSchema.nullable().optional(),
+  startDate: z.string().date().nullable().optional(),
+  targetDate: z.string().date().nullable().optional(),
   stateId: z.string().uuid().nullable().optional(),
   labelIds: z.array(z.string().uuid()).max(100).optional(),
   assigneeIds: z.array(z.string().uuid()).max(100).optional(),
