@@ -10,7 +10,6 @@ import type { ShouldRevalidateFunctionArgs } from "react-router";
 import useSWR from "swr";
 // components
 import { LogoSpinner } from "@/components/common/logo-spinner";
-import { PoweredBy } from "@/components/common/powered-by";
 import { SomethingWentWrongError } from "@/components/issues/issue-layouts/error";
 import { IssuesNavbarRoot } from "@/components/issues/navbar";
 // hooks
@@ -19,8 +18,8 @@ import { usePublish, usePublishList } from "@/hooks/store/publish";
 import { useIssueFilter } from "@/hooks/store/use-issue-filter";
 import type { Route } from "./+types/layout";
 
-const DEFAULT_TITLE = "Plane";
-const DEFAULT_DESCRIPTION = "Made with Plane, an AI-powered work management platform with publishing capabilities.";
+const DEFAULT_TITLE = "Ten-Fold";
+const DEFAULT_DESCRIPTION = "Shared with Ten-Fold.";
 
 interface IssueMetadata {
   name?: string;
@@ -140,7 +139,6 @@ function IssuesLayout(props: Route.ComponentProps) {
           <Outlet />
         </div>
       </div>
-      <PoweredBy />
     </>
   );
 }

@@ -5,9 +5,6 @@
  */
 
 import { observer } from "mobx-react";
-import { ProjectsOutline } from "@makeplane/propel/icons";
-// components
-import { ProjectLogo } from "@/components/common/project-logo";
 // store
 import type { PublishStore } from "@/store/publish/publish.store";
 // local imports
@@ -20,23 +17,15 @@ type Props = {
 export const IssuesNavbarRoot = observer(function IssuesNavbarRoot(props: Props) {
   const { publishSettings } = props;
   // hooks
-  const { project_details } = publishSettings;
+  const { project_details, workspace_detail } = publishSettings;
 
   return (
     <div className="relative flex w-full justify-between gap-4 px-5">
       {/* project detail */}
       <div className="flex shrink-0 items-center gap-2">
-        {project_details ? (
-          <span className="grid size-7 shrink-0 place-items-center">
-            <ProjectLogo logo={project_details.logo_props} className="text-16" />
-          </span>
-        ) : (
-          <span className="grid size-7 shrink-0 place-items-center rounded-sm uppercase">
-            <ProjectsOutline className="size-4" />
-          </span>
-        )}
         <div className="line-clamp-1 max-w-[300px] overflow-hidden text-16 font-medium">
-          {project_details?.name || `...`}
+          {workspace_detail?.name || "..."} <span className="px-1 text-secondary">&gt;</span>{" "}
+          {project_details?.name || "..."}
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">

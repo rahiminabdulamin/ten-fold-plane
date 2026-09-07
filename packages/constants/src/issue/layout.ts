@@ -32,6 +32,11 @@ export const SITES_ISSUE_LAYOUTS: {
     icon: "Kanban",
     titleTranslationKey: "issue.layouts.kanban",
   },
+  {
+    key: "calendar",
+    icon: "Calendar",
+    titleTranslationKey: "issue.layouts.calendar",
+  },
 ];
 
 export const ISSUE_LAYOUT_MAP: TIssueLayoutMap = {

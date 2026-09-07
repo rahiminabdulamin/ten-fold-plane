@@ -21,7 +21,6 @@ import type { PublishStore } from "@/store/publish/publish.store";
 import type { TIssueLayout } from "@/types/issue";
 // local imports
 import { IssuesLayoutSelection } from "./layout-selection";
-import { NavbarTheme } from "./theme";
 import { UserAvatar } from "./user-avatar";
 
 export type NavbarControlsProps = {
@@ -117,11 +116,6 @@ export const NavbarControls = observer(function NavbarControls(props: NavbarCont
       {/* issue filters */}
       <div className="shrink-0">
         <IssueFiltersDropdown anchor={anchor} />
-      </div>
-
-      {/* theming */}
-      <div className="shrink-0">
-        <NavbarTheme />
       </div>
 
       {!isInIframe && <UserAvatar />}

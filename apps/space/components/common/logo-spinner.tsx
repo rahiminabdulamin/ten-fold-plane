@@ -4,19 +4,15 @@
  * See the LICENSE file for details.
  */
 
-import { useTheme } from "next-themes";
-// assets
-import LogoSpinnerDark from "@/app/assets/images/logo-spinner-dark.gif?url";
-import LogoSpinnerLight from "@/app/assets/images/logo-spinner-light.gif?url";
+import logo from "@/app/assets/branding/tenfold-logo-square-rebrand-loader-v3.png?url";
 
 export function LogoSpinner() {
-  const { resolvedTheme } = useTheme();
-
-  const logoSrc = resolvedTheme === "dark" ? LogoSpinnerLight : LogoSpinnerDark;
-
   return (
-    <div className="flex items-center justify-center">
-      <img src={logoSrc} alt="logo" className="h-6 w-auto sm:h-11" />
+    <div className="flex flex-col items-center justify-center gap-3">
+      <div className="animate-shimmer rounded-lg">
+        <img src={logo} alt="Ten-Fold" className="h-[66px] w-auto object-contain sm:h-[132px]" />
+      </div>
+      <p className="animate-shimmer text-sm text-[#BFBFBF]">Please wait...</p>
     </div>
   );
 }

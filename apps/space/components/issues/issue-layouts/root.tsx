@@ -19,6 +19,7 @@ import type { PublishStore } from "@/store/publish/publish.store";
 // local imports
 import { SomethingWentWrongError } from "./error";
 import { IssueKanbanLayoutRoot } from "./kanban/base-kanban-root";
+import { PublicCalendarLayout } from "./calendar/root";
 import { IssuesListLayoutRoot } from "./list/base-list-root";
 
 type Props = {
@@ -74,6 +75,7 @@ export const IssuesLayoutsRoot = observer(function IssuesLayoutsRoot(props: Prop
               <IssueKanbanLayoutRoot anchor={anchor} />
             </div>
           )}
+          {activeLayout === "calendar" && <PublicCalendarLayout />}
         </div>
       )}
     </div>
