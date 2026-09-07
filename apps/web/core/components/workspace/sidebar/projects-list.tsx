@@ -234,7 +234,6 @@ export const SidebarProjectsList = observer(function SidebarProjectsList() {
               )}
               {isAllProjectsListOpen && (
                 <Disclosure.Panel as="div" className="relative flex flex-col gap-0.5 pl-4" static>
-                  <span className="workspace-tree-connector pointer-events-none absolute top-0 bottom-0 left-2 w-px bg-layer-3" />
                   <>
                     {displayedProjects.map((projectId, index) => (
                       <SidebarProjectsListItem

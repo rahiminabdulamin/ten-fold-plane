@@ -10,7 +10,9 @@ test("workspace rows use a tree connector in the main sidebar", async () => {
     read("core/components/workspace/sidebar/projects-list-item.tsx"),
   ]);
 
-  assert.match(projectsList, /workspace-tree-connector/);
+  assert.match(projectsList, /pl-4/);
+  assert.match(projectRow, /workspace-tree-connector/);
   assert.match(projectRow, /workspace-tree-branch/);
-  assert.match(projectRow, /isLastChild && "bottom-1\/2"/);
+  assert.match(projectRow, /bg-\(--text-color-secondary\)/);
+  assert.match(projectRow, /isLastChild \? "bottom-1\/2" : "-bottom-0\.5"/);
 });
