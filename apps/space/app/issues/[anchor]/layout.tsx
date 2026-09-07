@@ -8,7 +8,6 @@ import { observer } from "mobx-react";
 import { Outlet } from "react-router";
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 import useSWR from "swr";
-import tenfoldLogo from "../../../../web/public/branding/tenfold-logo-square-rebrand-black-v3.png?url";
 // components
 import { LogoSpinner } from "@/components/common/logo-spinner";
 import { SomethingWentWrongError } from "@/components/issues/issue-layouts/error";
@@ -21,6 +20,7 @@ import type { Route } from "./+types/layout";
 
 const DEFAULT_TITLE = "Ten-Fold";
 const DEFAULT_DESCRIPTION = "Shared with Ten-Fold.";
+const TENFOLD_LOGO_URL = "/branding/tenfold-logo-square-rebrand-black-v3.png";
 
 interface IssueMetadata {
   name?: string;
@@ -73,11 +73,11 @@ export function meta({ loaderData }: Route.MetaArgs) {
   ];
 
   metaTags.push(
-    { property: "og:image", content: tenfoldLogo },
+    { property: "og:image", content: TENFOLD_LOGO_URL },
     { property: "og:image:width", content: "391" },
     { property: "og:image:height", content: "391" },
     { property: "og:image:alt", content: "Ten-Fold logo" },
-    { name: "twitter:image", content: tenfoldLogo },
+    { name: "twitter:image", content: TENFOLD_LOGO_URL },
     { name: "twitter:image:alt", content: "Ten-Fold logo" }
   );
 
