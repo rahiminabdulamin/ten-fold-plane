@@ -57,11 +57,8 @@
   }
 
   body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-layout {
-    flex: 0 0 calc(100% - var(--copilot-panel-width));
     inline-size: calc(100% - var(--copilot-panel-width));
-    transition:
-      flex-basis 260ms ease,
-      inline-size 260ms ease;
+    transition: inline-size 260ms ease;
   }
 
   [data-copilot-sidebar] {
@@ -101,23 +98,23 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   --primary: var(--text-color-primary);
   --border: var(--border-color-subtle);
   font-family: "Inter Variable", sans-serif;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 [data-copilotkit] [data-streamdown] {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.15;
 }
 
 [data-copilotkit] [data-streamdown^="heading-"] {
-  font-size: 14px;
-  line-height: 1.35;
+  font-size: 13px;
+  line-height: 1.15;
 }
 
 [data-copilotkit] textarea,
 [data-copilotkit] input {
   font-family: "Inter Variable", sans-serif;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 [data-copilotkit] [class*="text-xs"] {
@@ -137,7 +134,7 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 [data-copilot-sidebar] [data-sidebar-chat] > [data-copilotkit] > div {
   width: 100% !important;
   max-width: none !important;
-  padding-inline: 0.75rem !important;
+  padding-inline: 0rem !important;
 }
 
 [data-copilot-sidebar] [data-testid="copilot-chat-input"] {
@@ -156,7 +153,7 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 
 [data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
   margin-block: 0.25rem !important;
-  padding-block: 8px !important;
+  padding-block: 4px !important;
   padding-inline: 0.625rem !important;
   border-radius: 0.5rem !important;
 }
@@ -172,8 +169,8 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 
 [data-copilotkit] [data-testid^="copilot-"][data-testid$="-message"],
 [data-copilotkit] [data-testid^="copilot-"][data-testid$="-message"] :is(p, li, td, th, code, pre, span, strong, em) {
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.15;
 }
 
 [data-copilotkit] [data-testid^="copilot-"][data-testid$="-message"] [class*="text-xs"] {

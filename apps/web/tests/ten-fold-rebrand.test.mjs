@@ -112,6 +112,8 @@ test("CopilotKit is a compact resizable Ten-Fold panel below the viewport-wide n
   assert.match(contentWrapper, /copilot-panel-layout/);
   assert.match(styles, /\.copilot-panel-layout/);
   assert.match(styles, /--copilot-panel-width/);
+  assert.match(styles, /inline-size:\s*calc\(100% - var\(--copilot-panel-width\)\)/);
+  assert.doesNotMatch(styles, /flex:\s*0 0 calc\(100% - var\(--copilot-panel-width\)\)/);
   assert.match(styles, /\[data-copilotkit\]/);
   assert.match(styles, /z-index: 99999/);
 });
