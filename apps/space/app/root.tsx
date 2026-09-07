@@ -6,11 +6,7 @@
 
 import { Links, Meta, Outlet, Scripts } from "react-router";
 // assets
-import appleTouchIcon from "@/app/assets/favicon/apple-touch-icon.png?url";
-import favicon16 from "@/app/assets/favicon/favicon-16x16.png?url";
-import favicon32 from "@/app/assets/favicon/favicon-32x32.png?url";
-import faviconIco from "@/app/assets/favicon/favicon.ico?url";
-import siteWebmanifest from "@/app/assets/favicon/site.webmanifest?url";
+import tenFoldLogo from "@/app/assets/branding/tenfold-logo-square-rebrand-loader-v3.png?url";
 import { LogoSpinner } from "@/components/common/logo-spinner";
 import globalStyles from "@/styles/globals.css?url";
 // types
@@ -19,20 +15,22 @@ import type { Route } from "./+types/root";
 import ErrorPage from "./error";
 import { AppProviders } from "./providers";
 // fonts
+// oxlint-disable-next-line eslint-plugin-import(no-unassigned-import) -- loads the global Inter font stylesheet
 import "@fontsource-variable/inter";
 import interVariableWoff2 from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+// oxlint-disable-next-line eslint-plugin-import(no-unassigned-import) -- loads the global Material Symbols stylesheet
 import "@fontsource/material-symbols-rounded";
+// oxlint-disable-next-line eslint-plugin-import(no-unassigned-import) -- loads the global IBM Plex Mono stylesheet
 import "@fontsource/ibm-plex-mono";
 
 const APP_TITLE = "Ten-Fold | Share your work publicly";
 const APP_DESCRIPTION = "Ten-Fold makes it easy to share project views publicly.";
 
 export const links: Route.LinksFunction = () => [
-  { rel: "apple-touch-icon", sizes: "180x180", href: appleTouchIcon },
-  { rel: "icon", type: "image/png", sizes: "32x32", href: favicon32 },
-  { rel: "icon", type: "image/png", sizes: "16x16", href: favicon16 },
-  { rel: "shortcut icon", href: faviconIco },
-  { rel: "manifest", href: siteWebmanifest },
+  { rel: "apple-touch-icon", sizes: "180x180", href: tenFoldLogo },
+  { rel: "icon", type: "image/png", href: tenFoldLogo },
+  { rel: "shortcut icon", href: tenFoldLogo },
+  { rel: "manifest", href: "/site.webmanifest.json" },
   { rel: "stylesheet", href: globalStyles },
   {
     rel: "preload",
@@ -74,13 +72,12 @@ export const meta: Route.MetaFunction = () => [
   { name: "description", content: APP_DESCRIPTION },
   { property: "og:title", content: APP_TITLE },
   { property: "og:description", content: APP_DESCRIPTION },
-  { property: "og:url", content: "https://sites.plane.so/" },
+  { property: "og:url", content: "https://ten-fold.co/spaces/" },
   {
     name: "keywords",
     content:
       "software development, customer feedback, software, accelerate, code management, release management, project management, work item tracking, agile, scrum, kanban, collaboration",
   },
-  { name: "twitter:site", content: "@planepowers" },
 ];
 
 export default function Root() {
