@@ -13,6 +13,13 @@ describe("work-item tool contracts", () => {
     expect(buildWorkItemQuery("backlog")).toEqual({ per_page: "20", state_group: "backlog" });
   });
 
+  it("sends an inclusive target-date range when listing upcoming work items", () => {
+    expect(buildWorkItemQuery(undefined, "2026-09-07", "2026-09-30")).toEqual({
+      per_page: "20",
+      target_date__range: "2026-09-07,2026-09-30",
+    });
+  });
+
   it("reports the current date and time in the user's timezone", () => {
     expect(getUserLocalDateTime("Asia/Singapore", new Date("2026-09-07T16:30:00Z"))).toEqual({
       date: "2026-09-08",

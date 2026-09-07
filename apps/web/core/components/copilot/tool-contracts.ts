@@ -61,6 +61,7 @@ export async function createWorkItemsSequentially<TItem, TValue>(
 
   for (const item of items) {
     try {
+      // oxlint-disable-next-line eslint(no-await-in-loop) -- preserve request order and stop after the first failure.
       created.push({ item, value: await create(item) });
     } catch (error) {
       failed.push({ item, message: error instanceof Error ? error.message : "Request failed" });
@@ -92,8 +93,12 @@ export function findProjectMatches(projects: ProjectLookupRecord[], query: strin
     .map(({ id, name, identifier }) => ({ id, name, identifier }));
 }
 
-export function buildWorkItemQuery(stateGroup?: WorkItemStateGroup) {
-  return { per_page: "20", ...(stateGroup ? { state_group: stateGroup } : {}) };
+export function buildWorkItemQuery(stateGroup?: WorkItemStateGroup, dateFrom?: string, dateTo?: string) {
+  return {
+    per_page: "20",
+    ...(stateGroup ? { state_group: stateGroup } : {}),
+    ...(dateFrom && dateTo ? { target_date__range: `${dateFrom},${dateTo}` } : {}),
+  };
 }
 
 export function getUserLocalDateTime(timeZone: string, now: Date = new Date()) {
