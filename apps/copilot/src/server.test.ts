@@ -61,6 +61,13 @@ describe("createServer", () => {
     expect((await fetch(url)).status).toBe(401);
     expect((await fetch(url, { headers: { Authorization: "Bearer invalid" } })).status).toBe(401);
     expect((await fetch(url, { headers: { Authorization: `Bearer ${identityToken()}` } })).status).toBe(200);
+    expect(
+      (
+        await fetch(`${url.replace(/\/info$/, "/inspector-metadata")}`, {
+          headers: { Authorization: `Bearer ${identityToken()}` },
+        })
+      ).status
+    ).toBe(204);
     server.close();
   });
 });

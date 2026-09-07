@@ -1,6 +1,6 @@
 import { CopilotKit, CopilotSidebar, useFrontendTool, useHumanInTheLoop } from "@copilotkit/react-core/v2";
 import { API_BASE_URL } from "@plane/constants";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useParams } from "react-router";
 
@@ -39,6 +39,7 @@ const MIN_COPILOT_PANEL_WIDTH = 280;
 const MAX_COPILOT_PANEL_WIDTH = 560;
 const LAUNCHER_SIZE = 56;
 const LAUNCHER_GUTTER = 24;
+const COPILOT_SIDEBAR_LABELS = { modalHeaderTitle: "Ten-Fold Assistant" };
 
 type LauncherPosition = { x: number; y: number };
 
@@ -84,8 +85,8 @@ function PlaneTools() {
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
   const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
   const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
+  const launcherPositionRef = useRef<LauncherPosition | null>(null);
   const dragStart = useRef<{ x: number; y: number; pointerX: number; pointerY: number; moved: boolean } | null>(null);
-  const preserveSidebarOpen = useRef(false);
 
   useEffect(() => {
     const storedWidth = Number(window.localStorage.getItem(COPILOT_PANEL_WIDTH_STORAGE_KEY));
@@ -114,6 +115,9 @@ function PlaneTools() {
 
   useEffect(() => {
     if (!launcherPosition) return;
+    launcherPositionRef.current = launcherPosition;
+    document.documentElement.style.setProperty("--copilot-launcher-left", `${launcherPosition.x}px`);
+    document.documentElement.style.setProperty("--copilot-launcher-top", `${launcherPosition.y}px`);
     window.localStorage.setItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY, JSON.stringify(launcherPosition));
   }, [launcherPosition]);
 
@@ -122,48 +126,6 @@ function PlaneTools() {
     window.localStorage.removeItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
     setLauncherPosition(position);
   }, []);
-
-  useEffect(() => {
-    let panel: HTMLElement | null = null;
-    let wasOpen = false;
-    let panelObserver: MutationObserver | undefined;
-    const reopen = () => {
-      window.requestAnimationFrame(() => {
-        if (preserveSidebarOpen.current && panel?.getAttribute("aria-hidden") === "true") {
-          document.querySelector<HTMLButtonElement>('[data-slot="chat-toggle-button"]')?.click();
-        }
-      });
-    };
-    const observePanel = () => {
-      const nextPanel = document.querySelector<HTMLElement>("[data-copilot-sidebar]");
-      if (nextPanel === panel) return;
-      panelObserver?.disconnect();
-      panel = nextPanel;
-      if (!panel) return;
-      wasOpen = panel.getAttribute("aria-hidden") === "false";
-      if (wasOpen) preserveSidebarOpen.current = true;
-      else if (preserveSidebarOpen.current) reopen();
-      panelObserver = new MutationObserver(() => {
-        const isOpen = panel?.getAttribute("aria-hidden") === "false";
-        if (isOpen) {
-          preserveSidebarOpen.current = true;
-        } else if (wasOpen && preserveSidebarOpen.current) {
-          reopen();
-        } else if (wasOpen) {
-          resetLauncherPosition();
-        }
-        wasOpen = isOpen;
-      });
-      panelObserver.observe(panel, { attributes: true, attributeFilter: ["aria-hidden"] });
-    };
-    const documentObserver = new MutationObserver(observePanel);
-    documentObserver.observe(document.body, { childList: true, subtree: true });
-    observePanel();
-    return () => {
-      panelObserver?.disconnect();
-      documentObserver.disconnect();
-    };
-  }, [resetLauncherPosition]);
 
   const startResize = (event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -189,11 +151,12 @@ function PlaneTools() {
     window.addEventListener("pointerup", stopResize, true);
   };
 
-  const startLauncherDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!launcherPosition) return;
+  const startLauncherDrag = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
+    const currentLauncherPosition = launcherPositionRef.current;
+    if (!currentLauncherPosition) return;
     dragStart.current = {
-      x: launcherPosition.x,
-      y: launcherPosition.y,
+      x: currentLauncherPosition.x,
+      y: currentLauncherPosition.y,
       pointerX: event.clientX,
       pointerY: event.clientY,
       moved: false,
@@ -215,7 +178,45 @@ function PlaneTools() {
     };
     window.addEventListener("pointermove", drag);
     window.addEventListener("pointerup", stopDrag);
-  };
+  }, []);
+
+  const stopLauncherClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    if (dragStart.current?.moved) event.preventDefault();
+    dragStart.current = null;
+  }, []);
+
+  const sidebarToggleButton = useMemo(
+    () => ({ onPointerDown: startLauncherDrag, onClick: stopLauncherClick }),
+    [startLauncherDrag, stopLauncherClick]
+  );
+
+  const sidebarHeader = useMemo(
+    () => ({
+      children: ({ closeButton, titleContent }: { closeButton: React.ReactNode; titleContent: React.ReactNode }) => (
+        <header
+          className="flex h-[51px] items-center justify-between bg-surface-1 px-4"
+          onClickCapture={(event) => {
+            if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) resetLauncherPosition();
+          }}
+        >
+          <div className="flex items-center gap-2 text-primary">
+            <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+              <path
+                d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.75"
+              />
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+            </svg>
+            <div className="text-13 font-medium">{titleContent}</div>
+          </div>
+          {closeButton}
+        </header>
+      ),
+    }),
+    [resetLauncherPosition]
+  );
 
   useFrontendTool(
     {
@@ -650,45 +651,11 @@ function PlaneTools() {
     <>
       <CopilotSidebar
         defaultOpen={false}
-        header={{
-          children: ({ closeButton, titleContent }) => (
-            <header
-              className="flex h-[51px] items-center justify-between bg-surface-1 px-4"
-              onClickCapture={(event) => {
-                if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
-                  preserveSidebarOpen.current = false;
-                }
-              }}
-            >
-              <div className="flex items-center gap-2 text-primary">
-                <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
-                  <path
-                    d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeWidth="1.75"
-                  />
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
-                </svg>
-                <div className="text-13 font-medium">{titleContent}</div>
-              </div>
-              {closeButton}
-            </header>
-          ),
-        }}
-        labels={{ modalHeaderTitle: "Ten-Fold Assistant" }}
+        header={sidebarHeader}
+        labels={COPILOT_SIDEBAR_LABELS}
         position="right"
         width="var(--copilot-panel-width)"
-        toggleButton={{
-          onPointerDown: startLauncherDrag,
-          onClick: (event) => {
-            if (dragStart.current?.moved) event?.preventDefault();
-            dragStart.current = null;
-          },
-          style: launcherPosition
-            ? { left: launcherPosition.x, top: launcherPosition.y, right: "auto", bottom: "auto", touchAction: "none" }
-            : undefined,
-        }}
+        toggleButton={sidebarToggleButton}
       />
       <div
         className="copilot-panel-resize-handle"

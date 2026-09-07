@@ -54,11 +54,10 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.doesNotMatch(copilot, /const dateSchema = z\.string\(\)\.date\(\)/);
   assert.match(copilot, /startDate: z\.string\(\)\.date\(\)\.optional\(\)/);
   assert.match(copilot, /targetDate: z\.string\(\)\.date\(\)\.optional\(\)/);
-  assert.match(copilot, /MutationObserver/);
-  assert.match(copilot, /const preserveSidebarOpen = useRef\(false\)/);
-  assert.match(copilot, /childList:\s*true/);
-  assert.match(copilot, /data-testid="copilot-close-button"/);
-  assert.match(copilot, /querySelector<HTMLButtonElement>\('\[data-slot="chat-toggle-button"\]'\)\?\.click\(\)/);
+  assert.doesNotMatch(copilot, /MutationObserver/);
+  assert.doesNotMatch(copilot, /preserveSidebarOpen/);
+  assert.doesNotMatch(copilot, /chat-toggle-button"\]'\)\?\.click\(\)/);
+  assert.match(copilot, /const sidebarToggleButton = useMemo/);
   assert.match(copilot, /catch \{[\s\S]*window\.setTimeout\(refresh, 5_000\)/);
   assert.match(copilot, /onPointerDown={startResize}/);
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
@@ -72,6 +71,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /<header[\s\S]*className="flex h-\[51px\] items-center justify-between/);
   assert.match(copilot, /onPointerDown:\s*startLauncherDrag/);
   assert.match(styles, /--copilot-panel-width/);
+  assert.match(styles, /--copilot-launcher-left/);
+  assert.match(styles, /--copilot-launcher-top/);
   assert.match(styles, /margin-inline-end:\s*0 !important/);
   assert.match(styles, /--sidebar-width:\s*var\(--copilot-panel-width\) !important/);
   assert.match(

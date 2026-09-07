@@ -91,6 +91,14 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   display: none !important;
 }
 
+[data-slot="chat-toggle-button"] {
+  left: var(--copilot-launcher-left) !important;
+  top: var(--copilot-launcher-top) !important;
+  right: auto !important;
+  bottom: auto !important;
+  touch-action: none;
+}
+
 [data-copilotkit] {
   --cpk-default-font-family: "Inter Variable", sans-serif;
   --foreground: var(--text-color-primary);
