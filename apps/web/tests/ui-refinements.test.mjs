@@ -80,6 +80,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     /body:has\(\[data-copilot-sidebar\]\[aria-hidden="false"\]\) \[data-slot="chat-toggle-button"\]/
   );
   assert.match(styles, /\[data-sidebar-chat\] > \[data-copilotkit\] > div/);
+  assert.match(styles, /\[data-copilot-sidebar\] \.cpk\\:px-4[\s\S]*padding-inline:\s*4px !important/);
   assert.match(styles, /\.cpk\\:px-8\.cpk\\:pb-4/);
   assert.match(styles, /padding-inline:\s*0\.5rem !important/);
   assert.match(styles, /\.cpk\\:max-w-3xl\.cpk\\:mx-auto/);
@@ -89,7 +90,15 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
   assert.match(
     styles,
-    /\[data-copilotkit\] \[data-testid\^="copilot-"\]\[data-testid\$="-message"\][\s\S]*font-size:\s*14px/
+    /\[data-copilotkit\] \[data-testid\^="copilot-"\]\[data-testid\$="-message"\][\s\S]*font-size:\s*13px/
+  );
+  assert.match(
+    styles,
+    /\[data-copilot-sidebar\] \.copilot-user-message,\s*\[data-copilot-sidebar\] \.copilot-user-message \*[\s\S]*font-size:\s*13px !important/
+  );
+  assert.match(
+    styles,
+    /\[data-copilot-sidebar\] \.copilotKitMessage\.copilotKitUserMessage[\s\S]*padding-block:\s*4px !important/
   );
   assert.match(styles, /min-height:\s*40px !important/);
   assert.match(styles, /max-height:\s*160px !important/);

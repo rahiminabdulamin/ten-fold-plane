@@ -159,6 +159,16 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   padding-block: 0 !important;
 }
 
+[data-copilot-sidebar] .copilotKitMessage.copilotKitUserMessage {
+  padding-block: 4px !important;
+}
+
+[data-copilot-sidebar] .copilot-user-message,
+[data-copilot-sidebar] .copilot-user-message * {
+  font-size: 13px !important;
+  line-height: 1.15;
+}
+
 [data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
   margin-block: 0.25rem !important;
   padding-block: 4px !important;
@@ -187,6 +197,10 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 
 [data-copilot-sidebar] .cpk\:px-8.cpk\:pb-4 {
   padding-inline: 0.5rem !important;
+}
+
+[data-copilot-sidebar] .cpk\:px-4 {
+  padding-inline: 4px !important;
 }
 
 [data-copilot-sidebar] .cpk\:px-8.cpk\:pb-4 > .cpk\:max-w-3xl.cpk\:mx-auto {

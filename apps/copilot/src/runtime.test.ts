@@ -8,8 +8,15 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain("create_work_items exactly once");
     expect(DEFAULT_AGENT_PROMPT).toContain("dateFrom and dateTo");
     expect(DEFAULT_AGENT_PROMPT).toContain(
-      "Do not ask the user to confirm or re-establish the current project context"
+      "Do not ask the user to confirm or re-establish the current Workspace context"
     );
+  });
+
+  it("uses Team and Workspace in user-facing responses without renaming tool contracts", () => {
+    expect(DEFAULT_AGENT_PROMPT).toContain('call the top-level entity "Team" and the child entity "Workspace"');
+    expect(DEFAULT_AGENT_PROMPT).toContain("Keep tool names and parameter names unchanged");
+    expect(DEFAULT_AGENT_PROMPT).toContain("find_project");
+    expect(DEFAULT_AGENT_PROMPT).toContain("projectId");
   });
 
   it("creates the default gpt-4o-mini agent without exposing credentials", () => {

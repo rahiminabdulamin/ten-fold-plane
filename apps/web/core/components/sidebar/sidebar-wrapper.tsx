@@ -20,13 +20,13 @@ import { AppSidebarToggleButton } from "./sidebar-toggle-button";
 import { IconButton } from "@plane/propel/icon-button";
 
 type TSidebarWrapperProps = {
-  title: string;
   children: React.ReactNode;
   quickActions?: React.ReactNode;
+  showTeamSelector?: boolean;
 };
 
 export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWrapperProps) {
-  const { title, children, quickActions } = props;
+  const { children, quickActions, showTeamSelector = false } = props;
   // state
   const [isCustomizeNavDialogOpen, setIsCustomizeNavDialogOpen] = useState(false);
   // store hooks
@@ -54,15 +54,13 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
           {/* Workspace switcher and settings */}
 
           <div className="flex items-center justify-between gap-2 px-2">
-            {title === "Projects" ? (
+            {showTeamSelector && (
               <div className="min-w-0 flex-1 py-1 text-16 font-medium text-primary">
                 <WorkspaceMenuRoot variant="top-navigation" />
               </div>
-            ) : (
-              <span className="pt-1 text-16 font-medium text-primary">{title}</span>
             )}
             <div className="flex items-center gap-2">
-              {title === "Projects" && (
+              {showTeamSelector && (
                 <IconButton
                   size="base"
                   variant="ghost"

@@ -27,15 +27,17 @@ test("hierarchy emails use Team for the parent and Workspace for the child", asy
 });
 
 test("hard-coded navigation and entity controls use the rendered hierarchy", async () => {
-  const [sidebar, projectSettings, teamSettings, projectMenu, teamMenu] = await Promise.all([
+  const [sidebar, sidebarWrapper, projectSettings, teamSettings, projectMenu, teamMenu] = await Promise.all([
     read("app/(all)/[workspaceSlug]/(projects)/sidebar.tsx"),
+    read("core/components/sidebar/sidebar-wrapper.tsx"),
     read("core/components/settings/project/sidebar/header.tsx"),
     read("core/components/settings/workspace/sidebar/header.tsx"),
     read("core/components/power-k/menus/projects.tsx"),
     read("core/components/power-k/menus/workspaces.tsx"),
   ]);
 
-  assert.match(sidebar, /title="Workspaces"/);
+  assert.match(sidebar, /showTeamSelector/);
+  assert.match(sidebarWrapper, /showTeamSelector/);
   assert.match(projectSettings, />Workspace settings</);
   assert.match(teamSettings, />Team settings</);
   assert.match(projectMenu, /emptyText="No workspaces found"/);
@@ -56,4 +58,14 @@ test("renamed frontend files remain compatible with the pre-commit accessibility
   assert.match(workspaceWrapper, /<button[\s\S]*?type="button"[\s\S]*?onClick={handleSignOut}/);
   assert.doesNotMatch(joinModal, /tabIndex={1}/);
   assert.match(leaveModal, /data\.confirmLeave === "Leave Workspace"/);
+});
+
+test("assistant tools describe the hierarchy with Team and Workspace while retaining their API contracts", async () => {
+  const root = await read("core/components/copilot/root.tsx");
+
+  assert.match(root, /description: "List up to 20 Workspaces in the current Team\."/);
+  assert.match(root, /message: "A Team is required\."/);
+  assert.match(root, /name: "find_project"/);
+  assert.match(root, /projectId: z\.string\(\)\.uuid\(\)/);
+  assert.match(root, /projectService\.getProjectsLite\(workspace\)/);
 });
