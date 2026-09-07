@@ -425,12 +425,17 @@ function PlaneTools() {
     {
       name: "create_work_item",
       description:
-        "Create one work item in the current project with any supported editable fields. Use create_work_items for multiple items.",
-      parameters: workItemMutationSchema.extend({ title: z.string().min(1).max(255) }),
-      handler: async (input) => {
-        if (!workspace || !projectId) return { ok: false, message: "A current project is required.", retryable: false };
+        "Create one work item with any supported editable fields. Use create_work_items for multiple items. When the user names a project, pass its canonical projectId returned by find_project.",
+      parameters: workItemMutationSchema.extend({
+        title: z.string().min(1).max(255),
+        projectId: z.string().uuid().optional(),
+      }),
+      handler: async ({ projectId: requestedProjectId, ...input }) => {
+        const targetProjectId = requestedProjectId ?? projectId;
+        if (!workspace || !targetProjectId)
+          return { ok: false, message: "Find a project first, then provide its project ID.", retryable: false };
         try {
-          const issue = await issueService.createIssue(workspace, projectId, toWorkItemPayload(input));
+          const issue = await issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(input));
           return {
             ...toolResult("create_work_item", `Created ${issue.name}.`, [issue.id]),
             data: { id: issue.id, name: issue.name },
