@@ -8,6 +8,7 @@ import { observer } from "mobx-react";
 import { Outlet } from "react-router";
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 import useSWR from "swr";
+import tenfoldLogo from "../../../../web/public/branding/tenfold-logo-square-rebrand-black-v3.png?url";
 // components
 import { LogoSpinner } from "@/components/common/logo-spinner";
 import { SomethingWentWrongError } from "@/components/issues/issue-layouts/error";
@@ -24,7 +25,6 @@ const DEFAULT_DESCRIPTION = "Shared with Ten-Fold.";
 interface IssueMetadata {
   name?: string;
   description?: string;
-  cover_image?: string;
 }
 
 // Loader function runs on the server and fetches metadata
@@ -58,7 +58,6 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
   const title = metadata?.name || DEFAULT_TITLE;
   const description = metadata?.description || DEFAULT_DESCRIPTION;
-  const coverImage = metadata?.cover_image;
 
   const metaTags = [
     { title },
@@ -73,16 +72,14 @@ export function meta({ loaderData }: Route.MetaArgs) {
     { name: "twitter:description", content: description },
   ];
 
-  // Add images if cover image exists
-  if (coverImage) {
-    metaTags.push(
-      { property: "og:image", content: coverImage },
-      { property: "og:image:width", content: "800" },
-      { property: "og:image:height", content: "600" },
-      { property: "og:image:alt", content: title },
-      { name: "twitter:image", content: coverImage }
-    );
-  }
+  metaTags.push(
+    { property: "og:image", content: tenfoldLogo },
+    { property: "og:image:width", content: "391" },
+    { property: "og:image:height", content: "391" },
+    { property: "og:image:alt", content: "Ten-Fold logo" },
+    { name: "twitter:image", content: tenfoldLogo },
+    { name: "twitter:image:alt", content: "Ten-Fold logo" }
+  );
 
   return metaTags;
 }
