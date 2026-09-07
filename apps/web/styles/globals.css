@@ -46,8 +46,9 @@
 }
 
 /* CopilotKit's sidebar normally shifts the body, including the global nav.
- * Keep that shift local to the lower application row so all three panels share
- * the space beneath the viewport-wide top navigation. */
+ * Reserve its width in the lower application row instead, so the assistant is
+ * a desktop app panel and every nested workspace panel lays out in the space
+ * that remains. The viewport-wide top navigation is deliberately untouched. */
 @media (min-width: 768px) {
   body:has([data-copilot-sidebar][aria-hidden="false"]) {
     margin-inline-start: 0 !important;
@@ -56,12 +57,18 @@
   }
 
   body:has([data-copilot-sidebar][aria-hidden="false"]) .copilot-panel-layout {
-    margin-inline-end: var(--copilot-panel-width);
-    transition: margin-inline-end 260ms ease;
+    flex: 0 0 calc(100% - var(--copilot-panel-width));
+    inline-size: calc(100% - var(--copilot-panel-width));
+    transition:
+      flex-basis 260ms ease,
+      inline-size 260ms ease;
   }
 
   [data-copilot-sidebar] {
     --sidebar-width: var(--copilot-panel-width) !important;
+    /* The banner is hidden below, so its reserved space must not move the
+     * active-conversation composer above the welcome-screen composer. */
+    --copilotkit-license-banner-offset: 0px;
     top: 40px !important;
     height: calc(100dvh - 40px) !important;
   }
@@ -144,7 +151,7 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 }
 
 [data-copilot-sidebar] .copilot-user-message {
-  padding-top: 8px !important;
+  padding-block: 0 !important;
 }
 
 [data-copilot-sidebar] [data-testid^="copilot-"][data-testid$="-message"] > div {
@@ -152,6 +159,15 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   padding-block: 8px !important;
   padding-inline: 0.625rem !important;
   border-radius: 0.5rem !important;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-assistant-message"] {
+  margin-block: 0 !important;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-assistant-message"] > div {
+  margin-block: 0 !important;
+  padding-block: 0 !important;
 }
 
 [data-copilotkit] [data-testid^="copilot-"][data-testid$="-message"],

@@ -645,7 +645,7 @@ function PlaneTools() {
         header={{
           children: ({ closeButton, titleContent }) => (
             <header
-              className="flex h-[51px] items-center justify-between border-b border-subtle bg-surface-1 px-4"
+              className="flex h-[51px] items-center justify-between bg-surface-1 px-4"
               onClickCapture={(event) => {
                 if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
                   preserveSidebarOpen.current = false;
