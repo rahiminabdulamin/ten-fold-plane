@@ -91,6 +91,7 @@ export const ExtendedProjectSidebar = observer(function ExtendedProjectSidebar()
         title: t("link_copied"),
         message: t("project_link_copied_to_clipboard"),
       });
+      return undefined;
     });
   };
   return (
@@ -112,7 +113,7 @@ export const ExtendedProjectSidebar = observer(function ExtendedProjectSidebar()
       >
         <div className="sticky top-4 flex w-full flex-col gap-1 px-4">
           <div className="flex items-center justify-between">
-            <span className="py-1.5 text-13 font-semibold text-tertiary">Projects</span>
+            <span className="py-1.5 text-13 font-semibold text-tertiary">Workspaces</span>
             {isAuthorizedUser && (
               <Tooltip label={t("create_project")}>
                 <button
@@ -134,7 +135,6 @@ export const ExtendedProjectSidebar = observer(function ExtendedProjectSidebar()
               className="w-full max-w-[234px] border-none bg-transparent text-13 outline-none placeholder:text-placeholder"
               placeholder={t("search")}
               value={searchQuery}
-              autoFocus
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>

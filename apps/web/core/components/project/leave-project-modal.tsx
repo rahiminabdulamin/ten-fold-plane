@@ -60,11 +60,11 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
 
     if (data) {
       if (data.projectName === project?.name) {
-        if (data.confirmLeave === "Leave Project") {
+        if (data.confirmLeave === "Leave Workspace") {
           router.push(`/${workspaceSlug}/projects`);
           return leaveProject(workspaceSlug.toString(), project.id)
             .then(() => {
-              handleClose();
+              return handleClose();
             })
             .catch((_err) => {
               setToast({
@@ -77,7 +77,7 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
           setToast({
             type: TOAST_TYPE.ERROR,
             title: "Error!",
-            message: "Please confirm leaving the project by typing the 'Leave Project'.",
+            message: "Please confirm leaving the workspace by typing 'Leave Workspace'.",
           });
         }
       } else {
@@ -104,7 +104,7 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
             <WarningTriangleOutline className="h-6 w-6 text-danger-primary" aria-hidden="true" />
           </span>
           <span className="flex items-center justify-start">
-            <h3 className="text-18 font-medium 2xl:text-20">Leave Project</h3>
+            <h3 className="text-18 font-medium 2xl:text-20">Leave Workspace</h3>
           </span>
         </div>
 
@@ -137,7 +137,7 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
                     value={value}
                     onChange={onChange}
                     ref={ref}
-                    placeholder="Enter project name"
+                    placeholder="Enter workspace name"
                   />
                 </InputGroup>
               </Field>
@@ -147,7 +147,7 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
 
         <div className="text-secondary">
           <p className="text-13">
-            To confirm, type <span className="font-medium text-primary">Leave Project</span> below:
+            To confirm, type <span className="font-medium text-primary">Leave Workspace</span> below:
           </p>
           <Controller
             control={control}
@@ -163,7 +163,7 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
                     value={value}
                     onChange={onChange}
                     ref={ref}
-                    placeholder="Enter 'leave project'"
+                    placeholder="Enter 'leave workspace'"
                   />
                 </InputGroup>
               </Field>
@@ -175,7 +175,7 @@ export const LeaveProjectModal = observer(function LeaveProjectModal(props: ILea
             Cancel
           </Button>
           <Button variant="error-fill" size="lg" type="submit" loading={isSubmitting}>
-            {isSubmitting ? "Leaving..." : "Leave Project"}
+            {isSubmitting ? "Leaving..." : "Leave Workspace"}
           </Button>
         </div>
       </form>

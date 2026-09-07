@@ -159,21 +159,22 @@ export const WorkspaceAuthWrapper = observer(function WorkspaceAuthWrapper(props
             </div>
             <div className="relative flex items-center gap-2">
               <div className="text-13 font-medium">{currentUser?.email}</div>
-              <div
-                className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-sm hover:bg-layer-1"
+              <button
+                type="button"
+                className="relative flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-sm border-0 bg-transparent hover:bg-layer-1"
                 onClick={handleSignOut}
               >
                 <Tooltip label={"Sign out"} alignOffset={8} disabled={isMobile}>
                   <LogOutOutline width={14} height={14} />
                 </Tooltip>
-              </div>
+              </button>
             </div>
           </div>
           <div className="relative flex h-full w-full flex-grow flex-col items-center justify-center space-y-3">
             <div className="relative flex-shrink-0">
               <img src={WorkSpaceNotAvailable} className="h-[220px] object-contain object-center" alt="Plane logo" />
             </div>
-            <h3 className="text-center text-16 font-semibold">Workspace not found</h3>
+            <h3 className="text-center text-16 font-semibold">Team not found</h3>
             <p className="text-center text-13 text-secondary">
               No workspace found with the URL. It may not exist or you lack authorization to view it.
             </p>
@@ -223,7 +224,7 @@ export const WorkspaceAuthWrapper = observer(function WorkspaceAuthWrapper(props
               </Link>
               <Link href="/create-workspace">
                 <span>
-                  <Button variant="primary">Create new workspace</Button>
+                  <Button variant="primary">Create new team</Button>
                 </span>
               </Link>
             </div>

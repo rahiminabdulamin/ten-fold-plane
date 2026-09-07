@@ -30,7 +30,7 @@ export function NotAWorkspaceMember() {
             </Link>
             <Link href="/create-workspace">
               <span>
-                <Button variant="primary">Create new workspace</Button>
+                <Button variant="primary">Create new team</Button>
               </span>
             </Link>
           </div>

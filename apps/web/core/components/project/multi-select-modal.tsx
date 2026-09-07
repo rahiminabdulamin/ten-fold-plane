@@ -94,7 +94,7 @@ export const ProjectMultiSelectModal = observer(function ProjectMultiSelectModal
           <SearchOutline className="size-4 flex-shrink-0 text-placeholder" aria-hidden="true" />
           <Combobox.Input
             className="h-12 w-full border-0 bg-transparent text-13 text-primary outline-none placeholder:text-placeholder focus:ring-0"
-            placeholder="Search for projects"
+            placeholder="Search for workspaces"
             displayValue={() => ""}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -106,9 +106,10 @@ export const ProjectMultiSelectModal = observer(function ProjectMultiSelectModal
               const projectDetails = projectDetailsMap.get(projectId);
               if (!projectDetails) return null;
               return (
-                <div
+                <button
+                  type="button"
                   key={projectDetails.id}
-                  className="group flex cursor-pointer items-center gap-1.5 rounded-sm bg-surface-2 px-2 py-1"
+                  className="group flex cursor-pointer items-center gap-1.5 rounded-sm border-0 bg-surface-2 px-2 py-1"
                   onClick={() => {
                     handleSelectedProjectChange(selectedProjectIds.filter((id) => id !== projectDetails.id));
                   }}
@@ -118,7 +119,7 @@ export const ProjectMultiSelectModal = observer(function ProjectMultiSelectModal
                     {projectDetails.identifier}
                   </p>
                   <CloseOutline className="size-3 flex-shrink-0 text-placeholder transition-colors group-hover:text-secondary" />
-                </div>
+                </button>
               );
             })}
           </div>
