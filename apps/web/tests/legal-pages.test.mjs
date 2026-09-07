@@ -21,17 +21,17 @@ test("publishes original Ten-Fold legal pages", async () => {
   assert.match(privacy, /PrivacyPolicy/);
 });
 
-test("uses Ten-Fold legal links in authentication and the workspace sidebar", async () => {
-  const [agreement, sidebar] = await Promise.all([
+test("uses Ten-Fold legal links in authentication and the shared sidebar wrapper", async () => {
+  const [agreement, sidebarWrapper] = await Promise.all([
     readAppFile("core/components/account/terms-and-conditions.tsx"),
-    readAppFile("app/(all)/[workspaceSlug]/(projects)/sidebar.tsx"),
+    readAppFile("core/components/sidebar/sidebar-wrapper.tsx"),
   ]);
 
   assert.doesNotMatch(agreement, /plane\.so\/legals/);
   assert.match(agreement, /termsOfService: "\/terms"/);
   assert.match(agreement, /privacyPolicy: "\/privacy"/);
-  assert.match(sidebar, /Terms of Service/);
-  assert.match(sidebar, /Privacy Policy/);
+  assert.match(sidebarWrapper, /Terms of Service/);
+  assert.match(sidebarWrapper, /Privacy Policy/);
 });
 
 test("keeps long legal content scrollable inside the fixed application shell", async () => {

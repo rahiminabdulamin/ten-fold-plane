@@ -293,6 +293,13 @@ export const SidebarProjectsListItem = observer(function SidebarProjectsListItem
           ref={projectRef}
         >
           <DropIndicator classNames="absolute top-0" isVisible={instruction === "DRAG_OVER"} />
+          <span
+            className={cn(
+              "pointer-events-none absolute top-1/2 bottom-0 -left-2 w-px bg-surface-1",
+              isLastChild && "bottom-1/2"
+            )}
+          />
+          <span className="workspace-tree-branch pointer-events-none absolute top-1/2 -left-2 h-px w-2 bg-layer-3" />
           <div
             className={cn(
               "group/project-item relative flex w-full items-center rounded-md px-2 py-1.5 text-primary hover:bg-layer-transparent-hover",
