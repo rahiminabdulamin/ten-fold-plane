@@ -96,15 +96,7 @@ function PlaneTools() {
       panelWidthRef.current = width;
       setPanelWidth(width);
     }
-    const storedPosition = window.localStorage.getItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
-    if (storedPosition) {
-      try {
-        setLauncherPosition(clampLauncherPosition(JSON.parse(storedPosition) as LauncherPosition));
-        return;
-      } catch {
-        window.localStorage.removeItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
-      }
-    }
+    window.localStorage.removeItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
     setLauncherPosition(getDefaultLauncherPosition());
   }, []);
 

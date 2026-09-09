@@ -62,6 +62,14 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
   assert.match(copilot, /event\.stopPropagation\(\)/);
   assert.match(copilot, /const panelWidthRef = useRef\(DEFAULT_COPILOT_PANEL_WIDTH\)/);
+  assert.match(
+    copilot,
+    /window\.localStorage\.removeItem\(COPILOT_LAUNCHER_POSITION_STORAGE_KEY\);\s*setLauncherPosition\(getDefaultLauncherPosition\(\)\);/
+  );
+  assert.doesNotMatch(
+    copilot,
+    /const storedPosition = window\.localStorage\.getItem\(COPILOT_LAUNCHER_POSITION_STORAGE_KEY\)/
+  );
   assert.match(copilot, /width="var\(--copilot-panel-width\)"/);
   assert.match(copilot, /panelWidthRef\.current = width/);
   assert.match(copilot, /const stopResize = \(releaseEvent: PointerEvent\)/);
