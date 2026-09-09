@@ -50,7 +50,7 @@ const SidebarDropdownItem = observer(function SidebarDropdownItem(props: TProps)
         <div className="flex items-center justify-between gap-1 rounded-sm p-1 text-13 text-primary">
           <div className="relative flex w-[80%] items-center justify-start gap-2.5">
             <span
-              className={`relative flex h-8 w-8 flex-shrink-0 items-center justify-center border-subtle p-2 text-14 font-medium uppercase ${
+              className={`relative flex h-8 w-8 flex-shrink-0 items-center justify-center border-none p-2 text-14 font-medium uppercase ${
                 !workspace?.logo_url && "rounded-md bg-[#026292] text-on-color"
               }`}
             >
