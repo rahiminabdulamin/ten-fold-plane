@@ -30,7 +30,6 @@ export const links: Route.LinksFunction = () => [
   { rel: "apple-touch-icon", sizes: "180x180", href: tenFoldLogo },
   { rel: "icon", type: "image/png", href: tenFoldLogo },
   { rel: "shortcut icon", href: tenFoldLogo },
-  { rel: "manifest", href: "/site.webmanifest.json" },
   { rel: "stylesheet", href: globalStyles },
   {
     rel: "preload",

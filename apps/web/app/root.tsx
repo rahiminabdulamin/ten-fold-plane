@@ -9,7 +9,7 @@ import { Links, Meta, Outlet, Scripts } from "react-router";
 import type { LinksFunction } from "react-router";
 import { ThemeProvider } from "next-themes";
 // plane imports
-import { SITE_DESCRIPTION, SITE_NAME } from "@plane/constants";
+import { SITE_DESCRIPTION } from "@plane/constants";
 // types
 // assets
 import icon180 from "@/app/assets/icons/icon-180x180.png?url";
@@ -37,11 +37,9 @@ const APP_TITLE = "Ten-Fold | Project management";
 export const links: LinksFunction = () => [
   { rel: "icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v3.png" },
   { rel: "shortcut icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v3.png" },
-  { rel: "manifest", href: "/site.webmanifest.json" },
   { rel: "apple-touch-icon", href: icon512 },
   { rel: "apple-touch-icon", sizes: "180x180", href: icon180 },
   { rel: "apple-touch-icon", sizes: "512x512", href: icon512 },
-  { rel: "manifest", href: "/manifest.json" },
   { rel: "stylesheet", href: globalStyles },
   {
     rel: "preload",
@@ -59,13 +57,6 @@ export function Layout({ children }: { children: ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#fff" />
-        {/* Meta info for PWA */}
-        <meta name="application-name" content="Ten-Fold" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
         <Meta />
         <Links />
       </head>
