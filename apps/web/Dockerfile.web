@@ -78,17 +78,10 @@ RUN pnpm turbo run build --filter=web
 # *****************************************************************************
 # STAGE 3: Serve with Caddy
 # *****************************************************************************
-FROM caddy:2.11-builder-alpine AS caddy-builder
-
-RUN xcaddy build \
-    --with github.com/mholt/caddy-ratelimit
-
 FROM caddy:2.11-alpine AS production
 
 # curl is required by the HEALTHCHECK below and is not present in the base image
 RUN apk update && apk upgrade --no-cache && apk add --no-cache curl && rm -rf /var/cache/apk/*
-
-COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
 
 COPY apps/web/caddy/Caddyfile /etc/caddy/Caddyfile
 

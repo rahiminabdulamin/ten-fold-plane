@@ -58,7 +58,6 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.doesNotMatch(copilot, /preserveSidebarOpen/);
   assert.doesNotMatch(copilot, /chat-toggle-button"\]'\)\?\.click\(\)/);
   assert.match(copilot, /const sidebarToggleButton = useMemo/);
-  assert.match(copilot, /catch \{[\s\S]*window\.setTimeout\(refresh, 5_000\)/);
   assert.match(copilot, /onPointerDown={startResize}/);
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
   assert.match(copilot, /event\.stopPropagation\(\)/);

@@ -12,6 +12,7 @@ import { ProjectStateService } from "@/services/project/project-state.service";
 import { ProjectService } from "@/services/project";
 import { WorkspaceService } from "@/services/workspace.service";
 import { useUser } from "@/hooks/store/user";
+import { getRetryDelay } from "@/lib/retry-delay";
 
 import {
   buildWorkItemQuery,
@@ -677,19 +678,27 @@ export function PlaneCopilot() {
   useEffect(() => {
     let cancelled = false;
     let refreshTimer: number | undefined;
+    let failures = 0;
     const refresh = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/users/me/copilot-identity/`, { credentials: "include" });
-        if (!response.ok) throw new Error("Copilot identity refresh failed");
+        if (cancelled) return;
+        if (!response.ok) {
+          failures++;
+          refreshTimer = window.setTimeout(refresh, getRetryDelay(response.headers.get("Retry-After"), failures));
+          return;
+        }
         const identity = (await response.json()) as { token: string; expires_at: string };
         if (cancelled) return;
+        failures = 0;
         setToken(identity.token);
         refreshTimer = window.setTimeout(
           refresh,
           Math.max(Date.parse(identity.expires_at) - Date.now() - 30_000, 1_000)
         );
       } catch {
-        if (!cancelled) refreshTimer = window.setTimeout(refresh, 5_000);
+        failures++;
+        if (!cancelled) refreshTimer = window.setTimeout(refresh, getRetryDelay(null, failures));
       }
     };
     void refresh();
