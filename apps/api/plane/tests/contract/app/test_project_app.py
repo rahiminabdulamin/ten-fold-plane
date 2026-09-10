@@ -97,6 +97,21 @@ class TestProjectAPIPost(TestProjectBase):
         assert set(state_names) == set(expected_states)
 
     @pytest.mark.django_db
+    def test_create_project_uses_default_feature_visibility(self, session_client, workspace):
+        response = session_client.post(
+            self.get_project_url(workspace.slug),
+            {"name": "Default Features", "identifier": "DF"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["cycle_view"] is False
+        assert response.data["module_view"] is False
+        assert response.data["issue_views_view"] is True
+        assert response.data["page_view"] is True
+        assert response.data["intake_view"] is False
+
+    @pytest.mark.django_db
     def test_create_project_with_project_lead(self, session_client, workspace, create_user):
         """Test creating project with a different project lead"""
         # Create another user to be project lead

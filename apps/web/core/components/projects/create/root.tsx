@@ -18,6 +18,7 @@ import ProjectCreateButtons from "@/components/project/create/project-create-but
 // hooks
 import { getCoverImageType, uploadCoverImage } from "@/helpers/cover-image.helper";
 import { useProject } from "@/hooks/store/use-project";
+import { useAppRouter } from "@/hooks/use-app-router";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // plane web types
 import type { TProject } from "@plane/types";
@@ -28,17 +29,17 @@ export type TCreateProjectFormProps = {
   setToFavorite?: boolean;
   workspaceSlug: string;
   onClose: () => void;
-  handleNextStep: (projectId: string) => void;
   data?: Partial<TProject>;
   templateId?: string;
   updateCoverImageStatus: (projectId: string, coverImage: string) => Promise<void>;
 };
 
 export const CreateProjectForm = observer(function CreateProjectForm(props: TCreateProjectFormProps) {
-  const { setToFavorite, workspaceSlug, data, onClose, handleNextStep, updateCoverImageStatus } = props;
+  const { setToFavorite, workspaceSlug, data, onClose, updateCoverImageStatus } = props;
   // store
   const { t } = useTranslation();
   const { addProjectToFavorites, createProject, updateProject } = useProject();
+  const router = useAppRouter();
   // states
   const [shouldAutoSyncIdentifier, setShouldAutoSyncIdentifier] = useState(true);
   // form info
@@ -110,7 +111,9 @@ export const CreateProjectForm = observer(function CreateProjectForm(props: TCre
         if (setToFavorite) {
           handleAddToFavorites(res.id);
         }
-        return handleNextStep(res.id);
+        router.push(`/${workspaceSlug}/projects/${res.id}/issues`);
+        onClose();
+        return;
       })
       .catch((err) => {
         try {

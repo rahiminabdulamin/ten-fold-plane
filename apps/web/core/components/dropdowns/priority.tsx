@@ -427,6 +427,7 @@ export function PriorityDropdown(props: Props) {
   );
 
   return (
+    // oxlint-disable-next-line jsx_a11y/no-static-element-interactions
     <ComboDropDown
       as="div"
       ref={dropdownRef}
@@ -445,7 +446,7 @@ export function PriorityDropdown(props: Props) {
       renderByDefault={renderByDefault}
     >
       {isOpen && (
-        <Combobox.Options as="ul" className="fixed z-10" static>
+        <Combobox.Options as="ul" className="fixed z-40" static>
           <div
             className="my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none"
             ref={setPopperElement}

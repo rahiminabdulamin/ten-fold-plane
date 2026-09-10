@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import type { Placement } from "@popperjs/core";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
-import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { Combobox } from "@headlessui/react";
 // plane imports
@@ -79,10 +78,10 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
     if (isOpen) {
       onDropdownOpen?.();
       if (!isMobile) {
-        inputRef.current && inputRef.current.focus();
+        inputRef.current?.focus();
       }
     }
-  }, [isOpen, isMobile]);
+  }, [isOpen, isMobile, onDropdownOpen]);
 
   const searchInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (query !== "" && e.key === "Escape") {
@@ -131,11 +130,11 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
     currentUser?.id
   );
 
-  return createPortal(
+  return (
     <Combobox.Options as="ul" data-prevent-outside-click static>
       <div
         className={cn(
-          "z-30 my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none",
+          "z-40 my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none",
           optionsClassName
         )}
         ref={setPopperElement}
@@ -201,7 +200,6 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
           )}
         </div>
       </div>
-    </Combobox.Options>,
-    document.body
+    </Combobox.Options>
   );
 });

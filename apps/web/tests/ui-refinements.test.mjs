@@ -26,6 +26,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     sidebarWrapper,
     dateDropdown,
     memberOptions,
+    stateDropdown,
+    priorityDropdown,
   ] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
     read("core/components/copilot/root.tsx"),
@@ -47,6 +49,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     read("core/components/sidebar/sidebar-wrapper.tsx"),
     read("core/components/dropdowns/date.tsx"),
     read("core/components/dropdowns/member/member-options.tsx"),
+    read("core/components/dropdowns/state/base.tsx"),
+    read("core/components/dropdowns/priority.tsx"),
   ]);
 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
@@ -114,6 +118,12 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(select, /strategy:\s*"fixed"/);
   assert.match(dateDropdown, /strategy:\s*"fixed"/);
   assert.match(memberOptions, /strategy:\s*"fixed"/);
+  assert.match(stateDropdown, /Combobox\.Options as="ul" className="fixed z-40"/);
+  assert.match(priorityDropdown, /Combobox\.Options as="ul" className="fixed z-40"/);
+  assert.match(memberOptions, /"z-40 my-1 w-48/);
+  assert.match(dateDropdown, /"z-40 my-1 overflow-hidden/);
+  assert.doesNotMatch(memberOptions, /createPortal/);
+  assert.doesNotMatch(dateDropdown, /createPortal/);
   assert.match(auth, /items-center justify-center/);
   assert.doesNotMatch(workspaceLogo, /rounded-md object-cover/);
   assert.doesNotMatch(workspaceDropdown, /rounded-sm object-cover/);
