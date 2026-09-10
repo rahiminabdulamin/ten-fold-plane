@@ -42,12 +42,12 @@ test("Ten-Fold brand marks link home, use the long workspace logo, and label loa
     read("app/(all)/create-workspace/page.tsx"),
   ]);
 
-  assert.match(spinner, /src="\/branding\/tenfold-logo-square-rebrand-loader-v3\.png"/);
-  assert.match(authBase, /src="\/branding\/tenfold-logo-long-rebrand-white-v3\.png"/);
-  assert.match(header, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
-  assert.match(topNavigation, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
-  assert.match(topNavigation, /<Link href="\/"[^>]*>[\s\S]*tenfold-logo-long-rebrand-v3\.png/);
-  assert.match(createWorkspace, /src="\/branding\/tenfold-logo-long-rebrand-v3\.png"/);
+  assert.match(spinner, /src="\/branding\/tenfold-logo-square-rebrand-loader-v4\.png"/);
+  assert.match(authBase, /src="\/branding\/tenfold-logo-long-rebrand-white-v4\.png"/);
+  assert.match(header, /src="\/branding\/tenfold-logo-long-rebrand-v4\.png"/);
+  assert.match(topNavigation, /src="\/branding\/tenfold-logo-long-rebrand-v4\.png"/);
+  assert.match(topNavigation, /<Link href="\/"[^>]*>[\s\S]*tenfold-logo-long-rebrand-v4\.png/);
+  assert.match(createWorkspace, /src="\/branding\/tenfold-logo-long-rebrand-v4\.png"/);
   assert.match(spinner, /animate-shimmer/);
   assert.match(spinner, /Please wait\.\.\./);
   assert.match(spinner, /text-\[#BFBFBF\]/);
@@ -72,7 +72,7 @@ test("Ten-Fold removes unavailable onboarding and profile surfaces", async () =>
 
 test("Ten-Fold loader shimmers the square logo instead of spinning", async () => {
   const spinner = await read("core/components/common/logo-spinner.tsx");
-  assert.match(spinner, /tenfold-logo-square-rebrand-loader-v3\.png/);
+  assert.match(spinner, /tenfold-logo-square-rebrand-loader-v4\.png/);
   assert.match(spinner, /animate-shimmer/);
   assert.doesNotMatch(spinner, /animate-spin/);
 });
@@ -84,7 +84,7 @@ test("authentication surfaces use Ten-Fold branding without a compact-layout pro
   ]);
 
   assert.match(authBase, /lg:grid-cols-2/);
-  assert.match(authBase, /tenfold-logo-long-rebrand-white-v3\.png/);
+  assert.match(authBase, /tenfold-logo-long-rebrand-white-v4\.png/);
   assert.match(authBase, /#00364c/);
   assert.match(authBase, /h-16/);
   assert.match(authBase, /dimensions[\s\S]*screenshot-landing\.png[\s\S]*A focused place for teams/);

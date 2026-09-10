@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import logo from "@/app/assets/branding/tenfold-logo-square-rebrand-loader-v3.png?url";
+import logo from "@/app/assets/branding/tenfold-logo-square-rebrand-loader-v4.png?url";
 
 export function LogoSpinner() {
   return (

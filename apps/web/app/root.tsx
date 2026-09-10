@@ -35,8 +35,8 @@ import "@fontsource/ibm-plex-mono";
 const APP_TITLE = "Ten-Fold | Project management";
 
 export const links: LinksFunction = () => [
-  { rel: "icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v3.png" },
-  { rel: "shortcut icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v3.png" },
+  { rel: "icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v4.png" },
+  { rel: "shortcut icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v4.png" },
   { rel: "apple-touch-icon", href: icon512 },
   { rel: "apple-touch-icon", sizes: "180x180", href: icon180 },
   { rel: "apple-touch-icon", sizes: "512x512", href: icon512 },

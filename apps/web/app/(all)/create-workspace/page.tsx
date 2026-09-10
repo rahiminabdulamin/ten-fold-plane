@@ -65,7 +65,7 @@ const CreateWorkspacePage = observer(function CreateWorkspacePage() {
             href="/"
           >
             <img
-              src="/branding/tenfold-logo-long-rebrand-v3.png"
+              src="/branding/tenfold-logo-long-rebrand-v4.png"
               alt="Ten-Fold"
               className="h-9 w-auto object-contain"
             />

@@ -79,7 +79,7 @@ export function AuthHeaderBase(props: TAuthHeaderBase) {
       <PageHead title={pageTitle + " - Ten-Fold"} />
       <div className="sticky top-0 flex w-full flex-shrink-0 items-center justify-between gap-6">
         <Link href="/" className={hideLogoOnDesktop ? "lg:hidden" : undefined}>
-          <img src="/branding/tenfold-logo-long-rebrand-v3.png" alt="Ten-Fold" className="h-5 w-auto" />
+          <img src="/branding/tenfold-logo-long-rebrand-v4.png" alt="Ten-Fold" className="h-5 w-auto" />
         </Link>
         {additionalAction}
       </div>

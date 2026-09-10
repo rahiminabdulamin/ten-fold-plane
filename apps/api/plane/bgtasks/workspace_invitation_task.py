@@ -53,7 +53,7 @@ def workspace_invitation(email, workspace_id, token, current_site, inviter):
             "first_name": user.first_name or user.display_name or user.email,
             "workspace_name": workspace.name,
             "abs_url": abs_url,
-            "logo_url": f"{current_site}/branding/tenfold-logo-long-rebrand-v3.png",
+            "logo_url": f"{current_site}/branding/tenfold-logo-long-rebrand-v4.png",
         }
 
         html_content = render_to_string("emails/invitations/workspace_invitation.html", context)

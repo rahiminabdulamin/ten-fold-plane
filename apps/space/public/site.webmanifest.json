@@ -7,7 +7,7 @@
   "background_color": "#f9fafb",
   "theme_color": "#ffffff",
   "icons": [
-    { "src": "/branding/tenfold-logo-square-rebrand-black-v3.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/branding/tenfold-logo-square-rebrand-black-v3.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/branding/tenfold-logo-square-rebrand-black-v4.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/branding/tenfold-logo-square-rebrand-black-v4.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

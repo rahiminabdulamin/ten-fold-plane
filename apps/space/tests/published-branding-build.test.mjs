@@ -8,8 +8,8 @@ test("published issue metadata uses a Space-owned Ten-Fold logo asset", async ()
   const layout = await readFile(new URL("app/issues/[anchor]/layout.tsx", spaceRoot), "utf8");
 
   assert.doesNotMatch(layout, /web\/public/);
-  assert.match(layout, /const TENFOLD_LOGO_URL = "\/branding\/tenfold-logo-square-rebrand-black-v3\.png"/);
-  await access(new URL("public/branding/tenfold-logo-square-rebrand-black-v3.png", spaceRoot));
+  assert.match(layout, /const TENFOLD_LOGO_URL = "\/branding\/tenfold-logo-square-rebrand-black-v4\.png"/);
+  await access(new URL("public/branding/tenfold-logo-square-rebrand-black-v4.png", spaceRoot));
 });
 
 test("the public Space entry points do not render Plane branding", async () => {

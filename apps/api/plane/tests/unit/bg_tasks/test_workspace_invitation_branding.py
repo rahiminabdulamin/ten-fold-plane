@@ -15,13 +15,13 @@ def test_workspace_invitation_email_uses_ten_fold_branding():
             "first_name": "Amin",
             "workspace_name": "Brune4AI",
             "abs_url": "https://ten-fold.co/workspace-invitations/?invitation_id=123",
-            "logo_url": "https://ten-fold.co/branding/tenfold-logo-long-rebrand-v3.png",
+            "logo_url": "https://ten-fold.co/branding/tenfold-logo-long-rebrand-v4.png",
         },
     )
 
     assert "Join Brune4AI on Ten-Fold" in html
     assert "Brune4AI workspace on Ten-Fold" in html
-    assert "https://ten-fold.co/branding/tenfold-logo-long-rebrand-v3.png" in html
+    assert "https://ten-fold.co/branding/tenfold-logo-long-rebrand-v4.png" in html
     assert "Kognitif AI Enterprise" in html
     assert "Plane Software, Inc." not in html
     assert "on Plane" not in html

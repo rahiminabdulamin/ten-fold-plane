@@ -22,7 +22,7 @@ export function AuthBase({ authType }: AuthBaseProps) {
         style={{ background: "radial-gradient(circle at 100% 0%, #176d88 0%, #003f56 52%, #00364c 100%)" }}
       >
         <img
-          src="/branding/tenfold-logo-long-rebrand-white-v3.png"
+          src="/branding/tenfold-logo-long-rebrand-white-v4.png"
           alt="Ten-Fold"
           className="h-16 w-auto self-start xl:h-20"
         />

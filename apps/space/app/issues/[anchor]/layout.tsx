@@ -20,7 +20,7 @@ import type { Route } from "./+types/layout";
 
 const DEFAULT_TITLE = "Ten-Fold";
 const DEFAULT_DESCRIPTION = "Shared with Ten-Fold.";
-const TENFOLD_LOGO_URL = "/branding/tenfold-logo-square-rebrand-black-v3.png";
+const TENFOLD_LOGO_URL = "/branding/tenfold-logo-square-rebrand-black-v4.png";
 
 interface IssueMetadata {
   name?: string;

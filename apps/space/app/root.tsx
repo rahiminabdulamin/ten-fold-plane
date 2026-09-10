@@ -6,7 +6,7 @@
 
 import { Links, Meta, Outlet, Scripts } from "react-router";
 // assets
-import tenFoldLogo from "@/app/assets/branding/tenfold-logo-square-rebrand-loader-v3.png?url";
+import tenFoldLogo from "@/app/assets/branding/tenfold-logo-square-rebrand-loader-v4.png?url";
 import { LogoSpinner } from "@/components/common/logo-spinner";
 import globalStyles from "@/styles/globals.css?url";
 // types

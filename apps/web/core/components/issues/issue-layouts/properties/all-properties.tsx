@@ -280,7 +280,6 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             placeholder={t("common.order_by.start_date")}
             icon={<StartDateOutline className="h-3 w-3 flex-shrink-0" />}
             buttonVariant={issue.start_date ? "border-with-text" : "border-without-text"}
-            optionsClassName="z-10"
             disabled={isReadOnly}
             renderByDefault={isMobile}
             showTooltip
@@ -308,7 +307,6 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
               shouldHighlightIssueDueDate(issue.target_date, stateDetails?.group) ? "text-danger-primary" : ""
             }
             clearIconClassName="text-primary!"
-            optionsClassName="z-10"
             disabled={isReadOnly}
             renderByDefault={isMobile}
             showTooltip
@@ -331,7 +329,6 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             buttonClassName={issue.assignee_ids?.length > 0 ? "hover:bg-transparent px-0" : ""}
             showTooltip={issue?.assignee_ids?.length === 0}
             placeholder={t("common.assignees")}
-            optionsClassName="z-10"
             tooltipContent=""
             renderByDefault={isMobile}
           />

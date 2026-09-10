@@ -257,7 +257,7 @@ export const DateRangeDropdown = observer(function DateRangeDropdown(props: Prop
   const comboOptions = (
     <Combobox.Options as="ul" data-prevent-outside-click static>
       <div
-        className="z-30 my-1 overflow-hidden rounded-md border-[0.5px] border-subtle-1 bg-surface-1"
+        className="z-40 my-1 overflow-hidden rounded-md border-[0.5px] border-subtle-1 bg-surface-1"
         ref={setPopperElement}
         style={styles.popper}
         {...attributes.popper}
@@ -285,6 +285,7 @@ export const DateRangeDropdown = observer(function DateRangeDropdown(props: Prop
   return (
     <ComboDropDown
       as="div"
+      role="presentation"
       ref={dropdownRef}
       tabIndex={tabIndex}
       className={cn("h-full", className)}

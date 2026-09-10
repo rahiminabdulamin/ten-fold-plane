@@ -28,6 +28,12 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     memberOptions,
     stateDropdown,
     priorityDropdown,
+    dateRangeDropdown,
+    moduleOptions,
+    cycleOptions,
+    estimateDropdown,
+    labelDropdown,
+    filtersDropdown,
   ] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
     read("core/components/copilot/root.tsx"),
@@ -51,6 +57,12 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     read("core/components/dropdowns/member/member-options.tsx"),
     read("core/components/dropdowns/state/base.tsx"),
     read("core/components/dropdowns/priority.tsx"),
+    read("core/components/dropdowns/date-range.tsx"),
+    read("core/components/dropdowns/module/module-options.tsx"),
+    read("core/components/dropdowns/cycle/cycle-options.tsx"),
+    read("core/components/dropdowns/estimate.tsx"),
+    read("core/components/issues/issue-layouts/properties/label-dropdown.tsx"),
+    read("core/components/issues/issue-layouts/filters/header/helpers/dropdown.tsx"),
   ]);
 
   assert.match(home, /HOME_WIDGET_ORDER[^=]*=\s*\["recents", "my_stickies", "quick_links"\]/);
@@ -124,6 +136,14 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(dateDropdown, /"z-40 my-1 overflow-hidden/);
   assert.doesNotMatch(memberOptions, /createPortal/);
   assert.doesNotMatch(dateDropdown, /createPortal/);
+  assert.match(dateRangeDropdown, /className="z-40 my-1 overflow-hidden/);
+  assert.match(moduleOptions, /Combobox\.Options as="ul" className="fixed z-40"/);
+  assert.match(cycleOptions, /Combobox\.Options as="ul" className="fixed z-40"/);
+  assert.match(estimateDropdown, /Combobox\.Options as="ul" className="fixed z-40"/);
+  assert.match(labelDropdown, /Combobox\.Options as="ul" className="fixed z-40"/);
+  assert.match(labelDropdown, /`z-40 my-1 h-auto w-48/);
+  assert.doesNotMatch(issueProperties, /optionsClassName="z-10"/);
+  assert.match(filtersDropdown, /Popover\.Panel className="fixed z-40 translate-y-0"/);
   assert.match(auth, /items-center justify-center/);
   assert.doesNotMatch(workspaceLogo, /rounded-md object-cover/);
   assert.doesNotMatch(workspaceDropdown, /rounded-sm object-cover/);
@@ -137,7 +157,7 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.doesNotMatch(powerKNavigation, /(?:open|nav)_project_(?:cycle|module)/);
   assert.doesNotMatch(powerKHelp, /open_plane_documentation|join_forum|report_bug/);
   assert.match(sidebar, /isMobile && "fixed top-10 bottom-0 left-0 z-\[40\]"/);
-  assert.match(topNavigation, /tenfold-logo-square-rebrand-blackblack-v3\.png/);
+  assert.match(topNavigation, /tenfold-logo-square-rebrand-blackblack-v4\.png/);
   assert.match(topNavigation, /sm:hidden/);
   assert.match(topNavigation, /min-w-0 flex-1/);
   assert.match(topNavigation, /flex shrink-0 items-center sm:flex-1/);
