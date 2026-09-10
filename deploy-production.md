@@ -6,7 +6,7 @@ From the repository root in WSL, run:
 ./deploy-production.sh
 ```
 
-The script uploads the current repository to the production Droplet, preserves server-side `.env` files, and rebuilds the `web` and `proxy` services.
+The script uploads the current repository to the production Droplet, preserves server-side `.env` files, rebuilds and runs the migration service, then rebuilds the API, CopilotKit, web, and proxy services.
 
 To use a different SSH key without editing the script:
 
