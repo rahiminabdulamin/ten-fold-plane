@@ -12,10 +12,12 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from plane.api.views.spreadsheet import published_spreadsheet_form
 
 handler404 = "plane.app.views.error_404.custom_404_view"
 
 urlpatterns = [
+    path("forms/<uuid:publication_id>", published_spreadsheet_form, name="spreadsheet-public-form"),
     path("api/", include("plane.app.urls")),
     path("api/public/", include("plane.space.urls")),
     path("api/instances/", include("plane.license.urls")),

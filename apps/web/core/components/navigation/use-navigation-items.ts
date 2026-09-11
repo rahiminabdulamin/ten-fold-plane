@@ -5,6 +5,7 @@
  */
 
 import { useMemo, useCallback } from "react";
+import { Table2 } from "lucide-react";
 // plane imports
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import {
@@ -92,6 +93,16 @@ export const useNavigationItems = ({
         sortOrder: 5,
       },
       {
+        i18n_key: "sidebar.spreadsheets",
+        key: "spreadsheets",
+        name: "Spreadsheets",
+        href: `/${workspaceSlug}/projects/${projectId}/spreadsheets`,
+        icon: Table2,
+        access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER, EUserPermissions.GUEST],
+        shouldRender: !!project?.spreadsheet_view,
+        sortOrder: 6,
+      },
+      {
         i18n_key: "sidebar.intake",
         key: "intake",
         name: "Intake",
@@ -99,7 +110,7 @@ export const useNavigationItems = ({
         icon: IntakeOutline,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER, EUserPermissions.GUEST],
         shouldRender: !!project?.inbox_view,
-        sortOrder: 6,
+        sortOrder: 7,
       },
     ],
     [project]

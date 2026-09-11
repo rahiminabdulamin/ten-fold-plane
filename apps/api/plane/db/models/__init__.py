@@ -88,5 +88,11 @@ from .label import Label
 from .device import Device, DeviceSession
 
 from .sticky import Sticky
+from .spreadsheet import (
+    SpreadsheetAgentExecution,
+    SpreadsheetDocument,
+    SpreadsheetFormPublication,
+    SpreadsheetOperation,
+)
 
 from .description import Description, DescriptionVersion

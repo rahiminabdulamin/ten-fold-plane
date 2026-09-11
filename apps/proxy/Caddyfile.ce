@@ -13,6 +13,35 @@
 
 	reverse_proxy /api/copilotkit/* copilot:8200
 
+	# Grist's fingerprinted UI assets contain no document data and must load before
+	# either the private editor or a capability-gated public form can render.
+	@grist_static path /grist/v/* /grist/icons/* /grist/locales/* /grist/favicon*
+	handle @grist_static {
+		uri strip_prefix /grist
+		reverse_proxy grist:8484
+	}
+
+	handle /grist/* {
+		request_header -X-Ten-Fold-User
+		request_header -X-Ten-Fold-Name
+		forward_auth api:8000 {
+			uri /api/v1/internal/grist/authorize/
+			copy_headers X-Ten-Fold-User X-Ten-Fold-Name
+		}
+		uri strip_prefix /grist
+		reverse_proxy grist:8484
+	}
+
+	handle /grist-public/forms/* {
+		forward_auth api:8000 {
+			uri /api/v1/internal/grist/authorize-form/
+		}
+		uri strip_prefix /grist-public
+		reverse_proxy grist:8484
+	}
+
+	reverse_proxy /forms/* api:8000
+
 	reverse_proxy /api/* api:8000
 
 	reverse_proxy /auth/* api:8000

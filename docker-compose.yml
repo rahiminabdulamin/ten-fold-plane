@@ -22,6 +22,31 @@ services:
     depends_on:
       - api
 
+  grist:
+    image: gristlabs/grist:1.7.16
+    restart: always
+    environment:
+      GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET}
+      GRIST_FORWARD_AUTH_HEADER: X-Ten-Fold-User
+      GRIST_DEFAULT_EMAIL: spreadsheet-system@tenfold.internal
+      GRIST_IGNORE_SESSION: "true"
+      GRIST_SUPPORT_ANON: "true"
+      GRIST_SERVE_SAME_ORIGIN: "true"
+      GRIST_SINGLE_ORG: ten-fold
+      GRIST_ORG_IN_PATH: "true"
+      APP_HOME_URL: ${GRIST_PUBLIC_URL:-http://localhost/grist}
+      APP_DOC_URL: ${GRIST_PUBLIC_URL:-http://localhost/grist}
+      GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-gvisor}
+      GRIST_ENABLE_REQUEST_FUNCTION: "false"
+      GRIST_HIDE_UI_ELEMENTS: billing,templates,createSite,multiSite,multiAccounts,importFromAirtable,sendToDrive,tutorials,supportGrist,automations
+    volumes:
+      - gristdata:/persist
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8484/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
   admin:
     container_name: admin
     build:
@@ -60,6 +85,7 @@ services:
     depends_on:
       - plane-db
       - plane-redis
+      - grist
 
   worker:
     container_name: bgworker
@@ -192,3 +218,4 @@ volumes:
   redisdata:
   uploads:
   rabbitmq_data:
+  gristdata:

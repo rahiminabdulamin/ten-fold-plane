@@ -349,6 +349,7 @@ CELERY_IMPORTS = (
     # issue version tasks
     "plane.bgtasks.issue_version_sync",
     "plane.bgtasks.issue_description_version_sync",
+    "plane.bgtasks.spreadsheet_task",
 )
 
 FILE_SIZE_LIMIT = int(os.environ.get("FILE_SIZE_LIMIT", 5242880))
@@ -560,6 +561,13 @@ SCRIPT_CAPABLE_MIME_TYPES: frozenset[str] = frozenset(
 SEED_DIR = os.path.join(BASE_DIR, "seeds")
 
 ENABLE_DRF_SPECTACULAR = os.environ.get("ENABLE_DRF_SPECTACULAR", "0") == "1"
+
+# Private Grist control-plane connection. The public browser endpoint is always
+# routed through the Ten-Fold proxy; this URL must never be user controlled.
+GRIST_INTERNAL_URL = os.environ.get("GRIST_INTERNAL_URL", "http://grist:8484").rstrip("/")
+GRIST_INTERNAL_SECRET = os.environ.get("GRIST_INTERNAL_SECRET", "")
+GRIST_WORKSPACE_ID = int(os.environ.get("GRIST_WORKSPACE_ID", "1"))
+GRIST_PUBLIC_BASE_PATH = os.environ.get("GRIST_PUBLIC_BASE_PATH", "/grist").rstrip("/")
 
 if ENABLE_DRF_SPECTACULAR:
     REST_FRAMEWORK["DEFAULT_SCHEMA_CLASS"] = "drf_spectacular.openapi.AutoSchema"

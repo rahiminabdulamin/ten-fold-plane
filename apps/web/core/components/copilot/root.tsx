@@ -11,6 +11,7 @@ import { ProjectMemberService } from "@/services/project/project-member.service"
 import { ProjectStateService } from "@/services/project/project-state.service";
 import { ProjectService } from "@/services/project";
 import { WorkspaceService } from "@/services/workspace.service";
+import { SpreadsheetService } from "@/services/spreadsheet.service";
 import { useUser } from "@/hooks/store/user";
 import { getRetryDelay } from "@/lib/retry-delay";
 
@@ -33,6 +34,7 @@ const labelService = new IssueLabelService();
 const memberService = new ProjectMemberService();
 const estimateService = new EstimateService();
 const workspaceService = new WorkspaceService();
+const spreadsheetService = new SpreadsheetService();
 const COPILOT_PANEL_WIDTH_STORAGE_KEY = "tenfold-copilot-panel-width";
 const COPILOT_LAUNCHER_POSITION_STORAGE_KEY = "tenfold-copilot-launcher-position";
 const DEFAULT_COPILOT_PANEL_WIDTH = 360;
@@ -43,6 +45,66 @@ const LAUNCHER_GUTTER = 24;
 const COPILOT_SIDEBAR_LABELS = { modalHeaderTitle: "Ten-Fold Assistant" };
 
 type LauncherPosition = { x: number; y: number };
+
+type SpreadsheetChangeConfirmationProps = {
+  workspace: string;
+  projectId: string;
+  spreadsheetId: string;
+  operation: string;
+  payload: Record<string, unknown>;
+  summary: string;
+  respond: (result: ReturnType<typeof toolError> & { data?: unknown }) => void;
+};
+
+const SpreadsheetChangeConfirmation = (props: SpreadsheetChangeConfirmationProps) => {
+  const { workspace, projectId, spreadsheetId, operation, payload, summary, respond } = props;
+  const idempotencyKey = useRef(crypto.randomUUID());
+  const [preview, setPreview] = useState<{ preview_token: string; payload: Record<string, unknown> }>();
+  const [isApplying, setIsApplying] = useState(false);
+
+  useEffect(() => {
+    spreadsheetService
+      .agent(workspace, projectId, spreadsheetId, "preview", {
+        operation,
+        payload,
+        idempotency_key: idempotencyKey.current,
+      })
+      .then(setPreview)
+      .catch(() => respond(toolError(operation, "Spreadsheet change could not be previewed.")));
+  }, [operation, payload, projectId, respond, spreadsheetId, workspace]);
+
+  const execute = async () => {
+    if (!preview || isApplying) return;
+    setIsApplying(true);
+    try {
+      const result = await spreadsheetService.agent(workspace, projectId, spreadsheetId, "execute", {
+        preview_token: preview.preview_token,
+      });
+      respond({ ...toolResult(operation, "Spreadsheet updated.", [spreadsheetId]), data: result });
+    } catch {
+      respond(toolError(operation, "Spreadsheet change failed."));
+    }
+  };
+
+  return (
+    <section aria-label="Confirm spreadsheet change" className="rounded border border-subtle p-3">
+      <p>{summary}</p>
+      <pre className="text-xs my-2 max-h-48 overflow-auto rounded bg-layer-1 p-2">
+        {preview ? JSON.stringify({ operation, payload: preview.payload }, null, 2) : "Validating preview…"}
+      </pre>
+      <button
+        type="button"
+        disabled={isApplying}
+        onClick={() => respond(toolError(operation, "Spreadsheet change cancelled."))}
+      >
+        Cancel
+      </button>
+      <button type="button" className="ml-2" disabled={!preview || isApplying} onClick={execute}>
+        {isApplying ? "Applying…" : "Apply"}
+      </button>
+    </section>
+  );
+};
 
 const workItemMutationSchema = z.object({
   title: z.string().min(1).max(255).optional(),
@@ -80,7 +142,7 @@ const clampLauncherPosition = ({ x, y }: LauncherPosition): LauncherPosition => 
 });
 
 function PlaneTools() {
-  const { workspaceSlug, projectId } = useParams();
+  const { workspaceSlug, projectId, spreadsheetId } = useParams();
   const { data: user } = useUser();
   const workspace = typeof workspaceSlug === "string" ? workspaceSlug : "";
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
@@ -592,6 +654,67 @@ function PlaneTools() {
       },
     },
     [workspace, projectId]
+  );
+
+  useHumanInTheLoop(
+    {
+      name: "change_spreadsheet",
+      description:
+        "Preview and, after explicit approval, change rows, tables, columns, views, forms, or formulas in the active spreadsheet.",
+      parameters: z.object({
+        operation: z.enum([
+          "add_records",
+          "update_records",
+          "delete_records",
+          "create_table",
+          "add_column",
+          "update_column",
+          "create_view",
+          "create_form",
+          "set_formula",
+        ]),
+        payload: z.record(z.string(), z.unknown()),
+        summary: z.string().min(1).max(500),
+      }),
+      render: ({ args, status, respond }) => {
+        if (status !== "executing" || !respond) return <p>Preparing spreadsheet change…</p>;
+        if (!workspace || !projectId || !spreadsheetId) return <p>Open a spreadsheet before requesting a change.</p>;
+        return (
+          <SpreadsheetChangeConfirmation
+            workspace={workspace}
+            projectId={projectId}
+            spreadsheetId={spreadsheetId}
+            operation={args.operation}
+            payload={args.payload}
+            summary={args.summary}
+            respond={respond}
+          />
+        );
+      },
+    },
+    [workspace, projectId, spreadsheetId]
+  );
+
+  useFrontendTool(
+    {
+      name: "query_spreadsheet",
+      description: "Query up to 100 rows from a table in the active spreadsheet.",
+      parameters: z.object({
+        table: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/),
+        limit: z.number().int().min(1).max(100).default(50),
+      }),
+      handler: async ({ table, limit }) => {
+        if (!workspace || !projectId || !spreadsheetId)
+          return toolError("query_spreadsheet", "Open a spreadsheet first.");
+        try {
+          const data = await spreadsheetService.agent(workspace, projectId, spreadsheetId, "query", { table, limit });
+          return { ...toolResult("query_spreadsheet", `Read ${table}.`, [spreadsheetId]), data };
+        } catch {
+          return toolError("query_spreadsheet", "Spreadsheet query failed.");
+        }
+      },
+    },
+    [workspace, projectId, spreadsheetId]
   );
 
   useHumanInTheLoop(

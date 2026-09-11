@@ -1,4 +1,24 @@
 services:
+  grist:
+    image: gristlabs/grist:1.7.16
+    restart: unless-stopped
+    networks:
+      - dev_env
+    environment:
+      GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET:-local-grist-session-secret}
+      GRIST_FORWARD_AUTH_HEADER: X-Ten-Fold-User
+      GRIST_DEFAULT_EMAIL: spreadsheet-system@tenfold.internal
+      GRIST_IGNORE_SESSION: "true"
+      GRIST_SUPPORT_ANON: "true"
+      GRIST_SINGLE_ORG: ten-fold
+      GRIST_ORG_IN_PATH: "true"
+      GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-pynbox}
+      GRIST_ENABLE_REQUEST_FUNCTION: "false"
+    volumes:
+      - gristdata:/persist
+    ports:
+      - "127.0.0.1:8484:8484"
+
   plane-redis:
     image: valkey/valkey:7.2.11-alpine
     restart: unless-stopped
@@ -84,6 +104,7 @@ services:
       - plane-db
       - plane-redis
       - plane-mq
+      - grist
     ports:
       - "8000:8000"
 
@@ -148,6 +169,7 @@ volumes:
   uploads:
   pgdata:
   rabbitmq_data:
+  gristdata:
 
 networks:
   dev_env:
