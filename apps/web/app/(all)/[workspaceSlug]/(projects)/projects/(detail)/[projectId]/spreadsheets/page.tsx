@@ -48,8 +48,12 @@ export default function SpreadsheetsPage({ params }: Route.ComponentProps) {
   const create = async () => {
     const name = window.prompt("Spreadsheet name", "Untitled spreadsheet")?.trim();
     if (!name) return;
-    const document = await service.create(workspaceSlug, projectId, name);
-    setDocuments((current) => [...current, document]);
+    try {
+      const document = await service.create(workspaceSlug, projectId, name);
+      setDocuments((current) => [...current, document]);
+    } catch {
+      setError("Unable to create the spreadsheet. Check the spreadsheet service logs.");
+    }
   };
 
   if (loading) return <div className="p-6 text-secondary">Loading spreadsheets…</div>;

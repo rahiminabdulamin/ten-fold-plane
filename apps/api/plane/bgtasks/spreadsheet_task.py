@@ -1,12 +1,17 @@
 # Copyright (c) 2023-present Plane Software, Inc. and contributors
 # SPDX-License-Identifier: AGPL-3.0-only
 
+import logging
+
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
 
 from plane.db.models import ProjectMember, SpreadsheetDocument, SpreadsheetOperation
 from plane.integrations.grist import GristClient
+
+
+logger = logging.getLogger(__name__)
 
 
 def _roles(spreadsheet):
@@ -74,6 +79,7 @@ def process_spreadsheet_operation(operation_id):
         operation.last_error_code = ""
         operation.save(update_fields=["status", "last_error_code", "updated_at"])
     except Exception:
+        logger.exception("Spreadsheet operation %s failed", operation_id)
         spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
         spreadsheet.last_error_code = "grist_unavailable"
         spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])

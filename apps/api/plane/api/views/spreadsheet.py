@@ -3,11 +3,13 @@
 
 import re
 import uuid
+from datetime import timedelta
 from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core import signing
 from django.db import transaction
+from django.utils import timezone
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -52,14 +54,15 @@ def _document(slug, project_id, pk):
     return SpreadsheetDocument.objects.get(id=pk, workspace__slug=slug, project_id=project_id, deleted_at__isnull=True)
 
 
-def _queue(spreadsheet, kind, payload=None):
+def _queue(spreadsheet, kind, payload=None, enqueue=True):
     operation = SpreadsheetOperation.objects.create(
         spreadsheet=spreadsheet,
         kind=kind,
         payload=payload or {},
         idempotency_key=f"{kind}:{spreadsheet.id}:{uuid.uuid4()}",
     )
-    transaction.on_commit(lambda: process_spreadsheet_operation.delay(str(operation.id)))
+    if enqueue:
+        transaction.on_commit(lambda: process_spreadsheet_operation.delay(str(operation.id)))
     return operation
 
 
@@ -77,8 +80,15 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
         serializer.is_valid(raise_exception=True)
         workspace = Workspace.objects.get(slug=slug)
         spreadsheet = serializer.save(workspace=workspace, project_id=project_id)
-        _queue(spreadsheet, SpreadsheetOperation.Kind.PROVISION)
-        return Response(SpreadsheetDocumentSerializer(spreadsheet).data, status=status.HTTP_202_ACCEPTED)
+        operation = _queue(spreadsheet, SpreadsheetOperation.Kind.PROVISION, enqueue=False)
+        process_spreadsheet_operation.apply(args=[str(operation.id)])
+        spreadsheet.refresh_from_db()
+        if spreadsheet.status != SpreadsheetDocument.Status.READY:
+            return Response(
+                {"error": spreadsheet.last_error_code or "grist_unavailable"},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        return Response(SpreadsheetDocumentSerializer(spreadsheet).data, status=status.HTTP_201_CREATED)
 
 
 class SpreadsheetDetailEndpoint(SpreadsheetBaseEndpoint):
@@ -108,8 +118,31 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
 
     def post(self, request, slug, project_id, pk):
         spreadsheet = _document(slug, project_id, pk)
+        if spreadsheet.status == SpreadsheetDocument.Status.PROVISIONING:
+            operation = (
+                spreadsheet.operations.filter(kind=SpreadsheetOperation.Kind.PROVISION).order_by("-created_at").first()
+            )
+            can_recover = operation and (
+                operation.status == SpreadsheetOperation.Status.PENDING
+                or (
+                    operation.status == SpreadsheetOperation.Status.RUNNING
+                    and operation.updated_at < timezone.now() - timedelta(seconds=30)
+                )
+            )
+            if can_recover:
+                if operation.status == SpreadsheetOperation.Status.RUNNING:
+                    operation.status = SpreadsheetOperation.Status.FAILED
+                    operation.save(update_fields=["status", "updated_at"])
+                process_spreadsheet_operation.apply(args=[str(operation.id)])
+                spreadsheet.refresh_from_db()
         if spreadsheet.status != SpreadsheetDocument.Status.READY:
-            return Response({"error": "spreadsheet_not_ready", "status": spreadsheet.status}, status=409)
+            return Response(
+                {
+                    "error": spreadsheet.last_error_code or "spreadsheet_not_ready",
+                    "status": spreadsheet.status,
+                },
+                status=409,
+            )
         return Response({"url": f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}?embed=true"})
 
 
