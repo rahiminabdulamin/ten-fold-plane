@@ -12,6 +12,9 @@ export type TSpreadsheetDocument = {
   updated_at: string;
 };
 
+export const isSpreadsheetProvisioning = (reason: { response?: { data?: { status?: string } } }) =>
+  reason.response?.data?.status === "provisioning";
+
 export class SpreadsheetService extends APIService {
   constructor() {
     super(API_BASE_URL);

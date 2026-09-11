@@ -12,14 +12,38 @@ export default function SpreadsheetsPage({ params }: Route.ComponentProps) {
   const [documents, setDocuments] = useState<TSpreadsheetDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const hasProvisioningDocuments = documents.some((document) => document.status === "provisioning");
 
   useEffect(() => {
-    void service
-      .list(workspaceSlug, projectId)
-      .then(setDocuments)
-      .catch(() => setError("Unable to load spreadsheets."))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    const load = () =>
+      service
+        .list(workspaceSlug, projectId)
+        .then((items) => {
+          if (!cancelled) setDocuments(items);
+          return items;
+        })
+        .catch(() => {
+          if (!cancelled) setError("Unable to load spreadsheets.");
+          return [];
+        })
+        .finally(() => !cancelled && setLoading(false));
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, [workspaceSlug, projectId]);
+
+  useEffect(() => {
+    if (!hasProvisioningDocuments) return;
+    const refresh = window.setInterval(() => {
+      void service
+        .list(workspaceSlug, projectId)
+        .then(setDocuments)
+        .catch(() => undefined);
+    }, 2000);
+    return () => window.clearInterval(refresh);
+  }, [hasProvisioningDocuments, projectId, workspaceSlug]);
 
   const create = async () => {
     const name = window.prompt("Spreadsheet name", "Untitled spreadsheet")?.trim();

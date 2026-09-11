@@ -35,8 +35,8 @@ def process_spreadsheet_operation(operation_id):
         operation.save(update_fields=["status", "attempts", "updated_at"])
 
     spreadsheet = operation.spreadsheet
-    client = GristClient()
     try:
+        client = GristClient()
         if operation.kind == SpreadsheetOperation.Kind.PROVISION:
             if not spreadsheet.grist_document_id:
                 spreadsheet.grist_document_id = client.create_document(spreadsheet.name, settings.GRIST_WORKSPACE_ID)
