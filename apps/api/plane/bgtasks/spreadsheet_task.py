@@ -3,6 +3,7 @@
 
 import logging
 
+import requests
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
@@ -12,6 +13,16 @@ from plane.integrations.grist import GristClient
 
 
 logger = logging.getLogger(__name__)
+
+
+def grist_failure_code(error):
+    if isinstance(error, requests.Timeout):
+        return "grist_timeout"
+    if isinstance(error, requests.ConnectionError):
+        return "grist_connection_failed"
+    if isinstance(error, requests.HTTPError) and error.response is not None:
+        return f"grist_http_{error.response.status_code}"
+    return "grist_unavailable"
 
 
 def _roles(spreadsheet):
@@ -78,12 +89,12 @@ def process_spreadsheet_operation(operation_id):
         operation.status = SpreadsheetOperation.Status.COMPLETE
         operation.last_error_code = ""
         operation.save(update_fields=["status", "last_error_code", "updated_at"])
-    except Exception:
+    except Exception as error:
         logger.exception("Spreadsheet operation %s failed", operation_id)
         spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
-        spreadsheet.last_error_code = "grist_unavailable"
+        spreadsheet.last_error_code = grist_failure_code(error)
         spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
         operation.status = SpreadsheetOperation.Status.FAILED
-        operation.last_error_code = "grist_unavailable"
+        operation.last_error_code = spreadsheet.last_error_code
         operation.save(update_fields=["status", "last_error_code", "updated_at"])
         raise

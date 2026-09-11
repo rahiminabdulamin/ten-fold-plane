@@ -51,8 +51,9 @@ export default function SpreadsheetsPage({ params }: Route.ComponentProps) {
     try {
       const document = await service.create(workspaceSlug, projectId, name);
       setDocuments((current) => [...current, document]);
-    } catch {
-      setError("Unable to create the spreadsheet. Check the spreadsheet service logs.");
+    } catch (reason: any) {
+      const code = reason?.response?.data?.error;
+      setError(code ? `Unable to create the spreadsheet (${code}).` : "Unable to create the spreadsheet.");
     }
   };
 
