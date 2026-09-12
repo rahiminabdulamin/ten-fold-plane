@@ -1,3 +1,246 @@
+/*
+ * Ten-Fold theme bridge for Grist 1.7.16.
+ *
+ * Grist renders editors, forms, menus, modals, and transient UI in its own
+ * document. Its semantic variables are the stable seam that lets all of those
+ * surfaces follow Ten-Fold without coupling this file to generated classes.
+ */
+:root {
+  color-scheme: light;
+
+  /* Ten-Fold / Propel light palette. */
+  --tenfold-canvas: oklch(0.9614 0.0013 286.38);
+  --tenfold-surface-1: oklch(1 0 0);
+  --tenfold-surface-2: oklch(0.9911 0 0);
+  --tenfold-layer-1: oklch(0.9821 0 0);
+  --tenfold-layer-hover: oklch(0.9614 0.0013 286.38);
+  --tenfold-text-primary: oklch(0.1689 0.0021 286.18);
+  --tenfold-text-secondary: oklch(0.3225 0.0045 219.62);
+  --tenfold-text-tertiary: oklch(0.4176 0.0072 239.98);
+  --tenfold-text-placeholder: oklch(0.4928 0.0079 233.77);
+  --tenfold-text-disabled: oklch(0.5651 0.0086 228.95);
+  --tenfold-border-subtle: oklch(0.9396 0.0017 247.84);
+  --tenfold-border-strong: oklch(0.8782 0.0035 247.86);
+  --tenfold-accent: oklch(0.4799 0.1158 242.91);
+  --tenfold-accent-hover: oklch(0.4347 0.1041 242.48);
+  --tenfold-accent-active: oklch(0.3399 0.0783 240.32);
+  --tenfold-accent-subtle: oklch(0.9847 0.0083 236.56);
+  --tenfold-accent-subtle-hover: oklch(0.9715 0.0167 230.9);
+  --tenfold-accent-subtle-active: oklch(0.9428 0.0341 230.22);
+  --tenfold-danger: oklch(0.583 0.2387 28.48);
+  --tenfold-warning: oklch(0.6671 0.1685 53.38);
+  --tenfold-info: oklch(0.5465 0.2455 262.87);
+  --tenfold-success: oklch(0.632 0.186 147.37);
+  --tenfold-backdrop: oklch(0.1482 0.0034 196.79 / 30%);
+
+  /* Typography and shape. Keep data and UI type consistent with Ten-Fold. */
+  --grist-theme-font-family: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --grist-theme-font-family-data: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --grist-font-family: var(--grist-theme-font-family);
+  --grist-font-family-data: var(--grist-theme-font-family-data);
+  --grist-theme-medium-font-size: 13px;
+  --grist-theme-small-font-size: 11px;
+  --grist-theme-big-control-font-size: 13px;
+  --grist-theme-control-border-radius: 6px;
+  --grist-border-radius: 6px;
+
+  /* Global semantic tokens. */
+  --grist-theme-body: var(--tenfold-text-primary);
+  --grist-theme-emphasis: var(--tenfold-text-primary);
+  --grist-theme-text: var(--tenfold-text-primary);
+  --grist-theme-text-dark: var(--tenfold-text-primary);
+  --grist-theme-text-medium: var(--tenfold-text-secondary);
+  --grist-theme-text-light: var(--tenfold-text-tertiary);
+  --grist-theme-text-disabled: var(--tenfold-text-disabled);
+  --grist-theme-secondary: var(--tenfold-text-tertiary);
+  --grist-theme-secondary-muted: var(--tenfold-text-placeholder);
+  --grist-theme-bg-default: var(--tenfold-surface-1);
+  --grist-theme-bg-secondary: var(--tenfold-surface-2);
+  --grist-theme-bg-tertiary: var(--tenfold-layer-1);
+  --grist-theme-bg-emphasis: var(--tenfold-text-primary);
+  --grist-theme-decoration: var(--tenfold-border-strong);
+  --grist-theme-decoration-secondary: var(--tenfold-border-subtle);
+  --grist-theme-decoration-tertiary: var(--tenfold-layer-hover);
+  --grist-theme-primary: var(--tenfold-accent);
+  --grist-theme-primary-muted: var(--tenfold-accent-hover);
+  --grist-theme-primary-dim: var(--tenfold-accent-active);
+  --grist-theme-primary-emphasis: var(--tenfold-accent-subtle-active);
+  --grist-theme-primary-translucent: oklch(0.4799 0.1158 242.91 / 42%);
+  --grist-theme-token-hover: var(--tenfold-layer-hover);
+  --grist-theme-backdrop: var(--tenfold-backdrop);
+  --grist-theme-error: var(--tenfold-danger);
+  --grist-theme-warning: var(--tenfold-warning);
+  --grist-theme-info: var(--tenfold-info);
+
+  /* Application canvas, panels, cards, and widgets. */
+  --grist-theme-page-bg: var(--tenfold-canvas);
+  --grist-theme-page-panels-main-panel-bg: var(--tenfold-surface-1);
+  --grist-theme-page-panels-left-panel-bg: var(--tenfold-surface-2);
+  --grist-theme-page-panels-right-panel-bg: var(--tenfold-surface-2);
+  --grist-theme-page-panels-top-header-bg: var(--tenfold-surface-1);
+  --grist-theme-page-panels-bottom-footer-bg: var(--tenfold-surface-1);
+  --grist-theme-page-panels-border: var(--tenfold-border-subtle);
+  --grist-theme-page-panels-border-resizing: var(--tenfold-accent);
+  --grist-theme-widget-bg: var(--tenfold-surface-1);
+  --grist-theme-widget-border: var(--tenfold-border-subtle);
+  --grist-theme-widget-active-border: var(--tenfold-accent);
+  --grist-theme-widget-active-non-focused-border: var(--tenfold-accent-subtle-active);
+  --grist-theme-card-compact-widget-bg: var(--tenfold-layer-1);
+  --grist-theme-card-compact-record-bg: var(--tenfold-surface-1);
+  --grist-theme-card-blocks-bg: var(--tenfold-layer-1);
+  --grist-theme-card-form-label: var(--tenfold-text-tertiary);
+  --grist-theme-card-compact-label: var(--tenfold-text-tertiary);
+  --grist-theme-card-blocks-label: var(--tenfold-text-tertiary);
+  --grist-theme-card-form-border: var(--tenfold-border-subtle);
+  --grist-theme-card-compact-border: var(--tenfold-border-subtle);
+
+  /* Tables, records, selection, and editing. */
+  --grist-theme-table-header-fg: var(--tenfold-text-secondary);
+  --grist-theme-table-header-selected-fg: var(--tenfold-text-primary);
+  --grist-theme-table-header-bg: var(--tenfold-layer-1);
+  --grist-theme-table-header-selected-bg: var(--tenfold-accent-subtle-hover);
+  --grist-theme-table-header-border: var(--tenfold-border-subtle);
+  --grist-theme-table-body-bg: var(--tenfold-surface-1);
+  --grist-theme-table-body-border: var(--tenfold-border-subtle);
+  --grist-theme-table-add-new-bg: var(--tenfold-accent-subtle);
+  --grist-theme-table-frozen-columns-border: var(--tenfold-border-strong);
+  --grist-theme-table-drag-drop-indicator: var(--tenfold-accent);
+  --grist-theme-table-drag-drop-shadow: var(--tenfold-accent-subtle);
+  --grist-theme-table-cell-summary-bg: var(--tenfold-layer-1);
+  --grist-theme-cell-fg: var(--tenfold-text-primary);
+  --grist-theme-cell-bg: var(--tenfold-surface-1);
+  --grist-theme-cell-zebra-bg: var(--tenfold-surface-2);
+  --grist-theme-cell-editor-fg: var(--tenfold-text-primary);
+  --grist-theme-cell-editor-bg: var(--tenfold-surface-1);
+  --grist-theme-cell-editor-placeholder-fg: var(--tenfold-text-placeholder);
+  --grist-theme-cursor: var(--tenfold-accent);
+  --grist-theme-cursor-inactive: var(--tenfold-accent-subtle-active);
+  --grist-theme-cursor-readonly: var(--tenfold-text-disabled);
+  --grist-theme-token-selection: oklch(0.4799 0.1158 242.91 / 12%);
+  --grist-theme-selection: oklch(0.4799 0.1158 242.91 / 12%);
+  --grist-theme-selection-darker: oklch(0.4799 0.1158 242.91 / 20%);
+  --grist-theme-selection-darkest: oklch(0.4799 0.1158 242.91 / 30%);
+  --grist-theme-selection-opaque-bg: var(--tenfold-accent-subtle-hover);
+  --grist-theme-selection-opaque-dark-bg: var(--tenfold-accent-subtle-active);
+  --grist-theme-selection-header: var(--tenfold-accent-subtle-hover);
+
+  /* Buttons, inputs, toggles, and disabled/read-only states. */
+  --grist-theme-control-fg: var(--tenfold-accent);
+  --grist-theme-control-primary-fg: var(--tenfold-surface-1);
+  --grist-theme-control-primary-bg: var(--tenfold-accent);
+  --grist-theme-control-primary-hover-bg: var(--tenfold-accent-hover);
+  --grist-theme-control-secondary-fg: var(--tenfold-text-secondary);
+  --grist-theme-control-secondary-hover-fg: var(--tenfold-text-primary);
+  --grist-theme-control-secondary-hover-bg: var(--tenfold-layer-hover);
+  --grist-theme-control-secondary-disabled-fg: var(--tenfold-text-disabled);
+  --grist-theme-control-disabled-fg: var(--tenfold-text-disabled);
+  --grist-theme-control-disabled-bg: var(--tenfold-layer-1);
+  --grist-theme-control-border: 1px solid var(--tenfold-accent);
+  --grist-theme-input-fg: var(--tenfold-text-primary);
+  --grist-theme-input-bg: var(--tenfold-surface-1);
+  --grist-theme-input-placeholder-fg: var(--tenfold-text-placeholder);
+  --grist-theme-input-border: var(--tenfold-border-strong);
+  --grist-theme-input-focus: var(--tenfold-accent);
+  --grist-theme-input-disabled-fg: var(--tenfold-text-disabled);
+  --grist-theme-input-disabled-bg: var(--tenfold-layer-1);
+  --grist-theme-input-readonly-bg: var(--tenfold-surface-2);
+  --grist-theme-input-readonly-border: var(--tenfold-border-subtle);
+  --grist-theme-input-invalid: var(--tenfold-danger);
+  --grist-theme-checkbox-bg: var(--tenfold-surface-1);
+  --grist-theme-checkbox-selected-bg: var(--tenfold-accent);
+  --grist-theme-checkbox-border: var(--tenfold-border-strong);
+  --grist-theme-checkbox-border-hover: var(--tenfold-accent);
+  --grist-theme-checkbox-disabled-bg: var(--tenfold-layer-1);
+
+  /* Menus, popovers, dialogs, tooltips, and feedback. */
+  --grist-theme-menu-text: var(--tenfold-text-primary);
+  --grist-theme-menu-light-text: var(--tenfold-text-tertiary);
+  --grist-theme-menu-bg: var(--tenfold-surface-1);
+  --grist-theme-menu-border: var(--tenfold-border-subtle);
+  --grist-theme-menu-shadow: oklch(0.1482 0.0034 196.79 / 18%);
+  --grist-theme-menu-item-fg: var(--tenfold-text-secondary);
+  --grist-theme-menu-item-selected-fg: var(--tenfold-text-primary);
+  --grist-theme-menu-item-selected-bg: var(--tenfold-accent-subtle);
+  --grist-theme-menu-item-disabled-fg: var(--tenfold-text-disabled);
+  --grist-theme-popup-bg: var(--tenfold-surface-1);
+  --grist-theme-popup-secondary-bg: var(--tenfold-surface-2);
+  --grist-theme-modal-bg: var(--tenfold-surface-1);
+  --grist-theme-modal-border: var(--tenfold-border-subtle);
+  --grist-theme-modal-border-dark: var(--tenfold-border-strong);
+  --grist-theme-modal-border-hover: var(--tenfold-accent);
+  --grist-theme-modal-backdrop: var(--tenfold-backdrop);
+  --grist-theme-tooltip-bg: var(--tenfold-text-primary);
+  --grist-theme-tooltip-fg: var(--tenfold-surface-1);
+  --grist-theme-hover: var(--tenfold-layer-hover);
+  --grist-theme-hover-light: var(--tenfold-surface-2);
+  --grist-theme-text-error: var(--tenfold-danger);
+  --grist-theme-progress-bar-fg: var(--tenfold-accent);
+  --grist-theme-progress-bar-bg: var(--tenfold-border-subtle);
+  --grist-theme-loader-fg: var(--tenfold-accent);
+  --grist-theme-loader-bg: var(--tenfold-accent-subtle-active);
+  --grist-theme-toast-success-bg: var(--tenfold-success);
+  --grist-theme-toast-warning-bg: var(--tenfold-warning);
+  --grist-theme-toast-error-bg: var(--tenfold-danger);
+  --grist-theme-toast-info-bg: var(--tenfold-info);
+
+  /* Secondary workflows: forms, pickers, import, comments, and charts. */
+  --grist-theme-choice-entry-bg: var(--tenfold-surface-1);
+  --grist-theme-choice-entry-border: var(--tenfold-border-subtle);
+  --grist-theme-choice-entry-border-hover: var(--tenfold-accent);
+  --grist-theme-choice-token-bg: var(--tenfold-layer-1);
+  --grist-theme-choice-token-selected-bg: var(--tenfold-accent-subtle-hover);
+  --grist-theme-select-button-bg: var(--tenfold-surface-1);
+  --grist-theme-select-button-border: var(--tenfold-border-strong);
+  --grist-theme-select-button-fg: var(--tenfold-text-primary);
+  --grist-theme-select-button-placeholder-fg: var(--tenfold-text-placeholder);
+  --grist-theme-autocomplete-item-selected-bg: var(--tenfold-accent-subtle);
+  --grist-theme-date-picker-selected-bg: var(--tenfold-accent);
+  --grist-theme-date-picker-selected-fg: var(--tenfold-surface-1);
+  --grist-theme-date-picker-selected-bg-hover: var(--tenfold-accent-hover);
+  --grist-theme-date-picker-range-bg: var(--tenfold-accent-subtle);
+  --grist-theme-date-picker-range-bg-hover: var(--tenfold-accent-subtle-hover);
+  --grist-theme-importer-outside-bg: var(--tenfold-surface-2);
+  --grist-theme-importer-main-content-bg: var(--tenfold-surface-1);
+  --grist-theme-importer-active-file-bg: var(--tenfold-accent);
+  --grist-theme-importer-inactive-file-bg: var(--tenfold-layer-1);
+  --grist-theme-comments-popup-header-bg: var(--tenfold-surface-2);
+  --grist-theme-comments-popup-body-bg: var(--tenfold-surface-1);
+  --grist-theme-comments-popup-border: var(--tenfold-border-subtle);
+  --grist-theme-comments-panel-resolved-topic-bg: var(--tenfold-layer-1);
+  --grist-theme-chart-fg: var(--tenfold-text-secondary);
+  --grist-theme-chart-bg: var(--tenfold-surface-1);
+  --grist-theme-chart-x-axis: var(--tenfold-text-tertiary);
+  --grist-theme-chart-y-axis: var(--tenfold-text-tertiary);
+  --grist-theme-link: var(--tenfold-accent-hover);
+  --grist-theme-link-hover: var(--tenfold-accent-active);
+
+  --scroll-bar-fg: oklch(0.1482 0.0034 196.79 / 20%);
+  --scroll-bar-hover-fg: oklch(0.1482 0.0034 196.79 / 30%);
+  --scroll-bar-active-fg: oklch(0.1482 0.0034 196.79 / 40%);
+  --scroll-bar-bg: transparent;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--grist-theme-font-family);
+  font-variant-ligatures: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  color: var(--tenfold-text-primary);
+  background-color: var(--tenfold-canvas);
+}
+
+*:focus-visible {
+  outline-color: var(--tenfold-accent);
+}
+
 /* Ten-Fold supplies workspace navigation and identity; Grist supplies the sheet editor. */
 .test-left-panel,
 .test-left-resizer,

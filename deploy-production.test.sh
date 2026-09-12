@@ -48,6 +48,13 @@ grep -Fq '.test-gristdoc' "$editor_page_path"
 grep -Fq '[data-grist-region-id="left"]' "$grist_css_path"
 grep -Fq 'button[aria-label="Open navigation panel (left panel)"]' "$grist_css_path"
 grep -Fq 'button[aria-label="Close navigation panel (left panel)"]' "$grist_css_path"
+grep -Fq -- '--grist-theme-font-family: "Inter Variable"' "$grist_css_path"
+grep -Fq -- '--grist-theme-bg-default: var(--tenfold-surface-1)' "$grist_css_path"
+grep -Fq -- '--grist-theme-control-primary-bg: var(--tenfold-accent)' "$grist_css_path"
+grep -Fq -- '--grist-theme-menu-item-selected-bg: var(--tenfold-accent-subtle)' "$grist_css_path"
+grep -Fq -- '--grist-theme-table-header-bg: var(--tenfold-layer-1)' "$grist_css_path"
+grep -Fq -- '--grist-theme-input-focus: var(--tenfold-accent)' "$grist_css_path"
+grep -Fq -- '--grist-theme-modal-bg: var(--tenfold-surface-1)' "$grist_css_path"
 if grep -Fq 'data-test-id="gristdoc"' "$editor_page_path"; then
   echo 'Grist exposes editor readiness as .test-gristdoc, not a data-test-id attribute' >&2
   exit 1
