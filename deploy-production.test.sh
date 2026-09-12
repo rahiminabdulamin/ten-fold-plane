@@ -29,3 +29,7 @@ grep -Fq '178.128.104.112' "$script_path"
 grep -Fq "require('http').get('http://localhost:8484/status'" "$compose_path"
 grep -Fq 'vars grist_original_uri {uri}' "$proxy_path"
 grep -Fq 'header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}' "$proxy_path"
+if grep -Fq 'request_header -X-Ten-Fold-User' "$proxy_path"; then
+  echo 'Private Grist proxy must not delete the identity copied by forward_auth' >&2
+  exit 1
+fi
