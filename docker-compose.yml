@@ -29,6 +29,8 @@ services:
       GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET}
       GRIST_FORWARD_AUTH_HEADER: X-Ten-Fold-User
       GRIST_DEFAULT_EMAIL: spreadsheet-system@tenfold.internal
+      GRIST_ADMIN_EMAIL: spreadsheet-system@tenfold.internal
+      GRIST_IN_SERVICE: "true"
       GRIST_IGNORE_SESSION: "true"
       GRIST_SUPPORT_ANON: "true"
       GRIST_SERVE_SAME_ORIGIN: "true"

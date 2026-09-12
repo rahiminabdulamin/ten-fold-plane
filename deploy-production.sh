@@ -63,7 +63,7 @@ if ! docker compose up -d --build --wait grist api worker beat-worker copilot we
   exit 1
 fi
 if ! docker compose exec -T grist node -e \
-  "require('http').get({host:'localhost',port:8484,path:'/api/workspaces/1',headers:{'X-Ten-Fold-User':'spreadsheet-system@tenfold.internal'}},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"; then
+  "require('http').get({host:'localhost',port:8484,path:'/api/workspaces/1',headers:{'X-Ten-Fold-User':'spreadsheet-system@tenfold.internal'}},r=>{if(r.statusCode!==200)console.error('Workspace probe HTTP '+r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"; then
   echo "Grist is healthy, but its configured workspace is unavailable." >&2
   docker compose logs --tail=200 grist
   exit 1
