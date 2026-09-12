@@ -5,6 +5,8 @@ set -euo pipefail
 script_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/deploy-production.sh"
 compose_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/docker-compose.yml"
 proxy_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/proxy/Caddyfile.ce"
+migration_0126_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/api/plane/db/migrations/0126_spreadsheet_document_types.py"
+migration_0127_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/api/plane/db/migrations/0127_spreadsheet_form_view_id.py"
 
 [[ -f "$script_path" ]]
 grep -Fq 'rsync -az --delete' "$script_path"
@@ -34,6 +36,13 @@ grep -Fq 'vars grist_original_uri {uri}' "$proxy_path"
 grep -Fq 'header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}' "$proxy_path"
 grep -Fq '@grist_form_preview path_regexp grist_form_preview' "$proxy_path"
 grep -Fq '@grist_native_form path_regexp grist_native_form' "$proxy_path"
+[[ -f "$migration_0127_path" ]]
+grep -Fq 'dependencies = [("db", "0126_spreadsheet_document_types")]' "$migration_0127_path"
+grep -Fq 'name="grist_form_view_id"' "$migration_0127_path"
+if grep -Fq 'name="grist_form_view_id"' "$migration_0126_path"; then
+  echo 'Do not modify the already-deployed 0126 migration' >&2
+  exit 1
+fi
 if grep -Fq 'request_header -X-Ten-Fold-User' "$proxy_path"; then
   echo 'Private Grist proxy must not delete the identity copied by forward_auth' >&2
   exit 1
