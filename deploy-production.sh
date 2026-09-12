@@ -48,10 +48,39 @@ if [[ -z "$grist_session_secret" ]]; then
 fi
 set_env .env GRIST_PUBLIC_URL "$PRODUCTION_URL/grist"
 set_env apps/api/.env GRIST_INTERNAL_URL "http://grist:8484"
-set_env apps/api/.env GRIST_WORKSPACE_ID "1"
 set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/grist"
 
 docker compose pull grist
+docker compose up -d --wait grist
+grist_workspace_id="$(docker compose exec -T grist node --input-type=module <<'NODE'
+const headers = {
+  "X-Ten-Fold-User": "spreadsheet-system@tenfold.internal",
+  "X-Requested-With": "XMLHttpRequest",
+};
+const base = "http://localhost:8484/api/orgs/current/workspaces";
+const response = await fetch(base, {headers});
+if (!response.ok) throw new Error(`Workspace discovery HTTP ${response.status}: ${await response.text()}`);
+const workspaces = await response.json();
+if (workspaces.length) {
+  console.log(workspaces[0].id);
+} else {
+  const created = await fetch(base, {
+    method: "POST",
+    headers: {...headers, "Content-Type": "application/json"},
+    body: JSON.stringify({name: "Ten-Fold"}),
+  });
+  if (!created.ok) throw new Error(`Workspace creation HTTP ${created.status}: ${await created.text()}`);
+  const result = await created.json();
+  console.log(typeof result === "object" ? result.id : result);
+}
+NODE
+)"
+[[ "$grist_workspace_id" =~ ^[0-9]+$ ]] || {
+  echo "Grist returned an invalid workspace ID: $grist_workspace_id" >&2
+  exit 1
+}
+set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"
+
 docker compose up --build migrator
 if ! docker compose up -d --build --wait grist api worker beat-worker copilot web proxy; then
   docker compose ps
@@ -59,12 +88,6 @@ if ! docker compose up -d --build --wait grist api worker beat-worker copilot we
   if [[ -n "$grist_container_id" ]]; then
     docker inspect --format '{{json .State.Health}}' "$grist_container_id"
   fi
-  docker compose logs --tail=200 grist
-  exit 1
-fi
-if ! docker compose exec -T grist node -e \
-  "require('http').get({host:'localhost',port:8484,path:'/api/workspaces/1',headers:{'X-Ten-Fold-User':'spreadsheet-system@tenfold.internal'}},r=>{if(r.statusCode!==200)console.error('Workspace probe HTTP '+r.statusCode);process.exit(r.statusCode===200?0:1)}).on('error',e=>{console.error(e.message);process.exit(1)})"; then
-  echo "Grist is healthy, but its configured workspace is unavailable." >&2
   docker compose logs --tail=200 grist
   exit 1
 fi
