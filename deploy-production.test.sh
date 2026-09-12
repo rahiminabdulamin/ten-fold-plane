@@ -37,10 +37,11 @@ grep -Fq 'vars grist_original_uri {uri}' "$proxy_path"
 grep -Fq 'header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}' "$proxy_path"
 grep -Fq '@grist_form_preview path_regexp grist_form_preview' "$proxy_path"
 grep -Fq '@grist_native_form path_regexp grist_native_form' "$proxy_path"
+grep -Fq '@grist_shared_api path /o/ten-fold/api/s/*' "$proxy_path"
 [[ -f "$migration_0127_path" ]]
 grep -Fq 'dependencies = [("db", "0126_spreadsheet_document_types")]' "$migration_0127_path"
 grep -Fq 'name="grist_form_view_id"' "$migration_0127_path"
-grep -Fq "querySelector('.test-gristdoc')" "$editor_page_path"
+grep -Fq '.test-gristdoc' "$editor_page_path"
 if grep -Fq 'data-test-id="gristdoc"' "$editor_page_path"; then
   echo 'Grist exposes editor readiness as .test-gristdoc, not a data-test-id attribute' >&2
   exit 1

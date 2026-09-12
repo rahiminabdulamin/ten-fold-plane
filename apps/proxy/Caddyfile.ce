@@ -34,6 +34,16 @@
 		reverse_proxy grist:8484
 	}
 
+	# Grist's /api/s namespace is authorized by its unguessable share key and is
+	# used to load, submit, and upload attachments for published forms.
+	@grist_shared_api path /o/ten-fold/api/s/*
+	handle @grist_shared_api {
+		reverse_proxy grist:8484 {
+			header_up -X-Ten-Fold-User
+			header_up -X-Ten-Fold-Name
+		}
+	}
+
 	@grist_editor path /grist/* /o/ten-fold /o/ten-fold/* /dw/self/*
 	handle @grist_editor {
 		vars grist_original_uri {uri}
