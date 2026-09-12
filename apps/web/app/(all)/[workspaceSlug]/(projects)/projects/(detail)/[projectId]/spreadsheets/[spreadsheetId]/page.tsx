@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { LogoSpinner } from "@/components/common/logo-spinner";
+import { applyGristEditorStyle } from "@/lib/grist-editor-style";
 import { isSpreadsheetProvisioning, SpreadsheetService } from "@/services/spreadsheet.service";
 import type { Route } from "./+types/page";
 
@@ -44,9 +45,12 @@ export default function SpreadsheetEditorPage({ params }: { params: Route.Compon
   }, [workspaceSlug, projectId, spreadsheetId]);
 
   const waitForEditor = () => {
+    if (readyTimer.current) clearTimeout(readyTimer.current);
     const check = () => {
       try {
-        if (iframeRef.current?.contentDocument?.querySelector(".test-gristdoc")) {
+        const document = iframeRef.current?.contentDocument;
+        if (document?.head) applyGristEditorStyle(document);
+        if (document?.querySelector(".test-gristdoc")) {
           setEditorReady(true);
           return;
         }

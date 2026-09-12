@@ -37,6 +37,8 @@ RUN corepack enable pnpm
 
 # Copy full directory structure before fetch to ensure all package.json files are available
 COPY --from=builder /app/out/full/ .
+# The editor embeds this shared stylesheet; proxy is outside the pruned web workspace.
+COPY --from=builder /app/apps/proxy/grist-custom.css ./apps/proxy/grist-custom.css
 COPY turbo.json turbo.json
 
 # Fetch dependencies to cache store, then install offline with dev deps
