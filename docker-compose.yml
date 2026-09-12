@@ -203,6 +203,11 @@ services:
       context: ./apps/proxy
       dockerfile: Dockerfile.ce
     restart: always
+    # Preserve TLS certificates and ACME accounts when rebuilding the proxy.
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ${CADDY_TLS_DIRECTORY:-/etc/tenfold/tls}:/etc/caddy/tls:ro
     env_file:
       - .env
     ports:
@@ -224,3 +229,5 @@ volumes:
   uploads:
   rabbitmq_data:
   gristdata:
+  caddy_data:
+  caddy_config:

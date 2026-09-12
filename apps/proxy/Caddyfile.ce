@@ -72,5 +72,6 @@
 }
 
 {$SITE_ADDRESS} {
+	tls {$CADDY_TLS_CERT_FILE} {$CADDY_TLS_KEY_FILE}
 	import plane_proxy
 }

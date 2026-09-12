@@ -48,6 +48,9 @@ if [[ -z "$grist_session_secret" ]]; then
 fi
 set_env .env GRIST_PUBLIC_URL "$PRODUCTION_URL/grist"
 set_env .env GRIST_PUBLIC_ORIGIN "$PRODUCTION_URL"
+set_env .env CADDY_TLS_DIRECTORY "/etc/tenfold/tls"
+set_env .env CADDY_TLS_CERT_FILE "/etc/caddy/tls/origin.pem"
+set_env .env CADDY_TLS_KEY_FILE "/etc/caddy/tls/origin.key"
 set_env apps/api/.env GRIST_INTERNAL_URL "http://grist:8484"
 set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/o/ten-fold"
 
