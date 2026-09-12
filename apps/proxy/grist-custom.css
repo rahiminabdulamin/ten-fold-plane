@@ -239,6 +239,16 @@ body {
   background-color: var(--tenfold-canvas);
 }
 
+/* Published and previewed Grist forms should stand alone as Ten-Fold forms. */
+body > div[class*="grain335"] > div > div {
+  background-color: var(--tenfold-surface-1) !important;
+}
+
+body > div[class*="grain335"] > div > div > div[class*="grain337"],
+body > div[class*="grain335"] > div > footer {
+  display: none !important;
+}
+
 *:focus-visible {
   outline-color: var(--tenfold-accent);
 }

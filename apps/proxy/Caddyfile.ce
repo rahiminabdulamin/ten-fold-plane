@@ -25,6 +25,13 @@
 
 	# Grist's fingerprinted UI assets contain no document data and must load before
 	# either the private editor or a capability-gated public form can render.
+	# Keep Grist form tabs branded like the parent Ten-Fold application.
+	@grist_favicon path /grist/favicon*
+	handle @grist_favicon {
+		rewrite * /branding/tenfold-logo-square-rebrand-black-v4.png
+		reverse_proxy web:3000
+	}
+
 	@grist_static path /grist/custom.css /grist/v/* /grist/icons/* /grist/locales/* /grist/favicon*
 	handle @grist_static {
 		uri strip_prefix /grist
