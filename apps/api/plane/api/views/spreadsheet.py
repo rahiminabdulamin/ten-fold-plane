@@ -211,7 +211,14 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
             )
         url = f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}"
         if spreadsheet.document_type == SpreadsheetDocument.DocumentType.FORM:
-            url = f"{url}/f/{spreadsheet.grist_form_view_section_id}"
+            view_id = spreadsheet.grist_form_view_id
+            if not view_id:
+                view_id = GristClient().form_view_id(
+                    spreadsheet.grist_document_id, spreadsheet.grist_form_view_section_id
+                )
+                spreadsheet.grist_form_view_id = view_id
+                spreadsheet.save(update_fields=["grist_form_view_id", "updated_at"])
+            url = f"{url}/p/{view_id}#a1.s{spreadsheet.grist_form_view_section_id}"
         response = Response({"url": url})
         response.set_cookie(
             "tenfold_grist_capability",

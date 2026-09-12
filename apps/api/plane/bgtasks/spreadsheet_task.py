@@ -67,8 +67,12 @@ def process_spreadsheet_operation_now(operation_or_id):
                 spreadsheet.document_type == SpreadsheetDocument.DocumentType.FORM
                 and not spreadsheet.grist_form_view_section_id
             ):
-                spreadsheet.grist_form_view_section_id = client.create_form_view(spreadsheet.grist_document_id)
-                spreadsheet.save(update_fields=["grist_form_view_section_id", "updated_at"])
+                view_id, section_id = client.create_form_view(spreadsheet.grist_document_id)
+                spreadsheet.grist_form_view_id = view_id
+                spreadsheet.grist_form_view_section_id = section_id
+                spreadsheet.save(
+                    update_fields=["grist_form_view_id", "grist_form_view_section_id", "updated_at"]
+                )
             current, delta = _permission_delta(spreadsheet)
             client.update_permissions(spreadsheet.grist_document_id, delta)
             spreadsheet.grist_permissions = current
@@ -98,6 +102,7 @@ def process_spreadsheet_operation_now(operation_or_id):
         spreadsheet.save(
             update_fields=[
                 "grist_document_id",
+                "grist_form_view_id",
                 "grist_form_view_section_id",
                 "grist_permissions",
                 "status",

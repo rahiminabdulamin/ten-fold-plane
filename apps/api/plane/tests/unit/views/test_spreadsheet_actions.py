@@ -52,19 +52,31 @@ def test_create_form_view_returns_the_new_form_section(monkeypatch):
             return {
                 "records": [
                     {"id": 2, "fields": {"tableRef": 7, "parentKey": "record"}},
-                    {"id": 9, "fields": {"tableRef": 7, "parentKey": "form"}},
+                    {"id": 9, "fields": {"tableRef": 7, "parentKey": "form", "parentId": 3}},
                 ]
             }
 
     monkeypatch.setattr(client, "document_api", document_api)
 
-    assert client.create_form_view("document") == 9
+    assert client.create_form_view("document") == (3, 9)
     assert calls[0] == (
         "POST",
         "document",
         "/apply",
         [["CreateViewSection", 7, 0, "form", None, None]],
     )
+
+
+@pytest.mark.unit
+def test_form_view_id_finds_an_existing_form_editor_page(monkeypatch):
+    client = object.__new__(GristClient)
+    monkeypatch.setattr(
+        client,
+        "document_api",
+        lambda *_: {"records": [{"id": 9, "fields": {"parentId": 3}}]},
+    )
+
+    assert client.form_view_id("document", 9) == 3
 
 
 @pytest.mark.unit

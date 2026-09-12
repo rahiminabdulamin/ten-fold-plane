@@ -19,4 +19,9 @@ class Migration(migrations.Migration):
             name="grist_form_view_section_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
+        migrations.AddField(
+            model_name="spreadsheetdocument",
+            name="grist_form_view_id",
+            field=models.PositiveIntegerField(blank=True, null=True),
+        ),
     ]

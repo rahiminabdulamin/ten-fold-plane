@@ -37,7 +37,7 @@ export type TNavigationItem = {
   access: EUserPermissions[] | EUserProjectRoles[];
   shouldRender: boolean;
   sortOrder: number;
-  i18n_key: string;
+  i18n_key?: string;
   key: string;
 };
 
@@ -242,7 +242,7 @@ export const TabNavigationRoot = observer(function TabNavigationRoot(props: TTab
                   >
                     <Link to={item.href}>
                       <TabNavigationItem isActive={itemIsActive}>
-                        <span>{t(item.i18n_key)}</span>
+                        <span>{item.i18n_key ? t(item.i18n_key) : item.name}</span>
                       </TabNavigationItem>
                     </Link>
                   </div>

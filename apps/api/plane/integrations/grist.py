@@ -88,7 +88,20 @@ class GristClient:
         ]
         if not form_sections:
             raise GristConfigurationError("Grist did not create a form view")
-        return max(int(record["id"]) for record in form_sections)
+        section = max(form_sections, key=lambda record: int(record["id"]))
+        view_id = section.get("fields", {}).get("parentId")
+        if not isinstance(view_id, int) or view_id <= 0:
+            raise GristConfigurationError("Grist created a form without an editor page")
+        return view_id, int(section["id"])
+
+    def form_view_id(self, document_id, section_id):
+        sections = self.document_api("GET", document_id, "/tables/_grist_Views_section/records")
+        for record in sections.get("records", []):
+            if int(record.get("id", 0)) == int(section_id):
+                view_id = record.get("fields", {}).get("parentId")
+                if isinstance(view_id, int) and view_id > 0:
+                    return view_id
+        raise GristConfigurationError("Grist form editor page was not found")
 
     def document_api(self, method, document_id, suffix, *, payload=None):
         return self.request(method, self.document_path(document_id, suffix), json=payload)

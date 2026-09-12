@@ -93,7 +93,6 @@ export const useNavigationItems = ({
         sortOrder: 5,
       },
       {
-        i18n_key: "sidebar.spreadsheets",
         key: "spreadsheets",
         name: "Sheets",
         href: `/${workspaceSlug}/projects/${projectId}/spreadsheets`,
@@ -103,7 +102,6 @@ export const useNavigationItems = ({
         sortOrder: 6,
       },
       {
-        i18n_key: "sidebar.forms",
         key: "forms",
         name: "Forms",
         href: `/${workspaceSlug}/projects/${projectId}/forms`,
