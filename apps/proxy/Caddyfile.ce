@@ -13,6 +13,16 @@
 
 	reverse_proxy /api/copilotkit/* copilot:8200
 
+	# Grist references custom.css without a content hash, so it must not survive a
+	# deployment in browser or edge caches.
+	@grist_custom_css path /grist/v/*/custom.css
+	handle @grist_custom_css {
+		uri strip_prefix /grist
+		reverse_proxy grist:8484 {
+			header_down Cache-Control "no-store, max-age=0"
+		}
+	}
+
 	# Grist's fingerprinted UI assets contain no document data and must load before
 	# either the private editor or a capability-gated public form can render.
 	@grist_static path /grist/custom.css /grist/v/* /grist/icons/* /grist/locales/* /grist/favicon*
