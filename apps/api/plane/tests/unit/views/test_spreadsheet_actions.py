@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 import pytest
+from types import SimpleNamespace
+from unittest.mock import Mock
+from plane.api.views import spreadsheet as spreadsheet_views
 
 from plane.api.views.spreadsheet import (
     _can_recover_provisioning_operation,
@@ -113,6 +116,40 @@ def test_form_branding_css_uses_workspace_name_and_uploaded_logo():
 
     assert '--tenfold-form-team-name: "Brunei4AI";' in css
     assert '--tenfold-form-team-logo: url("/api/assets/v2/static/logo-id/");' in css
+
+
+@pytest.mark.unit
+def test_form_branding_preserves_unicode_and_escapes_css_strings():
+    css = _form_branding_css('团队 "A"\nB', None)
+    assert '团队 \\22 A\\22 \\a B' in css
+    assert '--tenfold-form-team-logo: none;' in css
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("path,lookup", [
+    ("/canonical12345/Form/f/4", "/api/docs/canonical12345"),
+    ("/forms/native-key/4", "/api/docs/s.native-key"),
+    ("/grist-public/forms/native-key/4", "/api/docs/s.native-key"),
+])
+def test_branding_resolves_native_shares_and_canonical_previews(monkeypatch, path, lookup):
+    workspace = SimpleNamespace(name="Brunei4AI", logo_url="/api/assets/v2/static/logo/")
+    documents = Mock()
+    documents.select_related.return_value.filter.return_value.first.side_effect = [
+        None, SimpleNamespace(workspace=workspace),
+    ]
+    publications = Mock()
+    publications.select_related.return_value.filter.return_value.first.return_value = None
+    monkeypatch.setattr(spreadsheet_views.SpreadsheetDocument, "objects", documents)
+    monkeypatch.setattr(spreadsheet_views.SpreadsheetFormPublication, "objects", publications)
+
+    def metadata(self, method, requested_path):
+        assert (method, requested_path) == ("GET", lookup)
+        return {"id": "full-document-id"}
+
+    monkeypatch.setattr(GristClient, "__init__", lambda self: None)
+    monkeypatch.setattr(GristClient, "request", metadata)
+    assert spreadsheet_views._form_branding_workspace(path) is workspace
+    assert documents.select_related.return_value.filter.call_args.kwargs["grist_document_id"] == "full-document-id"
 
 
 def test_duplicate_preserves_the_source_document_type():

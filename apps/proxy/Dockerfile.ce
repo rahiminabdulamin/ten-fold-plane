@@ -17,3 +17,8 @@ RUN apk update && apk upgrade --no-cache && apk add --no-cache nss-tools bash cu
 COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
 
 COPY Caddyfile.ce /etc/caddy/Caddyfile
+
+# Reject invalid routing syntax during the build, before replacing the live proxy.
+RUN SITE_ADDRESS=https://localhost FILE_SIZE_LIMIT=5242880 BUCKET_NAME=uploads \
+    CADDY_TLS_CERT_FILE=/etc/caddy/tls/origin.pem CADDY_TLS_KEY_FILE=/etc/caddy/tls/origin.key \
+    caddy adapt --config /etc/caddy/Caddyfile --adapter caddyfile > /dev/null

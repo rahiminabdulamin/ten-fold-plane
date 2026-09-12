@@ -15,27 +15,31 @@
 
 	# Grist references custom.css without a content hash, so it must not survive a
 	# deployment in browser or edge caches.
-	@grist_custom_css path /grist/v/*/custom.css
+	@grist_custom_css path /grist/v/*/custom.css /grist/custom.css
 	handle @grist_custom_css {
-		uri strip_prefix /grist
+		rewrite * /api/v1/internal/grist/form-branding/
+		reverse_proxy api:8000 {
+			header_down Cache-Control "no-store, max-age=0"
+		}
+	}
+
+	# The wrapper above receives the document Referer; this import contains only static styles.
+	handle /grist/form-base.css {
+		rewrite * /custom.css
 		reverse_proxy grist:8484 {
 			header_down Cache-Control "no-store, max-age=0"
 		}
 	}
 
-	# Form CSS imports this response to obtain the current workspace name and logo.
-	handle /grist/form-branding.css {
-		uri /api/v1/internal/grist/form-branding/
-		reverse_proxy api:8000
-	}
-
 	# Grist's fingerprinted UI assets contain no document data and must load before
 	# either the private editor or a capability-gated public form can render.
 	# Keep Grist form tabs branded like the parent Ten-Fold application.
-	@grist_favicon path /grist/favicon*
+	@grist_favicon path /grist/favicon* /grist/icons/favicon.png /grist/v/*/icons/favicon.png
 	handle @grist_favicon {
 		rewrite * /branding/tenfold-logo-square-rebrand-black-v4.png
-		reverse_proxy web:3000
+		reverse_proxy web:3000 {
+			header_down Cache-Control "no-store, max-age=0"
+		}
 	}
 
 	@grist_static path /grist/custom.css /grist/v/* /grist/icons/* /grist/locales/* /grist/favicon*

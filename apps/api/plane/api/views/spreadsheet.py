@@ -1,7 +1,7 @@
 # Copyright (c) 2023-present Plane Software, Inc. and contributors
 # SPDX-License-Identifier: AGPL-3.0-only
 
-import json
+import logging
 import re
 import secrets
 import uuid
@@ -143,30 +143,44 @@ def _grist_authorization_document_id(path, capability):
 
 
 def _form_branding_css(workspace_name, logo_url):
+    # CSS escapes are hexadecimal, not JSON's \uXXXX escapes.
+    def css_string(value):
+        return '"' + ''.join(
+            f"\\{ord(char):x} " if char in '\\"' or ord(char) < 32 or ord(char) == 127 else char
+            for char in value
+        ) + '"'
+
     return (
         ":root {\n"
-        f"  --tenfold-form-team-name: {json.dumps(workspace_name)};\n"
-        f"  --tenfold-form-team-logo: url({json.dumps(logo_url or '/branding/tenfold-logo-square-rebrand-black-v4.png')});\n"
+        f"  --tenfold-form-team-name: {css_string(workspace_name)};\n"
+        f"  --tenfold-form-team-logo: {'url(' + css_string(logo_url) + ')' if logo_url else 'none'};\n"
         "}\n"
     )
 
 
 def _form_branding_workspace(referrer):
     path = urlsplit(referrer).path
-    publication_match = re.fullmatch(r"/(?:grist-public/)?forms/([A-Za-z0-9_-]+)/[0-9]+(?:/.*)?", path)
+    publication_match = re.fullmatch(r"/(?:grist-public/)?forms/([A-Za-z0-9_-]+)/([0-9]+)(?:/.*)?", path)
     if publication_match:
         publication = (
             SpreadsheetFormPublication.objects.select_related("spreadsheet__workspace__logo_asset")
             .filter(
                 share_key=publication_match.group(1),
+                view_section_id=int(publication_match.group(2)),
                 enabled=True,
                 deleted_at__isnull=True,
                 spreadsheet__status=SpreadsheetDocument.Status.READY,
             )
             .first()
         )
-        return publication.spreadsheet.workspace if publication else None
-    document_id = _grist_document_id_from_path(path)
+        if publication:
+            return publication.spreadsheet.workspace
+        # Native Grist publications are not necessarily registered in Plane.
+        document_id = f"s.{publication_match.group(1)}"
+    else:
+        if not re.search(r"/f/[0-9]+/?$", path):
+            return None
+        document_id = _grist_document_id_from_path(path)
     if not document_id:
         return None
     spreadsheet = (
@@ -174,6 +188,15 @@ def _form_branding_workspace(referrer):
         .filter(grist_document_id=document_id, status=SpreadsheetDocument.Status.READY, deleted_at__isnull=True)
         .first()
     )
+    if not spreadsheet:
+        # Canonical preview IDs and native share keys must resolve to the exact stored ID.
+        metadata = GristClient().request("GET", f"/api/docs/{document_id}")
+        spreadsheet = (
+            SpreadsheetDocument.objects.select_related("workspace__logo_asset")
+            .filter(grist_document_id=metadata["id"], status=SpreadsheetDocument.Status.READY,
+                    deleted_at__isnull=True)
+            .first()
+        )
     return spreadsheet.workspace if spreadsheet else None
 
 
@@ -556,8 +579,15 @@ class GristFormBrandingEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        workspace = _form_branding_workspace(request.headers.get("Referer", ""))
-        css = _form_branding_css(workspace.name, workspace.logo_url) if workspace else ""
+        # This stylesheet is linked directly by Grist's HTML. An @import request
+        # would refer to the stylesheet itself and lose the form's document URL.
+        css = '@import url("/grist/form-base.css");\n'
+        try:
+            workspace = _form_branding_workspace(request.headers.get("Referer", ""))
+            if workspace:
+                css += _form_branding_css(workspace.name, workspace.logo_url)
+        except Exception:
+            logging.getLogger(__name__).exception("Unable to resolve Grist form branding")
         response = HttpResponse(css, content_type="text/css; charset=utf-8")
         response["Cache-Control"] = "no-store, max-age=0"
         response["X-Content-Type-Options"] = "nosniff"
