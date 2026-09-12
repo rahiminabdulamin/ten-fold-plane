@@ -40,11 +40,16 @@ def _permission_delta(spreadsheet):
     return current, {**{email: None for email in spreadsheet.grist_permissions if email not in current}, **current}
 
 
-def process_spreadsheet_operation_now(operation_id):
+def process_spreadsheet_operation_now(operation_or_id):
     with transaction.atomic():
-        operation = (
-            SpreadsheetOperation.objects.select_for_update().select_related("spreadsheet__project").get(id=operation_id)
-        )
+        if isinstance(operation_or_id, SpreadsheetOperation):
+            operation = operation_or_id
+        else:
+            operation = (
+                SpreadsheetOperation.objects.select_for_update()
+                .select_related("spreadsheet__project")
+                .get(id=operation_or_id)
+            )
         if operation.status in {SpreadsheetOperation.Status.RUNNING, SpreadsheetOperation.Status.COMPLETE}:
             return
         operation.status = SpreadsheetOperation.Status.RUNNING

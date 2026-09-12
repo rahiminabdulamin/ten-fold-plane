@@ -17,7 +17,11 @@ from rest_framework.response import Response
 
 from plane.api.serializers import SpreadsheetDocumentSerializer, SpreadsheetFormPublicationSerializer
 from plane.app.permissions import ProjectEntityPermission
-from plane.bgtasks.spreadsheet_task import process_spreadsheet_operation, process_spreadsheet_operation_now
+from plane.bgtasks.spreadsheet_task import (
+    grist_failure_code,
+    process_spreadsheet_operation,
+    process_spreadsheet_operation_now,
+)
 from plane.db.models import (
     ProjectMember,
     SpreadsheetAgentExecution,
@@ -76,6 +80,12 @@ def _can_recover_provisioning_operation(operation):
     )
 
 
+def _record_synchronous_failure(spreadsheet, error):
+    spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
+    spreadsheet.last_error_code = grist_failure_code(error)
+    spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
+
+
 class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [ProjectEntityPermission]
 
@@ -92,9 +102,9 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
         spreadsheet = serializer.save(workspace=workspace, project_id=project_id)
         operation = _queue(spreadsheet, SpreadsheetOperation.Kind.PROVISION, enqueue=False)
         try:
-            process_spreadsheet_operation_now(str(operation.id))
-        except Exception:
-            pass
+            process_spreadsheet_operation_now(operation)
+        except Exception as error:
+            _record_synchronous_failure(spreadsheet, error)
         spreadsheet.refresh_from_db()
         if spreadsheet.status == SpreadsheetDocument.Status.PROVISIONING:
             spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
@@ -148,9 +158,9 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
                     operation.status = SpreadsheetOperation.Status.FAILED
                     operation.save(update_fields=["status", "updated_at"])
                 try:
-                    process_spreadsheet_operation_now(str(operation.id))
-                except Exception:
-                    pass
+                    process_spreadsheet_operation_now(operation)
+                except Exception as error:
+                    _record_synchronous_failure(spreadsheet, error)
                 spreadsheet.refresh_from_db()
             elif not operation or operation.status == SpreadsheetOperation.Status.COMPLETE:
                 spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
