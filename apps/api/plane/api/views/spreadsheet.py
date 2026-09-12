@@ -90,6 +90,10 @@ def _record_synchronous_failure(spreadsheet, error):
 
 
 def _grist_document_id_from_path(path):
+    path = urlsplit(path).path
+    path = re.sub(r"^/dw/self/v/[A-Za-z0-9_-]+(?=/)", "", path)
+    if path.startswith("/o/ten-fold/"):
+        path = "/grist" + path
     match = GRIST_DOCUMENT_PATH.fullmatch(urlsplit(path).path)
     if not match:
         match = re.fullmatch(
@@ -101,7 +105,17 @@ def _grist_document_id_from_path(path):
 
 def _grist_authorization_document_id(path, capability):
     """Use the launched document for Grist's session-scoped follow-up requests."""
-    return _grist_document_id_from_path(path) or capability.get("document")
+    document_id = _grist_document_id_from_path(path)
+    if document_id:
+        return document_id
+    path = urlsplit(path).path
+    path = re.sub(r"^/dw/self/v/[A-Za-z0-9_-]+(?=/)", "", path)
+    if re.fullmatch(
+        r"(?:/grist)?/o/ten-fold/?|(?:/grist)?/o/ten-fold/api/(?:session/access/(?:active|all)|log)",
+        path,
+    ):
+        return capability.get("document")
+    return None
 
 
 class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
@@ -205,7 +219,7 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
             httponly=True,
             secure=not settings.DEBUG,
             samesite="Lax",
-            path="/grist/",
+            path="/",
         )
         return response
 

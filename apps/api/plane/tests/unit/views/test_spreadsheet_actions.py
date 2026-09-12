@@ -63,6 +63,9 @@ def test_failed_provisioning_operation_can_be_retried_once():
         "/grist/api/docs/g31document/tables/Table1/records",
         "/grist/o/ten-fold/api/docs/g31document/download",
         "/grist/o/ten-fold/api/worker/g31document",
+        "/o/ten-fold/doc/g31document?embed=true",
+        "/o/ten-fold/api/worker/g31document",
+        "/dw/self/v/unknown/o/ten-fold/api/docs/g31document/tables",
     ],
 )
 def test_grist_forward_auth_extracts_document_from_supported_paths(path):
@@ -86,4 +89,22 @@ def test_grist_canonical_document_url():
     assert _grist_document_id_from_path(
         "/grist/o/ten-fold/g31dmLkSY8WV/Untitled-spreadsheet-9?embed=true"
     ) == "g31dmLkSY8WV"
-    assert _grist_document_id_from_path("/o/ten-fold/g31dmLkSY8WV/Untitled-spreadsheet-9") is None
+    assert _grist_document_id_from_path(
+        "/o/ten-fold/g31dmLkSY8WV/Untitled-spreadsheet-9"
+    ) == "g31dmLkSY8WV"
+
+
+def test_grist_socket_authorization_requires_launch_context():
+    path = "/dw/self/v/unknown/o/ten-fold?clientId=0&newClient=1"
+    assert _grist_authorization_document_id(path, {"document": "g31document"}) == "g31document"
+    assert _grist_authorization_document_id(path, {}) is None
+    # A request for another document must check that document's membership.
+    assert _grist_authorization_document_id(
+        "/dw/self/v/unknown/o/ten-fold/api/docs/anotherDocument",
+        {"document": "g31document"},
+    ) == "anotherDocument"
+
+
+def test_grist_launch_context_does_not_authorize_arbitrary_routes():
+    for path in ["/admin", "/o/other/doc/123", "/o/ten-fold/api/orgs", "/dw/other/o/ten-fold"]:
+        assert _grist_authorization_document_id(path, {"document": "g31document"}) is None

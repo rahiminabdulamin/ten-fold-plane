@@ -567,7 +567,7 @@ ENABLE_DRF_SPECTACULAR = os.environ.get("ENABLE_DRF_SPECTACULAR", "0") == "1"
 GRIST_INTERNAL_URL = os.environ.get("GRIST_INTERNAL_URL", "http://grist:8484").rstrip("/")
 GRIST_INTERNAL_SECRET = os.environ.get("GRIST_INTERNAL_SECRET", "")
 GRIST_WORKSPACE_ID = int(os.environ.get("GRIST_WORKSPACE_ID", "1"))
-GRIST_PUBLIC_BASE_PATH = os.environ.get("GRIST_PUBLIC_BASE_PATH", "/grist").rstrip("/")
+GRIST_PUBLIC_BASE_PATH = os.environ.get("GRIST_PUBLIC_BASE_PATH", "/o/ten-fold").rstrip("/")
 
 if ENABLE_DRF_SPECTACULAR:
     REST_FRAMEWORK["DEFAULT_SCHEMA_CLASS"] = "drf_spectacular.openapi.AutoSchema"

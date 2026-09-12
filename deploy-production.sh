@@ -47,8 +47,9 @@ if [[ -z "$grist_session_secret" ]]; then
   set_env .env GRIST_SESSION_SECRET "$(openssl rand -hex 32)"
 fi
 set_env .env GRIST_PUBLIC_URL "$PRODUCTION_URL/grist"
+set_env .env GRIST_PUBLIC_ORIGIN "$PRODUCTION_URL"
 set_env apps/api/.env GRIST_INTERNAL_URL "http://grist:8484"
-set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/grist"
+set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/o/ten-fold"
 
 docker compose pull grist
 docker compose up -d --wait grist

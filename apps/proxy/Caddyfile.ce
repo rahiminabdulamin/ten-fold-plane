@@ -21,7 +21,8 @@
 		reverse_proxy grist:8484
 	}
 
-	handle /grist/* {
+	@grist_editor path /grist/* /o/ten-fold /o/ten-fold/* /dw/self/*
+	handle @grist_editor {
 		vars grist_original_uri {uri}
 		forward_auth api:8000 {
 			uri /api/v1/internal/grist/authorize/
@@ -29,10 +30,7 @@
 			copy_headers X-Ten-Fold-User X-Ten-Fold-Name
 		}
 		uri strip_prefix /grist
-		reverse_proxy grist:8484 {
-			# Grist canonical document redirects are rooted at /o/, outside our mount.
-			header_down Location "^(/o/.*)$" "/grist$1"
-		}
+		reverse_proxy grist:8484
 	}
 
 	handle /grist-public/forms/* {

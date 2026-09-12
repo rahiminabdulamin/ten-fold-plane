@@ -36,8 +36,9 @@ services:
       GRIST_SERVE_SAME_ORIGIN: "true"
       GRIST_SINGLE_ORG: ten-fold
       GRIST_ORG_IN_PATH: "true"
-      APP_HOME_URL: ${GRIST_PUBLIC_URL:-http://localhost/grist}
-      APP_DOC_URL: ${GRIST_PUBLIC_URL:-http://localhost/grist}
+      # Grist's browser router requires native /o/<org>/ document paths.
+      APP_HOME_URL: ${GRIST_PUBLIC_ORIGIN:-http://localhost}
+      APP_DOC_URL: ${GRIST_PUBLIC_ORIGIN:-http://localhost}
       # Grist builds its HTML asset base separately from home/document URLs.
       APP_STATIC_URL: ${GRIST_PUBLIC_URL:-http://localhost/grist}
       GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-gvisor}
