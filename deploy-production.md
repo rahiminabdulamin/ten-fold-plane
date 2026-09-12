@@ -6,7 +6,7 @@ From the repository root in WSL, run:
 ./deploy-production.sh
 ```
 
-The script uploads the current repository to the production Droplet, preserves server-side `.env` files, rebuilds and runs the migration service, then rebuilds the API, CopilotKit, web, and proxy services.
+The script uploads the current repository to the production Droplet, preserves server-side `.env` files, configures the Grist runtime, runs migrations, and rebuilds Grist, the API and background workers, CopilotKit, web, and proxy services. It waits for service health before reporting completion.
 
 To use a different SSH key without editing the script:
 
