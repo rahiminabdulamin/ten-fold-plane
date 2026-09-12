@@ -55,7 +55,14 @@ set_env apps/api/.env GRIST_INTERNAL_URL "http://grist:8484"
 set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/o/ten-fold"
 
 docker compose pull grist
-docker compose up -d --wait grist
+# rsync replaces files atomically; recreate Grist to refresh its single-file CSS mount.
+docker compose up -d --wait --force-recreate grist
+grist_css_expected="$(sha256sum apps/proxy/grist-custom.css | cut -d ' ' -f 1)"
+grist_css_actual="$(docker compose exec -T grist sha256sum /grist/static/custom.css | cut -d ' ' -f 1)"
+[[ "$grist_css_actual" == "$grist_css_expected" ]] || {
+  echo "Grist is using stale custom CSS; deployment stopped." >&2
+  exit 1
+}
 grist_workspace_id="$(docker compose exec -T grist node --input-type=module <<'NODE'
 const headers = {
   "X-Ten-Fold-User": "spreadsheet-system@tenfold.internal",
