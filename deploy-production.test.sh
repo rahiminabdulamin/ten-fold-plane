@@ -7,6 +7,7 @@ compose_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/docker-compose.yml"
 proxy_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/proxy/Caddyfile.ce"
 migration_0126_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/api/plane/db/migrations/0126_spreadsheet_document_types.py"
 migration_0127_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/api/plane/db/migrations/0127_spreadsheet_form_view_id.py"
+editor_page_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/web/app/(all)/[workspaceSlug]/(projects)/projects/(detail)/[projectId]/spreadsheets/[spreadsheetId]/page.tsx"
 
 [[ -f "$script_path" ]]
 grep -Fq 'rsync -az --delete' "$script_path"
@@ -39,6 +40,11 @@ grep -Fq '@grist_native_form path_regexp grist_native_form' "$proxy_path"
 [[ -f "$migration_0127_path" ]]
 grep -Fq 'dependencies = [("db", "0126_spreadsheet_document_types")]' "$migration_0127_path"
 grep -Fq 'name="grist_form_view_id"' "$migration_0127_path"
+grep -Fq "querySelector('.test-gristdoc')" "$editor_page_path"
+if grep -Fq 'data-test-id="gristdoc"' "$editor_page_path"; then
+  echo 'Grist exposes editor readiness as .test-gristdoc, not a data-test-id attribute' >&2
+  exit 1
+fi
 if grep -Fq 'name="grist_form_view_id"' "$migration_0126_path"; then
   echo 'Do not modify the already-deployed 0126 migration' >&2
   exit 1

@@ -46,7 +46,7 @@ export default function SpreadsheetEditorPage({ params }: { params: Route.Compon
   const waitForEditor = () => {
     const check = () => {
       try {
-        if (iframeRef.current?.contentDocument?.querySelector('[data-test-id="gristdoc"]')) {
+        if (iframeRef.current?.contentDocument?.querySelector(".test-gristdoc")) {
           setEditorReady(true);
           return;
         }
