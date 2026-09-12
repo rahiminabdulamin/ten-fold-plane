@@ -91,6 +91,10 @@ def _record_synchronous_failure(spreadsheet, error):
 
 def _grist_document_id_from_path(path):
     match = GRIST_DOCUMENT_PATH.fullmatch(urlsplit(path).path)
+    if not match:
+        match = re.fullmatch(
+            r"/grist/o/ten-fold/([A-Za-z0-9_-]+)/[^/]+(?:/.*)?", urlsplit(path).path
+        )
     return match.group(1) if match else None
 
 
@@ -359,6 +363,16 @@ class GristForwardAuthEndpoint(SpreadsheetBaseEndpoint):
         spreadsheet = SpreadsheetDocument.objects.filter(
             grist_document_id=document_id, status=SpreadsheetDocument.Status.READY
         ).first()
+        if not spreadsheet:
+            # Resolve Grist's canonical URL ID exactly; never authorize by an ID prefix.
+            try:
+                metadata = GristClient().request("GET", f"/api/docs/{document_id}")
+                spreadsheet = SpreadsheetDocument.objects.filter(
+                    grist_document_id=metadata["id"], status=SpreadsheetDocument.Status.READY,
+                    deleted_at__isnull=True,
+                ).first()
+            except Exception:
+                return Response({"error": "document_unavailable"}, status=403)
         membership = (
             ProjectMember.objects.select_related("member")
             .filter(project=spreadsheet.project, member_id=capability.get("user"), is_active=True)

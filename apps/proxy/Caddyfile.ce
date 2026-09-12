@@ -29,7 +29,10 @@
 			copy_headers X-Ten-Fold-User X-Ten-Fold-Name
 		}
 		uri strip_prefix /grist
-		reverse_proxy grist:8484
+		reverse_proxy grist:8484 {
+			# Grist canonical document redirects are rooted at /o/, outside our mount.
+			header_down Location "^(/o/.*)$" "/grist$1"
+		}
 	}
 
 	handle /grist-public/forms/* {

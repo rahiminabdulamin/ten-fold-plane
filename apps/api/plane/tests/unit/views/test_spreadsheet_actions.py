@@ -70,3 +70,11 @@ def test_grist_forward_auth_extracts_document_from_supported_paths(path):
 @pytest.mark.unit
 def test_grist_forward_auth_rejects_non_document_paths():
     assert _grist_document_id_from_path("/grist/") is None
+
+
+@pytest.mark.unit
+def test_grist_canonical_document_url():
+    assert _grist_document_id_from_path(
+        "/grist/o/ten-fold/g31dmLkSY8WV/Untitled-spreadsheet-9?embed=true"
+    ) == "g31dmLkSY8WV"
+    assert _grist_document_id_from_path("/o/ten-fold/g31dmLkSY8WV/Untitled-spreadsheet-9") is None
