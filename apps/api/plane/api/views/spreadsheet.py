@@ -37,6 +37,9 @@ from .base import BaseAPIView
 
 
 TABLE_ID = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+GRIST_DOCUMENT_PATH = re.compile(
+    r"^/grist/(?:o/[A-Za-z0-9_-]+/)?(?:doc|api/docs)/([A-Za-z0-9_-]+)(?:/.*)?$"
+)
 AGENT_OPERATIONS = {
     "add_records",
     "update_records",
@@ -84,6 +87,11 @@ def _record_synchronous_failure(spreadsheet, error):
     spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
     spreadsheet.last_error_code = grist_failure_code(error)
     spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
+
+
+def _grist_document_id_from_path(path):
+    match = GRIST_DOCUMENT_PATH.fullmatch(urlsplit(path).path)
+    return match.group(1) if match else None
 
 
 class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
@@ -174,7 +182,19 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
                 },
                 status=409,
             )
-        return Response({"url": f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}?embed=true"})
+        response = Response(
+            {"url": f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}?embed=true"}
+        )
+        response.set_cookie(
+            "tenfold_grist_capability",
+            signing.dumps({"user": str(request.user.id)}, salt="spreadsheet-editor"),
+            max_age=8 * 60 * 60,
+            httponly=True,
+            secure=not settings.DEBUG,
+            samesite="Lax",
+            path="/grist/",
+        )
+        return response
 
 
 class SpreadsheetDuplicateEndpoint(SpreadsheetBaseEndpoint):
@@ -320,26 +340,37 @@ class SpreadsheetAgentEndpoint(SpreadsheetBaseEndpoint):
 
 
 class GristForwardAuthEndpoint(SpreadsheetBaseEndpoint):
+    permission_classes = [AllowAny]
+
     def get(self, request):
-        path = urlsplit(request.headers.get("X-Forwarded-Uri", "")).path
-        match = re.fullmatch(r"/grist/(?:doc|api/docs)/([A-Za-z0-9_-]+)(?:/.*)?", path)
-        if not match:
-            match = re.fullmatch(r"/grist/o/docs/([A-Za-z0-9_-]+)(?:/.*)?", path)
-        if not match:
+        document_id = _grist_document_id_from_path(request.headers.get("X-Forwarded-Uri", ""))
+        if not document_id:
             return Response({"error": "document_required"}, status=403)
+        try:
+            capability = signing.loads(
+                request.COOKIES.get("tenfold_grist_capability", ""),
+                salt="spreadsheet-editor",
+                max_age=8 * 60 * 60,
+            )
+        except signing.BadSignature:
+            return Response({"error": "invalid_or_expired_editor_link"}, status=403)
+        if not isinstance(capability, dict) or not capability.get("user"):
+            return Response({"error": "invalid_or_expired_editor_link"}, status=403)
         spreadsheet = SpreadsheetDocument.objects.filter(
-            grist_document_id=match.group(1), status=SpreadsheetDocument.Status.READY
+            grist_document_id=document_id, status=SpreadsheetDocument.Status.READY
         ).first()
-        if (
-            not spreadsheet
-            or not ProjectMember.objects.filter(
-                project=spreadsheet.project, member=request.user, is_active=True
-            ).exists()
-        ):
+        membership = (
+            ProjectMember.objects.select_related("member")
+            .filter(project=spreadsheet.project, member_id=capability.get("user"), is_active=True)
+            .first()
+            if spreadsheet
+            else None
+        )
+        if not membership:
             return Response({"error": "forbidden"}, status=403)
         response = Response(status=204)
-        response["X-Ten-Fold-User"] = request.user.email
-        response["X-Ten-Fold-Name"] = request.user.display_name or request.user.email
+        response["X-Ten-Fold-User"] = membership.member.email
+        response["X-Ten-Fold-Name"] = membership.member.display_name or membership.member.email
         return response
 
 

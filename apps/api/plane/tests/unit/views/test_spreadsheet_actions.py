@@ -5,6 +5,7 @@ import pytest
 
 from plane.api.views.spreadsheet import (
     _can_recover_provisioning_operation,
+    _grist_document_id_from_path,
     _structural_actions,
     _validate_agent_payload,
 )
@@ -50,3 +51,22 @@ def test_failed_provisioning_operation_can_be_retried_once():
     operation = type("Operation", (), {"status": SpreadsheetOperation.Status.FAILED})()
 
     assert _can_recover_provisioning_operation(operation)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/grist/doc/g31document?embed=true",
+        "/grist/o/ten-fold/doc/g31document/p/1",
+        "/grist/api/docs/g31document/tables/Table1/records",
+        "/grist/o/ten-fold/api/docs/g31document/download",
+    ],
+)
+def test_grist_forward_auth_extracts_document_from_supported_paths(path):
+    assert _grist_document_id_from_path(path) == "g31document"
+
+
+@pytest.mark.unit
+def test_grist_forward_auth_rejects_non_document_paths():
+    assert _grist_document_id_from_path("/grist/") is None
