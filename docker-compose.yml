@@ -42,7 +42,7 @@ services:
     volumes:
       - gristdata:/persist
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8484/status"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8484/status"]
       interval: 15s
       timeout: 5s
       retries: 10

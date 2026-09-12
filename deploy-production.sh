@@ -53,7 +53,16 @@ set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/grist"
 
 docker compose pull grist
 docker compose up --build migrator
-docker compose up -d --build --wait grist api worker beat-worker copilot web proxy
+if ! docker compose up -d --build --wait grist api worker beat-worker copilot web proxy; then
+  docker compose logs --tail=100 grist api
+  exit 1
+fi
+if ! docker compose exec -T grist curl -fsS \
+  -H 'X-Ten-Fold-User: spreadsheet-system@tenfold.internal' \
+  http://localhost:8484/api/workspaces/1 >/dev/null; then
+  docker compose logs --tail=100 grist api
+  exit 1
+fi
 REMOTE
 
 echo "Deployment complete: $PRODUCTION_URL"
