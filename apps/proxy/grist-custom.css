@@ -1,0 +1,16 @@
+/* Ten-Fold owns workspace navigation and identity; Grist owns the sheet editor. */
+div:has(> .test-dp-add-new),
+.test-dm-account,
+.test-bc-home,
+.test-bc-workspace,
+.test-bc-workspace-ns,
+.test-bc-separator,
+.test-bc-doc,
+.test-bc-page {
+  display: none !important;
+}
+
+/* The widget type is chosen by Ten-Fold's spreadsheet flow. */
+.test-config-container div:has(> button) {
+  display: none !important;
+}

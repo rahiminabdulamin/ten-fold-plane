@@ -41,11 +41,13 @@ services:
       APP_DOC_URL: ${GRIST_PUBLIC_ORIGIN:-http://localhost}
       # Grist builds its HTML asset base separately from home/document URLs.
       APP_STATIC_URL: ${GRIST_PUBLIC_URL:-http://localhost/grist}
+      APP_STATIC_INCLUDE_CUSTOM_CSS: "true"
       GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-gvisor}
       GRIST_ENABLE_REQUEST_FUNCTION: "false"
       GRIST_HIDE_UI_ELEMENTS: billing,templates,createSite,multiSite,multiAccounts,importFromAirtable,sendToDrive,tutorials,supportGrist,automations
     volumes:
       - gristdata:/persist
+      - ./apps/proxy/grist-custom.css:/grist/static/custom.css:ro
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:8484/status',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 15s
