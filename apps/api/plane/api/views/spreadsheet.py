@@ -122,8 +122,11 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [ProjectEntityPermission]
 
     def get(self, request, slug, project_id):
+        document_type = request.query_params.get("document_type", SpreadsheetDocument.DocumentType.SHEET)
+        if document_type not in SpreadsheetDocument.DocumentType.values:
+            return Response({"error": "invalid_document_type"}, status=status.HTTP_400_BAD_REQUEST)
         items = SpreadsheetDocument.objects.filter(
-            workspace__slug=slug, project_id=project_id, deleted_at__isnull=True
+            workspace__slug=slug, project_id=project_id, document_type=document_type, deleted_at__isnull=True
         ).exclude(status="archived")
         return Response(SpreadsheetDocumentSerializer(items, many=True).data)
 
@@ -206,9 +209,10 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
                 },
                 status=409,
             )
-        response = Response(
-            {"url": f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}"}
-        )
+        url = f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}"
+        if spreadsheet.document_type == SpreadsheetDocument.DocumentType.FORM:
+            url = f"{url}/f/{spreadsheet.grist_form_view_section_id}"
+        response = Response({"url": url})
         response.set_cookie(
             "tenfold_grist_capability",
             signing.dumps(

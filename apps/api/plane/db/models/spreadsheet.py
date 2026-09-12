@@ -14,6 +14,10 @@ from .project import ProjectMember
 
 
 class SpreadsheetDocument(WorkspaceBaseModel):
+    class DocumentType(models.TextChoices):
+        SHEET = "sheet", "Sheet"
+        FORM = "form", "Form"
+
     class Status(models.TextChoices):
         PROVISIONING = "provisioning", "Provisioning"
         READY = "ready", "Ready"
@@ -22,7 +26,9 @@ class SpreadsheetDocument(WorkspaceBaseModel):
         ARCHIVED = "archived", "Archived"
 
     name = models.CharField(max_length=255)
+    document_type = models.CharField(max_length=8, choices=DocumentType.choices, default=DocumentType.SHEET)
     grist_document_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    grist_form_view_section_id = models.PositiveIntegerField(null=True, blank=True)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.PROVISIONING)
     last_error_code = models.CharField(max_length=64, blank=True)
     grist_permissions = models.JSONField(default=dict)

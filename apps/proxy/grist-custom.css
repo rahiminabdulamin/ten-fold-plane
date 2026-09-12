@@ -1,5 +1,7 @@
-/* Ten-Fold owns workspace navigation and identity; Grist owns the sheet editor. */
-div:has(> .test-dp-add-new),
+/* Ten-Fold supplies workspace navigation and identity; Grist supplies the sheet editor. */
+.test-left-panel,
+.test-left-resizer,
+button:has(> .test-left-opener),
 .test-dm-account,
 .test-bc-home,
 .test-bc-workspace,

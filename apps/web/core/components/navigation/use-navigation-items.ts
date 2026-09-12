@@ -5,7 +5,7 @@
  */
 
 import { useMemo, useCallback } from "react";
-import { Table2 } from "lucide-react";
+import { ClipboardPenLine, Table2 } from "lucide-react";
 // plane imports
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import {
@@ -95,12 +95,22 @@ export const useNavigationItems = ({
       {
         i18n_key: "sidebar.spreadsheets",
         key: "spreadsheets",
-        name: "Spreadsheets",
+        name: "Sheets",
         href: `/${workspaceSlug}/projects/${projectId}/spreadsheets`,
         icon: Table2,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER, EUserPermissions.GUEST],
         shouldRender: !!project?.spreadsheet_view,
         sortOrder: 6,
+      },
+      {
+        i18n_key: "sidebar.forms",
+        key: "forms",
+        name: "Forms",
+        href: `/${workspaceSlug}/projects/${projectId}/forms`,
+        icon: ClipboardPenLine,
+        access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER, EUserPermissions.GUEST],
+        shouldRender: !!project?.spreadsheet_view,
+        sortOrder: 7,
       },
       {
         i18n_key: "sidebar.intake",
@@ -110,7 +120,7 @@ export const useNavigationItems = ({
         icon: IntakeOutline,
         access: [EUserPermissions.ADMIN, EUserPermissions.MEMBER, EUserPermissions.GUEST],
         shouldRender: !!project?.inbox_view,
-        sortOrder: 7,
+        sortOrder: 8,
       },
     ],
     [project]

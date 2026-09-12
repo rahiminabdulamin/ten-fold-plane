@@ -222,6 +222,14 @@ export const coreRoutes: RouteConfigEntry[] = [
               ":workspaceSlug/projects/:projectId/spreadsheets/:spreadsheetId",
               "./(all)/[workspaceSlug]/(projects)/projects/(detail)/[projectId]/spreadsheets/[spreadsheetId]/page.tsx"
             ),
+            route(
+              ":workspaceSlug/projects/:projectId/forms",
+              "./(all)/[workspaceSlug]/(projects)/projects/(detail)/[projectId]/forms/page.tsx"
+            ),
+            route(
+              ":workspaceSlug/projects/:projectId/forms/:spreadsheetId",
+              "./(all)/[workspaceSlug]/(projects)/projects/(detail)/[projectId]/forms/[spreadsheetId]/page.tsx"
+            ),
           ]),
           // Intake list
           layout("./(all)/[workspaceSlug]/(projects)/projects/(detail)/[projectId]/intake/layout.tsx", [

@@ -63,6 +63,12 @@ def process_spreadsheet_operation_now(operation_or_id):
             if not spreadsheet.grist_document_id:
                 spreadsheet.grist_document_id = client.create_document(spreadsheet.name, settings.GRIST_WORKSPACE_ID)
                 spreadsheet.save(update_fields=["grist_document_id", "updated_at"])
+            if (
+                spreadsheet.document_type == SpreadsheetDocument.DocumentType.FORM
+                and not spreadsheet.grist_form_view_section_id
+            ):
+                spreadsheet.grist_form_view_section_id = client.create_form_view(spreadsheet.grist_document_id)
+                spreadsheet.save(update_fields=["grist_form_view_section_id", "updated_at"])
             current, delta = _permission_delta(spreadsheet)
             client.update_permissions(spreadsheet.grist_document_id, delta)
             spreadsheet.grist_permissions = current
@@ -90,7 +96,14 @@ def process_spreadsheet_operation_now(operation_or_id):
             spreadsheet.status = SpreadsheetDocument.Status.ARCHIVED
         spreadsheet.last_error_code = ""
         spreadsheet.save(
-            update_fields=["grist_document_id", "grist_permissions", "status", "last_error_code", "updated_at"]
+            update_fields=[
+                "grist_document_id",
+                "grist_form_view_section_id",
+                "grist_permissions",
+                "status",
+                "last_error_code",
+                "updated_at",
+            ]
         )
         operation.status = SpreadsheetOperation.Status.COMPLETE
         operation.last_error_code = ""

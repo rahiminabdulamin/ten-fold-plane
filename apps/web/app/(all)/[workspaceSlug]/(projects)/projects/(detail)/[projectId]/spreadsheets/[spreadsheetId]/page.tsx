@@ -4,7 +4,7 @@ import type { Route } from "./+types/page";
 
 const service = new SpreadsheetService();
 
-export default function SpreadsheetEditorPage({ params }: Route.ComponentProps) {
+export default function SpreadsheetEditorPage({ params }: { params: Route.ComponentProps["params"] }) {
   const { workspaceSlug, projectId, spreadsheetId } = params;
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");

@@ -10,6 +10,7 @@ from plane.api.views.spreadsheet import (
     _structural_actions,
     _validate_agent_payload,
 )
+from plane.integrations.grist import GristClient
 from plane.db.models import SpreadsheetOperation
 
 
@@ -37,6 +38,33 @@ def test_view_uses_numeric_table_reference():
     assert _structural_actions("create_form", {"table": "Orders"}, table_ref=7) == [
         ["CreateViewSection", 7, 0, "form", None, None]
     ]
+
+
+@pytest.mark.unit
+def test_create_form_view_returns_the_new_form_section(monkeypatch):
+    client = object.__new__(GristClient)
+    monkeypatch.setattr(client, "table_ref", lambda *_: 7)
+    calls = []
+
+    def document_api(method, document_id, suffix, payload=None):
+        calls.append((method, document_id, suffix, payload))
+        if method == "GET":
+            return {
+                "records": [
+                    {"id": 2, "fields": {"tableRef": 7, "parentKey": "record"}},
+                    {"id": 9, "fields": {"tableRef": 7, "parentKey": "form"}},
+                ]
+            }
+
+    monkeypatch.setattr(client, "document_api", document_api)
+
+    assert client.create_form_view("document") == 9
+    assert calls[0] == (
+        "POST",
+        "document",
+        "/apply",
+        [["CreateViewSection", 7, 0, "form", None, None]],
+    )
 
 
 @pytest.mark.unit

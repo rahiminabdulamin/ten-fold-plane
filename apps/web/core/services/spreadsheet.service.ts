@@ -3,9 +3,11 @@ import { API_BASE_URL } from "@plane/constants";
 import { APIService } from "@/services/api.service";
 
 export type TSpreadsheetStatus = "provisioning" | "ready" | "degraded" | "archiving" | "archived";
+export type TSpreadsheetDocumentType = "sheet" | "form";
 export type TSpreadsheetDocument = {
   id: string;
   name: string;
+  document_type: TSpreadsheetDocumentType;
   status: TSpreadsheetStatus;
   last_error_code: string;
   created_at: string;
@@ -24,12 +26,25 @@ export class SpreadsheetService extends APIService {
     return `/api/v1/workspaces/${workspaceSlug}/projects/${projectId}/spreadsheets`;
   }
 
-  list(workspaceSlug: string, projectId: string): Promise<TSpreadsheetDocument[]> {
-    return this.get(`${this.base(workspaceSlug, projectId)}/`).then((response) => response.data);
+  list(
+    workspaceSlug: string,
+    projectId: string,
+    documentType: TSpreadsheetDocumentType = "sheet"
+  ): Promise<TSpreadsheetDocument[]> {
+    return this.get(`${this.base(workspaceSlug, projectId)}/`, { params: { document_type: documentType } }).then(
+      (response) => response.data
+    );
   }
 
-  create(workspaceSlug: string, projectId: string, name: string): Promise<TSpreadsheetDocument> {
-    return this.post(`${this.base(workspaceSlug, projectId)}/`, { name }).then((response) => response.data);
+  create(
+    workspaceSlug: string,
+    projectId: string,
+    name: string,
+    documentType: TSpreadsheetDocumentType = "sheet"
+  ): Promise<TSpreadsheetDocument> {
+    return this.post(`${this.base(workspaceSlug, projectId)}/`, { name, document_type: documentType }).then(
+      (response) => response.data
+    );
   }
 
   rename(workspaceSlug: string, projectId: string, id: string, name: string): Promise<TSpreadsheetDocument> {

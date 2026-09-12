@@ -71,6 +71,25 @@ class GristClient:
     def update_permissions(self, document_id, users):
         return self.request("PATCH", self.document_path(document_id, "/access"), json={"delta": {"users": users}})
 
+    def create_form_view(self, document_id, table_id="Table1"):
+        table_ref = self.table_ref(document_id, table_id)
+        self.document_api(
+            "POST",
+            document_id,
+            "/apply",
+            payload=[["CreateViewSection", table_ref, 0, "form", None, None]],
+        )
+        sections = self.document_api("GET", document_id, "/tables/_grist_Views_section/records")
+        form_sections = [
+            record
+            for record in sections.get("records", [])
+            if record.get("fields", {}).get("tableRef") == table_ref
+            and record.get("fields", {}).get("parentKey") == "form"
+        ]
+        if not form_sections:
+            raise GristConfigurationError("Grist did not create a form view")
+        return max(int(record["id"]) for record in form_sections)
+
     def document_api(self, method, document_id, suffix, *, payload=None):
         return self.request(method, self.document_path(document_id, suffix), json=payload)
 

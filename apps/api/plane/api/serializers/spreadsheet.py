@@ -10,7 +10,7 @@ from .base import BaseSerializer
 class SpreadsheetDocumentSerializer(BaseSerializer):
     class Meta:
         model = SpreadsheetDocument
-        fields = ["id", "name", "status", "last_error_code", "created_at", "updated_at", "created_by"]
+        fields = ["id", "name", "document_type", "status", "last_error_code", "created_at", "updated_at", "created_by"]
         read_only_fields = ["id", "status", "last_error_code", "created_at", "updated_at", "created_by"]
 
     def validate_name(self, value):
