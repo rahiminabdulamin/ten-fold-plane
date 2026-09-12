@@ -1,6 +1,7 @@
 # Copyright (c) 2023-present Plane Software, Inc. and contributors
 # SPDX-License-Identifier: AGPL-3.0-only
 
+import json
 import re
 import secrets
 import uuid
@@ -12,7 +13,7 @@ from django.core import signing
 from django.db import transaction
 from django.db.models import Prefetch
 from django.utils import timezone
-from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -139,6 +140,41 @@ def _grist_authorization_document_id(path, capability):
     ):
         return capability.get("document")
     return None
+
+
+def _form_branding_css(workspace_name, logo_url):
+    return (
+        ":root {\n"
+        f"  --tenfold-form-team-name: {json.dumps(workspace_name)};\n"
+        f"  --tenfold-form-team-logo: url({json.dumps(logo_url or '/branding/tenfold-logo-square-rebrand-black-v4.png')});\n"
+        "}\n"
+    )
+
+
+def _form_branding_workspace(referrer):
+    path = urlsplit(referrer).path
+    publication_match = re.fullmatch(r"/(?:grist-public/)?forms/([A-Za-z0-9_-]+)/[0-9]+(?:/.*)?", path)
+    if publication_match:
+        publication = (
+            SpreadsheetFormPublication.objects.select_related("spreadsheet__workspace__logo_asset")
+            .filter(
+                share_key=publication_match.group(1),
+                enabled=True,
+                deleted_at__isnull=True,
+                spreadsheet__status=SpreadsheetDocument.Status.READY,
+            )
+            .first()
+        )
+        return publication.spreadsheet.workspace if publication else None
+    document_id = _grist_document_id_from_path(path)
+    if not document_id:
+        return None
+    spreadsheet = (
+        SpreadsheetDocument.objects.select_related("workspace__logo_asset")
+        .filter(grist_document_id=document_id, status=SpreadsheetDocument.Status.READY, deleted_at__isnull=True)
+        .first()
+    )
+    return spreadsheet.workspace if spreadsheet else None
 
 
 class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
@@ -513,6 +549,19 @@ class GristPublicFormAuthEndpoint(SpreadsheetBaseEndpoint):
         ):
             return Response({"error": "forbidden"}, status=403)
         return Response(status=204)
+
+
+class GristFormBrandingEndpoint(SpreadsheetBaseEndpoint):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        workspace = _form_branding_workspace(request.headers.get("Referer", ""))
+        css = _form_branding_css(workspace.name, workspace.logo_url) if workspace else ""
+        response = HttpResponse(css, content_type="text/css; charset=utf-8")
+        response["Cache-Control"] = "no-store, max-age=0"
+        response["X-Content-Type-Options"] = "nosniff"
+        return response
 
 
 def _execute_agent(client, document_id, operation, payload):

@@ -1,3 +1,5 @@
+@import url("/grist/form-branding.css");
+
 /*
  * Ten-Fold theme bridge for Grist 1.7.16.
  *
@@ -239,14 +241,85 @@ body {
   background-color: var(--tenfold-canvas);
 }
 
-/* Published and previewed Grist forms should stand alone as Ten-Fold forms. */
+/* Published and previewed Grist forms are a neutral, workspace-branded surface. */
+body:has(> div[class*="grain335"]) {
+  background-color: #f5f5f5;
+}
+
 body > div[class*="grain335"] > div > div {
-  background-color: var(--tenfold-surface-1) !important;
+  position: relative;
+  padding-top: 54px;
+  color: #171717;
+  background-color: #fff !important;
+  border: 2px solid #bdbdbd !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  --grist-theme-primary: #000;
+  --grist-theme-primary-muted: #262626;
+  --grist-theme-primary-dim: #000;
+  --grist-theme-control-primary-bg: #000;
+  --grist-theme-control-primary-hover-bg: #262626;
+  --grist-theme-control-primary-fg: #fff;
+  --grist-theme-control-border: 1px solid #737373;
+  --grist-theme-input-bg: #fff;
+  --grist-theme-input-border: #d4d4d4;
+  --grist-theme-text: #171717;
+  --grist-theme-text-medium: #404040;
+  --grist-theme-decoration: #d4d4d4;
+  --grist-theme-decoration-secondary: #e5e5e5;
+}
+
+body > div[class*="grain335"] > div > div::before {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  content: "";
+  background: var(--tenfold-form-team-logo) center / contain no-repeat;
+}
+
+body > div[class*="grain335"] > div > div::after {
+  position: absolute;
+  top: 20px;
+  left: 48px;
+  color: #171717;
+  font-size: 14px;
+  font-weight: 600;
+  content: var(--tenfold-form-team-name);
 }
 
 body > div[class*="grain335"] > div > div > div[class*="grain337"],
 body > div[class*="grain335"] > div > footer {
-  display: none !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 12px;
+  color: transparent;
+  font-size: 0;
+}
+
+body > div[class*="grain335"] > div > footer::before {
+  color: #404040;
+  font-size: 13px;
+  content: "Powered by";
+}
+
+body > div[class*="grain335"] > div > footer::after {
+  width: 78px;
+  height: 18px;
+  margin-left: 8px;
+  content: "";
+  background: url("/branding/tenfold-logo-long-rebrand-v4.png") center / contain no-repeat;
+  filter: grayscale(1) brightness(0);
+}
+
+body > div[class*="grain335"] button[type="submit"],
+body > div[class*="grain335"] .test-form-submit {
+  color: #fff !important;
+  background-color: #000 !important;
+  border-color: #000 !important;
 }
 
 *:focus-visible {

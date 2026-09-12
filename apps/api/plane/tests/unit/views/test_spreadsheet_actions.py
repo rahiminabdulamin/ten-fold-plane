@@ -6,6 +6,7 @@ import pytest
 from plane.api.views.spreadsheet import (
     _can_recover_provisioning_operation,
     _duplicate_document_fields,
+    _form_branding_css,
     _grist_authorization_document_id,
     _grist_document_id_from_path,
     _publication_values,
@@ -104,6 +105,14 @@ def test_form_publication_defaults_to_the_document_section_and_a_secure_key():
     assert values["view_section_id"] == 17
     assert values["access"] == "authenticated"
     assert len(values["share_key"]) >= 32
+
+
+@pytest.mark.unit
+def test_form_branding_css_uses_workspace_name_and_uploaded_logo():
+    css = _form_branding_css("Brunei4AI", "/api/assets/v2/static/logo-id/")
+
+    assert '--tenfold-form-team-name: "Brunei4AI";' in css
+    assert '--tenfold-form-team-logo: url("/api/assets/v2/static/logo-id/");' in css
 
 
 def test_duplicate_preserves_the_source_document_type():

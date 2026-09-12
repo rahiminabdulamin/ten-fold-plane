@@ -23,6 +23,12 @@
 		}
 	}
 
+	# Form CSS imports this response to obtain the current workspace name and logo.
+	handle /grist/form-branding.css {
+		uri /api/v1/internal/grist/form-branding/
+		reverse_proxy api:8000
+	}
+
 	# Grist's fingerprinted UI assets contain no document data and must load before
 	# either the private editor or a capability-gated public form can render.
 	# Keep Grist form tabs branded like the parent Ten-Fold application.
