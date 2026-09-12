@@ -38,7 +38,7 @@ from .base import BaseAPIView
 
 TABLE_ID = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 GRIST_DOCUMENT_PATH = re.compile(
-    r"^/grist/(?:o/[A-Za-z0-9_-]+/)?(?:doc|api/docs)/([A-Za-z0-9_-]+)(?:/.*)?$"
+    r"^/grist/(?:o/[A-Za-z0-9_-]+/)?(?:doc|api/(?:docs|worker))/([A-Za-z0-9_-]+)(?:/.*)?$"
 )
 AGENT_OPERATIONS = {
     "add_records",
@@ -93,9 +93,15 @@ def _grist_document_id_from_path(path):
     match = GRIST_DOCUMENT_PATH.fullmatch(urlsplit(path).path)
     if not match:
         match = re.fullmatch(
-            r"/grist/o/ten-fold/([A-Za-z0-9_-]+)/[^/]+(?:/.*)?", urlsplit(path).path
+            r"/grist/o/ten-fold/(?!api(?:/|$)|doc(?:/|$))([A-Za-z0-9_-]+)/[^/]+(?:/.*)?",
+            urlsplit(path).path,
         )
     return match.group(1) if match else None
+
+
+def _grist_authorization_document_id(path, capability):
+    """Use the launched document for Grist's session-scoped follow-up requests."""
+    return _grist_document_id_from_path(path) or capability.get("document")
 
 
 class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
@@ -191,7 +197,10 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
         )
         response.set_cookie(
             "tenfold_grist_capability",
-            signing.dumps({"user": str(request.user.id)}, salt="spreadsheet-editor"),
+            signing.dumps(
+                {"user": str(request.user.id), "document": spreadsheet.grist_document_id},
+                salt="spreadsheet-editor",
+            ),
             max_age=8 * 60 * 60,
             httponly=True,
             secure=not settings.DEBUG,
@@ -347,9 +356,6 @@ class GristForwardAuthEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        document_id = _grist_document_id_from_path(request.headers.get("X-Ten-Fold-Original-Uri", ""))
-        if not document_id:
-            return Response({"error": "document_required"}, status=403)
         try:
             capability = signing.loads(
                 request.COOKIES.get("tenfold_grist_capability", ""),
@@ -360,6 +366,11 @@ class GristForwardAuthEndpoint(SpreadsheetBaseEndpoint):
             return Response({"error": "invalid_or_expired_editor_link"}, status=403)
         if not isinstance(capability, dict) or not capability.get("user"):
             return Response({"error": "invalid_or_expired_editor_link"}, status=403)
+        document_id = _grist_authorization_document_id(
+            request.headers.get("X-Ten-Fold-Original-Uri", ""), capability
+        )
+        if not isinstance(document_id, str) or not document_id:
+            return Response({"error": "document_required"}, status=403)
         spreadsheet = SpreadsheetDocument.objects.filter(
             grist_document_id=document_id, status=SpreadsheetDocument.Status.READY
         ).first()

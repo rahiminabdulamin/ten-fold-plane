@@ -5,6 +5,7 @@ import pytest
 
 from plane.api.views.spreadsheet import (
     _can_recover_provisioning_operation,
+    _grist_authorization_document_id,
     _grist_document_id_from_path,
     _structural_actions,
     _validate_agent_payload,
@@ -61,6 +62,7 @@ def test_failed_provisioning_operation_can_be_retried_once():
         "/grist/o/ten-fold/doc/g31document/p/1",
         "/grist/api/docs/g31document/tables/Table1/records",
         "/grist/o/ten-fold/api/docs/g31document/download",
+        "/grist/o/ten-fold/api/worker/g31document",
     ],
 )
 def test_grist_forward_auth_extracts_document_from_supported_paths(path):
@@ -70,6 +72,13 @@ def test_grist_forward_auth_extracts_document_from_supported_paths(path):
 @pytest.mark.unit
 def test_grist_forward_auth_rejects_non_document_paths():
     assert _grist_document_id_from_path("/grist/") is None
+
+
+def test_grist_forward_auth_uses_the_launch_document_for_session_routes():
+    assert _grist_document_id_from_path("/grist/o/ten-fold/api/session/access/active") is None
+    assert _grist_authorization_document_id(
+        "/grist/o/ten-fold/api/session/access/active", {"document": "g31document"}
+    ) == "g31document"
 
 
 @pytest.mark.unit
