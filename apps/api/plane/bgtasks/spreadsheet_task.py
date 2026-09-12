@@ -9,20 +9,22 @@ from django.conf import settings
 from django.db import transaction
 
 from plane.db.models import ProjectMember, SpreadsheetDocument, SpreadsheetOperation
-from plane.integrations.grist import GristClient
+from plane.integrations.grist import GristClient, GristConfigurationError
 
 
 logger = logging.getLogger(__name__)
 
 
 def grist_failure_code(error):
+    if isinstance(error, GristConfigurationError):
+        return "grist_configuration_error"
     if isinstance(error, requests.Timeout):
         return "grist_timeout"
     if isinstance(error, requests.ConnectionError):
         return "grist_connection_failed"
     if isinstance(error, requests.HTTPError) and error.response is not None:
         return f"grist_http_{error.response.status_code}"
-    return "grist_unavailable"
+    return f"grist_internal_{type(error).__name__.lower()}"[:64]
 
 
 def _roles(spreadsheet):

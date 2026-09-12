@@ -45,7 +45,7 @@ class GristClient:
 
     def create_document(self, name, workspace_id):
         result = self.request("POST", f"/api/workspaces/{int(workspace_id)}/docs", json={"name": name})
-        return result if isinstance(result, str) else result["id"]
+        return self._document_id(result)
 
     def copy_document(self, document_id, name, workspace_id):
         result = self.request(
@@ -53,7 +53,14 @@ class GristClient:
             "/api/docs",
             json={"sourceDocumentId": document_id, "workspaceId": int(workspace_id), "documentName": name},
         )
-        return result if isinstance(result, str) else result["id"]
+        return self._document_id(result)
+
+    @staticmethod
+    def _document_id(result):
+        document_id = result.get("id") if isinstance(result, dict) else result
+        if not isinstance(document_id, (str, int)):
+            raise GristConfigurationError("Grist returned an invalid document id")
+        return str(document_id)
 
     def rename_document(self, document_id, name):
         return self.request("PATCH", self.document_path(document_id, ""), json={"name": name})

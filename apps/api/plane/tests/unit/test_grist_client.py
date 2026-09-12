@@ -37,3 +37,12 @@ def test_grist_client_resolves_numeric_table_ref(settings, monkeypatch):
     )
 
     assert client.table_ref("doc_123", "Orders") == 9
+
+
+@pytest.mark.unit
+def test_create_document_accepts_scalar_document_id(settings, monkeypatch):
+    settings.GRIST_INTERNAL_URL = "http://grist:8484"
+    client = GristClient()
+    monkeypatch.setattr(client, "request", lambda *args, **kwargs: 123)
+
+    assert client.create_document("Budget", 1) == "123"
