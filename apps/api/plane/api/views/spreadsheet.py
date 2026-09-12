@@ -66,6 +66,16 @@ def _queue(spreadsheet, kind, payload=None, enqueue=True):
     return operation
 
 
+def _can_recover_provisioning_operation(operation):
+    if not operation:
+        return False
+    if operation.status in {SpreadsheetOperation.Status.PENDING, SpreadsheetOperation.Status.FAILED}:
+        return True
+    return operation.status == SpreadsheetOperation.Status.RUNNING and operation.updated_at < timezone.now() - timedelta(
+        seconds=30
+    )
+
+
 class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [ProjectEntityPermission]
 
@@ -122,13 +132,7 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
             operation = (
                 spreadsheet.operations.filter(kind=SpreadsheetOperation.Kind.PROVISION).order_by("-created_at").first()
             )
-            can_recover = operation and (
-                operation.status == SpreadsheetOperation.Status.PENDING
-                or (
-                    operation.status == SpreadsheetOperation.Status.RUNNING
-                    and operation.updated_at < timezone.now() - timedelta(seconds=30)
-                )
-            )
+            can_recover = _can_recover_provisioning_operation(operation)
             if can_recover:
                 if operation.status == SpreadsheetOperation.Status.RUNNING:
                     operation.status = SpreadsheetOperation.Status.FAILED

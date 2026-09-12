@@ -54,13 +54,18 @@ set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/grist"
 docker compose pull grist
 docker compose up --build migrator
 if ! docker compose up -d --build --wait grist api worker beat-worker copilot web proxy; then
-  docker compose logs --tail=100 grist api
+  docker compose ps
+  grist_container_id="$(docker compose ps -q grist)"
+  if [[ -n "$grist_container_id" ]]; then
+    docker inspect --format '{{json .State.Health}}' "$grist_container_id"
+  fi
+  docker compose logs --tail=200 grist
   exit 1
 fi
-if ! docker compose exec -T grist curl -fsS \
-  -H 'X-Ten-Fold-User: spreadsheet-system@tenfold.internal' \
-  http://localhost:8484/api/workspaces/1 >/dev/null; then
-  docker compose logs --tail=100 grist api
+if ! docker compose exec -T grist node -e \
+  "require('http').get({host:'localhost',port:8484,path:'/api/workspaces/1',headers:{'X-Ten-Fold-User':'spreadsheet-system@tenfold.internal'}},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"; then
+  echo "Grist is healthy, but its configured workspace is unavailable." >&2
+  docker compose logs --tail=200 grist
   exit 1
 fi
 REMOTE

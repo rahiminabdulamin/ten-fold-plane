@@ -3,7 +3,12 @@
 
 import pytest
 
-from plane.api.views.spreadsheet import _structural_actions, _validate_agent_payload
+from plane.api.views.spreadsheet import (
+    _can_recover_provisioning_operation,
+    _structural_actions,
+    _validate_agent_payload,
+)
+from plane.db.models import SpreadsheetOperation
 
 
 @pytest.mark.unit
@@ -38,3 +43,10 @@ def test_delete_records_are_bounded_unique_positive_integers():
     for invalid in ([1, 1], [0], ["1"], list(range(1, 52))):
         with pytest.raises(ValueError):
             _validate_agent_payload("delete_records", {"record_ids": invalid})
+
+
+@pytest.mark.unit
+def test_failed_provisioning_operation_can_be_retried_once():
+    operation = type("Operation", (), {"status": SpreadsheetOperation.Status.FAILED})()
+
+    assert _can_recover_provisioning_operation(operation)
