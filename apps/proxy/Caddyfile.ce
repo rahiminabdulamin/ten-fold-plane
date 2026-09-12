@@ -24,8 +24,10 @@
 	handle /grist/* {
 		request_header -X-Ten-Fold-User
 		request_header -X-Ten-Fold-Name
+		vars grist_original_uri {uri}
 		forward_auth api:8000 {
 			uri /api/v1/internal/grist/authorize/
+			header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}
 			copy_headers X-Ten-Fold-User X-Ten-Fold-Name
 		}
 		uri strip_prefix /grist
@@ -33,8 +35,10 @@
 	}
 
 	handle /grist-public/forms/* {
+		vars grist_original_uri {uri}
 		forward_auth api:8000 {
 			uri /api/v1/internal/grist/authorize-form/
+			header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}
 		}
 		uri strip_prefix /grist-public
 		reverse_proxy grist:8484

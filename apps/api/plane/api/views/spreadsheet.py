@@ -343,7 +343,7 @@ class GristForwardAuthEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        document_id = _grist_document_id_from_path(request.headers.get("X-Forwarded-Uri", ""))
+        document_id = _grist_document_id_from_path(request.headers.get("X-Ten-Fold-Original-Uri", ""))
         if not document_id:
             return Response({"error": "document_required"}, status=403)
         try:
@@ -378,7 +378,7 @@ class GristPublicFormAuthEndpoint(SpreadsheetBaseEndpoint):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        path = urlsplit(request.headers.get("X-Forwarded-Uri", "")).path
+        path = urlsplit(request.headers.get("X-Ten-Fold-Original-Uri", "")).path
         match = re.fullmatch(r"/grist-public/forms/([A-Za-z0-9_-]+)/([0-9]+)(?:/.*)?", path)
         if not match:
             return Response({"error": "form_required"}, status=403)

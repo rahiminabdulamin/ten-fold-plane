@@ -4,6 +4,7 @@ set -euo pipefail
 
 script_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/deploy-production.sh"
 compose_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/docker-compose.yml"
+proxy_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/proxy/Caddyfile.ce"
 
 [[ -f "$script_path" ]]
 grep -Fq 'rsync -az --delete' "$script_path"
@@ -26,3 +27,5 @@ grep -Fq "docker inspect --format '{{json .State.Health}}'" "$script_path"
 grep -Fq 'docker compose logs --tail=200 grist' "$script_path"
 grep -Fq '178.128.104.112' "$script_path"
 grep -Fq "require('http').get('http://localhost:8484/status'" "$compose_path"
+grep -Fq 'vars grist_original_uri {uri}' "$proxy_path"
+grep -Fq 'header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}' "$proxy_path"
