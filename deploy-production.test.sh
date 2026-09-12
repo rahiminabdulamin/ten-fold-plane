@@ -77,11 +77,20 @@ trap 'rm -rf -- "$test_root"' EXIT
 mkdir -p "$test_root/apps/api" "$test_root/apps/proxy"
 touch "$test_root/.env" "$test_root/apps/api/.env" "$test_root/apps/proxy/grist-custom.css"
 export DEPLOY_PATH="$test_root" PRODUCTION_URL="https://deployment.test"
+export DEPLOY_SOURCE_SHA="test-source"
 # Extract only the quoted remote heredoc, not the local rsync/SSH wrapper.
 remote_body="$(sed -n "/<<'REMOTE'$/,/^REMOTE$/p" "$script_path" | sed '1d;$d')"
+# Use the production transport command itself, so reverting its stdin isolation
+# also breaks this regression test rather than only changing an untested wrapper.
+eval "$(sed -n '/^printf -v deploy_command /p' "$script_path")"
 
 docker() {
   printf '%s\n' "$*" >> "$DEPLOY_PATH/commands"
+  # Compose can consume stdin even without -i; emulate that behavior. Deployment
+  # commands must not share stdin with the script Bash is still reading.
+  if [[ "$*" != "compose exec -T grist node --input-type=module" ]]; then
+    cat >/dev/null
+  fi
   case "$*" in
     "compose run --rm --build migrator") return "${MIGRATION_EXIT:-0}" ;;
     "compose exec -T grist sha256sum /grist/static/custom.css")
@@ -89,6 +98,8 @@ docker() {
     "compose exec -T grist node --input-type=module") cat >/dev/null; printf '1\n' ;;
     "compose exec -T web cat /usr/share/caddy/html/index.html")
       printf '<script src="/assets/manifest-current.js"></script>' ;;
+    "compose exec -T web cat /usr/share/caddy/html/deployment-source.txt")
+      printf '%s' "${IMAGE_SOURCE:-test-source}" ;;
     *) return 0 ;;
   esac
 }
@@ -102,7 +113,7 @@ run_remote_case() {
   local scenario="$1" migration_exit="$2" public_state="$3" expected_exit="$4"
   : > "$test_root/commands"
   local actual_exit=0
-  MIGRATION_EXIT="$migration_exit" PUBLIC_STATE="$public_state" bash -c "$remote_body" > "$test_root/result" 2>&1 || actual_exit=$?
+  printf '%s\n' "$remote_body" | MIGRATION_EXIT="$migration_exit" PUBLIC_STATE="$public_state" bash -c "$deploy_command" > "$test_root/result" 2>&1 || actual_exit=$?
   [[ "$actual_exit" == "$expected_exit" ]] || {
     echo "FAIL: $scenario (exit $actual_exit, expected $expected_exit)" >&2
     cat "$test_root/result" >&2
@@ -122,3 +133,21 @@ fi
 run_remote_case "stale public frontend rejects deployment" 0 stale 1
 grep -Fq 'Frontend verification failed' "$test_root/result"
 run_remote_case "unreachable public frontend rejects deployment" 0 unreachable 22
+export IMAGE_SOURCE="old-source"
+run_remote_case "matching public and container manifests cannot hide stale source" 0 current 1
+grep -Fq 'Running web image does not match uploaded source' "$test_root/result"
+unset IMAGE_SOURCE
+
+# Run actual local preflight against this checkout. Stub rsync so the test
+# deliberately ends before any upload or SSH, even when a real key is present.
+rsync() { return 73; }
+export -f rsync
+preflight_exit=0
+DEPLOY_SSH_KEY="$test_root/.env" bash "$script_path" > "$test_root/preflight" 2>&1 || preflight_exit=$?
+[[ "$preflight_exit" == 73 ]] || {
+  cat "$test_root/preflight" >&2
+  echo "FAIL: local checksum preflight did not reach the upload boundary" >&2
+  exit 1
+}
+grep -Fq 'Source fingerprint:' "$test_root/preflight"
+echo "PASS: real-checkout checksum preflight handles directory symlinks"

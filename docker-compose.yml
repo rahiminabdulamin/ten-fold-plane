@@ -6,6 +6,7 @@ services:
       dockerfile: ./apps/web/Dockerfile.web
       args:
         DOCKER_BUILDKIT: 1
+        DEPLOY_SOURCE_SHA: ${DEPLOY_SOURCE_SHA:-manual}
         VITE_COPILOTKIT_RUNTIME_URL: ${VITE_COPILOTKIT_RUNTIME_URL:-/api/copilotkit}
     restart: always
     depends_on:

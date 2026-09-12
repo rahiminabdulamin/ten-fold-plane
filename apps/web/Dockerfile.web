@@ -75,7 +75,10 @@ ENV VITE_COPILOTKIT_RUNTIME_URL=$VITE_COPILOTKIT_RUNTIME_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBO_TELEMETRY_DISABLED=1
 
-RUN pnpm turbo run build --filter=web
+ARG DEPLOY_SOURCE_SHA=manual
+# Tie the build step and its receipt to the source checked by deployment.
+RUN pnpm turbo run build --filter=web --force \
+    && printf '%s\n' "$DEPLOY_SOURCE_SHA" > /app/apps/web/build/client/deployment-source.txt
 
 # *****************************************************************************
 # STAGE 3: Serve with Caddy
