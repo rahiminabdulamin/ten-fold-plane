@@ -207,7 +207,7 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
                 status=409,
             )
         response = Response(
-            {"url": f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}?embed=true"}
+            {"url": f"{settings.GRIST_PUBLIC_BASE_PATH}/doc/{spreadsheet.grist_document_id}"}
         )
         response.set_cookie(
             "tenfold_grist_capability",
