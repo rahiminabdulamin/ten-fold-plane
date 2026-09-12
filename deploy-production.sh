@@ -61,8 +61,9 @@ const base = "http://localhost:8484/api/orgs/current/workspaces";
 const response = await fetch(base, {headers});
 if (!response.ok) throw new Error(`Workspace discovery HTTP ${response.status}: ${await response.text()}`);
 const workspaces = await response.json();
-if (workspaces.length) {
-  console.log(workspaces[0].id);
+const ownedWorkspace = workspaces.find((workspace) => workspace.access === "owners");
+if (ownedWorkspace) {
+  console.log(ownedWorkspace.id);
 } else {
   const created = await fetch(base, {
     method: "POST",

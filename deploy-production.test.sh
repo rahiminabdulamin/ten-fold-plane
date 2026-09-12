@@ -18,6 +18,7 @@ grep -Fq 'GRIST_ADMIN_EMAIL: spreadsheet-system@tenfold.internal' "$compose_path
 grep -Fq 'docker compose pull grist' "$script_path"
 grep -Fq 'docker compose up -d --wait grist' "$script_path"
 grep -Fq 'api/orgs/current/workspaces' "$script_path"
+grep -Fq 'workspace.access === "owners"' "$script_path"
 grep -Fq 'body: JSON.stringify({name: "Ten-Fold"})' "$script_path"
 grep -Fq 'set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"' "$script_path"
 grep -Fq 'docker compose up -d --build --wait grist api worker beat-worker copilot web proxy' "$script_path"

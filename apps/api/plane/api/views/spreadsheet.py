@@ -93,6 +93,10 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
         operation = _queue(spreadsheet, SpreadsheetOperation.Kind.PROVISION, enqueue=False)
         process_spreadsheet_operation.apply(args=[str(operation.id)])
         spreadsheet.refresh_from_db()
+        if spreadsheet.status == SpreadsheetDocument.Status.PROVISIONING:
+            spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
+            spreadsheet.last_error_code = "grist_unavailable"
+            spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
         if spreadsheet.status != SpreadsheetDocument.Status.READY:
             return Response(
                 {"error": spreadsheet.last_error_code or "grist_unavailable"},
@@ -139,6 +143,10 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
                     operation.save(update_fields=["status", "updated_at"])
                 process_spreadsheet_operation.apply(args=[str(operation.id)])
                 spreadsheet.refresh_from_db()
+            elif not operation or operation.status == SpreadsheetOperation.Status.COMPLETE:
+                spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
+                spreadsheet.last_error_code = "grist_unavailable"
+                spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
         if spreadsheet.status != SpreadsheetDocument.Status.READY:
             return Response(
                 {
