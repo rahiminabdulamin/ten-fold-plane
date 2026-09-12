@@ -22,7 +22,8 @@ export default function SpreadsheetEditorPage({ params }: Route.ComponentProps) 
             retryTimer = setTimeout(launch, 2000);
             return;
           }
-          setError("The spreadsheet service is unavailable.");
+          const code = reason?.response?.data?.error;
+          setError(`The spreadsheet service is unavailable${code ? ` (${code})` : ""}.`);
         });
     };
     launch();

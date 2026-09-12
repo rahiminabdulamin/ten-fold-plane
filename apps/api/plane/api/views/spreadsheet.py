@@ -17,7 +17,7 @@ from rest_framework.response import Response
 
 from plane.api.serializers import SpreadsheetDocumentSerializer, SpreadsheetFormPublicationSerializer
 from plane.app.permissions import ProjectEntityPermission
-from plane.bgtasks.spreadsheet_task import process_spreadsheet_operation
+from plane.bgtasks.spreadsheet_task import process_spreadsheet_operation, process_spreadsheet_operation_now
 from plane.db.models import (
     ProjectMember,
     SpreadsheetAgentExecution,
@@ -91,7 +91,10 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
         workspace = Workspace.objects.get(slug=slug)
         spreadsheet = serializer.save(workspace=workspace, project_id=project_id)
         operation = _queue(spreadsheet, SpreadsheetOperation.Kind.PROVISION, enqueue=False)
-        process_spreadsheet_operation.apply(args=[str(operation.id)])
+        try:
+            process_spreadsheet_operation_now(str(operation.id))
+        except Exception:
+            pass
         spreadsheet.refresh_from_db()
         if spreadsheet.status == SpreadsheetDocument.Status.PROVISIONING:
             spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
@@ -132,7 +135,10 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
 
     def post(self, request, slug, project_id, pk):
         spreadsheet = _document(slug, project_id, pk)
-        if spreadsheet.status == SpreadsheetDocument.Status.PROVISIONING:
+        if spreadsheet.status in {
+            SpreadsheetDocument.Status.PROVISIONING,
+            SpreadsheetDocument.Status.DEGRADED,
+        }:
             operation = (
                 spreadsheet.operations.filter(kind=SpreadsheetOperation.Kind.PROVISION).order_by("-created_at").first()
             )
@@ -141,7 +147,10 @@ class SpreadsheetLaunchEndpoint(SpreadsheetBaseEndpoint):
                 if operation.status == SpreadsheetOperation.Status.RUNNING:
                     operation.status = SpreadsheetOperation.Status.FAILED
                     operation.save(update_fields=["status", "updated_at"])
-                process_spreadsheet_operation.apply(args=[str(operation.id)])
+                try:
+                    process_spreadsheet_operation_now(str(operation.id))
+                except Exception:
+                    pass
                 spreadsheet.refresh_from_db()
             elif not operation or operation.status == SpreadsheetOperation.Status.COMPLETE:
                 spreadsheet.status = SpreadsheetDocument.Status.DEGRADED

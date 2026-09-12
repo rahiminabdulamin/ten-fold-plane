@@ -40,8 +40,7 @@ def _permission_delta(spreadsheet):
     return current, {**{email: None for email in spreadsheet.grist_permissions if email not in current}, **current}
 
 
-@shared_task(autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 5})
-def process_spreadsheet_operation(operation_id):
+def process_spreadsheet_operation_now(operation_id):
     with transaction.atomic():
         operation = (
             SpreadsheetOperation.objects.select_for_update().select_related("spreadsheet__project").get(id=operation_id)
@@ -100,3 +99,8 @@ def process_spreadsheet_operation(operation_id):
         operation.last_error_code = spreadsheet.last_error_code
         operation.save(update_fields=["status", "last_error_code", "updated_at"])
         raise
+
+
+@shared_task(autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 5})
+def process_spreadsheet_operation(operation_id):
+    return process_spreadsheet_operation_now(operation_id)
