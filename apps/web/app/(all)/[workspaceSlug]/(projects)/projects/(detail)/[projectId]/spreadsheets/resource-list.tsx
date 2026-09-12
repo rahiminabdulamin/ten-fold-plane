@@ -1,5 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  ClipboardPenLine,
+  Table2,
+  CircleCheck,
+  LoaderCircle,
+  CircleAlert,
+  Archive,
+  Users,
+  Globe,
+  CalendarDays,
+  UserRound,
+} from "lucide-react";
+import { Input, InputGroup } from "@makeplane/propel/components/input";
+import {
   ArchiveOutline,
   CopyOutline,
   EditOutline,
@@ -23,13 +36,27 @@ import type {
 } from "@/services/spreadsheet.service";
 
 export type TResourceAction = "open" | "share" | "rename" | "duplicate" | "archive" | "retry";
+export const RESOURCE_STATUS_LABELS: Record<TSpreadsheetStatus, string> = {
+  ready: "Ready",
+  provisioning: "Preparing",
+  degraded: "Unavailable",
+  archiving: "Archiving",
+  archived: "Archived",
+};
 
 const STATUS_STYLES: Record<TSpreadsheetStatus, string> = {
-  ready: "bg-success-subtle text-success-primary",
-  provisioning: "bg-accent-subtle text-accent-primary",
-  degraded: "bg-danger-subtle text-danger-primary",
-  archiving: "bg-warning-subtle text-warning-primary",
-  archived: "bg-layer-2 text-secondary",
+  ready: "text-success-primary",
+  provisioning: "text-tertiary",
+  degraded: "text-danger-primary",
+  archiving: "text-tertiary",
+  archived: "text-tertiary",
+};
+const STATUS_ICONS = {
+  ready: CircleCheck,
+  provisioning: LoaderCircle,
+  degraded: CircleAlert,
+  archiving: Archive,
+  archived: Archive,
 };
 
 const sharingLabel = (document: TSpreadsheetDocument) =>
@@ -46,6 +73,7 @@ export function ResourceNameModal({
   title,
   initialName,
   submitLabel,
+  requireChange = false,
   onClose,
   onSubmit,
 }: {
@@ -53,6 +81,7 @@ export function ResourceNameModal({
   title: string;
   initialName: string;
   submitLabel: string;
+  requireChange?: boolean;
   onClose: () => void;
   onSubmit: (name: string) => Promise<void>;
 }) {
@@ -89,13 +118,15 @@ export function ResourceNameModal({
             <label htmlFor="resource-name" className="mb-2 block text-13 font-medium text-secondary">
               Name
             </label>
-            <input
-              id="resource-name"
-              maxLength={255}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="focus:border-accent-primary h-9 w-full rounded-md border border-subtle bg-surface-1 px-3 text-13 text-primary outline-none"
-            />
+            <InputGroup size="lg">
+              <Input
+                size="lg"
+                id="resource-name"
+                maxLength={255}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </InputGroup>
             {error && <p className="mt-1 text-11 text-danger-primary">{error}</p>}
           </div>
         </div>
@@ -103,7 +134,11 @@ export function ResourceNameModal({
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" loading={submitting} disabled={!name.trim() || name.trim() === initialName.trim()}>
+          <Button
+            type="submit"
+            loading={submitting}
+            disabled={!name.trim() || (requireChange && name.trim() === initialName.trim())}
+          >
             {submitLabel}
           </Button>
         </div>
@@ -150,22 +185,27 @@ export function FormShareModal({
           <h2 className="text-18 font-medium text-primary">Share “{document.name}”</h2>
           <p className="mt-1 text-13 text-secondary">Publish this form and control who can submit responses.</p>
         </div>
-        <label className="block text-13 font-medium text-secondary">
-          Audience
-          <select
-            className="mt-2 h-9 w-full rounded-md border border-subtle bg-surface-1 px-3 text-primary"
-            value={access}
+        <div className="space-y-2 text-13 text-secondary">
+          <p>Audience</p>
+          <CustomMenu
+            label={access === "public" ? "Anyone with the link" : "Signed-in users"}
             disabled={submitting}
-            onChange={(event) => {
-              const value = event.target.value as TSpreadsheetFormPublication["access"];
-              setAccess(value);
-              if (publication?.enabled) void mutate(() => onUpdate({ access: value }));
-            }}
+            placement="bottom-start"
+            closeOnSelect
           >
-            <option value="public">Anyone with the link</option>
-            <option value="authenticated">Signed-in users</option>
-          </select>
-        </label>
+            {(["public", "authenticated"] as const).map((value) => (
+              <CustomMenu.MenuItem
+                key={value}
+                onClick={() => {
+                  setAccess(value);
+                  if (publication?.enabled) void mutate(() => onUpdate({ access: value }));
+                }}
+              >
+                {value === "public" ? "Anyone with the link" : "Signed-in users"}
+              </CustomMenu.MenuItem>
+            ))}
+          </CustomMenu>
+        </div>
         {liveUrl && (
           <div className="rounded-md border border-subtle bg-layer-1 p-3">
             <p className="text-11 font-medium text-tertiary uppercase">Live form link</p>
@@ -242,7 +282,12 @@ const ResourceActions = ({
       key: "new-tab",
       title: "Open in new tab",
       icon: NewTabOutline,
-      action: () => window.open(document.id, "_blank"),
+      action: () =>
+        window.open(
+          window.location.origin + window.location.pathname.replace(/\/$/, "") + "/" + document.id,
+          "_blank",
+          "noopener,noreferrer"
+        ),
       disabled: !ready,
     },
     {
@@ -282,7 +327,9 @@ const ResourceActions = ({
     <div ref={ref}>
       <ContextMenu parentRef={ref} items={items} />
       <CustomMenu
+        ariaLabel={`Actions for ${document.name}`}
         customButton={<IconButton variant="tertiary" size="sm" icon={MoreHorizontalOutline} />}
+        buttonClassName="opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 aria-expanded:opacity-100"
         placement="bottom-end"
         closeOnSelect
       >
@@ -314,46 +361,70 @@ export function ResourceTable({
   onAction: (action: TResourceAction, document: TSpreadsheetDocument) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-subtle bg-surface-1">
-      <Table>
-        <TableHeader className="hidden md:table-header-group">
+    <div className="bg-surface-1">
+      <Table className="table-fixed [&_td]:h-11 [&_td]:border-r [&_td]:border-subtle [&_td]:px-5 [&_td]:py-0 [&_th]:h-11 [&_th]:border-r [&_th]:border-subtle [&_th]:px-5 [&_th]:text-secondary">
+        <colgroup>
+          <col className="w-[55%] md:w-[38%]" />
+          <col />
+          <col className="hidden md:table-column" />
+          <col className="hidden md:table-column" />
+          <col className="hidden md:table-column" />
+          <col className="w-12" />
+        </colgroup>
+        <TableHeader className="sticky top-0 z-10 hidden border-t-0 md:table-header-group">
           <TableRow>
-            <TableHead className="w-[38%] pl-4">Name</TableHead>
+            <TableHead className="w-[38%] !px-page-x">
+              {documents[0]?.document_type === "form" ? "Forms" : "Sheets"}
+            </TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Sharing</TableHead>
             <TableHead>Modified</TableHead>
             <TableHead>Created by</TableHead>
-            <TableHead className="w-10" />
+            <TableHead className="w-12 !border-r-0 !px-2">
+              <span className="sr-only">Actions</span>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {documents.map((document) => {
             const openable = document.status === "ready";
+            const ResourceIcon = document.document_type === "form" ? ClipboardPenLine : Table2;
+            const StatusIcon = STATUS_ICONS[document.status];
+            const SharingIcon =
+              document.publication?.enabled && document.publication.access === "public" ? Globe : Users;
+            const creator = document.created_by;
+            const creatorName =
+              creator?.display_name || [creator?.first_name, creator?.last_name].filter(Boolean).join(" ");
             return (
               <TableRow
                 key={document.id}
                 tabIndex={openable ? 0 : -1}
-                className={cn("border-b border-subtle last:border-0", openable && "cursor-pointer hover:bg-surface-2")}
-                onClick={() => openable && onOpen(document)}
+                className={cn(
+                  "group focus-visible:outline-accent-primary border-b border-subtle focus-visible:outline",
+                  openable && "cursor-pointer hover:bg-layer-1"
+                )}
+                onClick={(event) => {
+                  if (!(event.target as HTMLElement).closest("button, a, [role=menuitem]") && openable)
+                    onOpen(document);
+                }}
                 onKeyDown={(event) => {
-                  if (openable && (event.key === "Enter" || event.key === " ")) {
+                  if (
+                    event.target === event.currentTarget &&
+                    openable &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
                     event.preventDefault();
                     onOpen(document);
                   }
                 }}
               >
-                <TableCell className="pl-4">
+                <TableCell className="!px-page-x">
                   <div className="flex items-center gap-3">
-                    <span className="grid size-8 shrink-0 place-items-center rounded bg-layer-2 text-16">
-                      {document.document_type === "form" ? "F" : "S"}
-                    </span>
+                    <ResourceIcon className="size-4 shrink-0 text-tertiary" aria-hidden="true" />
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-primary">{document.name}</p>
-                      {document.status === "degraded" && (
-                        <p className="truncate text-11 text-danger-primary">
-                          {document.last_error_code || "Unable to connect. Retry when ready."}
-                        </p>
-                      )}
+                      <p className="truncate text-13 text-primary" title={document.name}>
+                        {document.name}
+                      </p>
                       <p className="mt-1 text-11 text-secondary md:hidden">
                         {sharingLabel(document)} · {calculateTimeAgoShort(document.updated_at)} ago
                       </p>
@@ -361,37 +432,51 @@ export function ResourceTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span
-                    className={cn(
-                      "inline-flex rounded-full px-2 py-1 text-11 font-medium capitalize",
-                      STATUS_STYLES[document.status]
-                    )}
-                  >
-                    {document.status}
+                  <span className="inline-flex items-center gap-2 text-13 text-primary">
+                    <StatusIcon
+                      className={cn("size-3.5 shrink-0", STATUS_STYLES[document.status])}
+                      aria-hidden="true"
+                    />
+                    <span
+                      title={
+                        document.status === "degraded"
+                          ? "Unable to connect. Use Retry from the actions menu."
+                          : undefined
+                      }
+                    >
+                      {RESOURCE_STATUS_LABELS[document.status]}
+                    </span>
                   </span>
                 </TableCell>
-                <TableCell className="hidden text-secondary md:table-cell">{sharingLabel(document)}</TableCell>
+                <TableCell className="hidden text-primary md:table-cell">
+                  <span className="flex items-center gap-2">
+                    <SharingIcon className="size-3.5 shrink-0 text-tertiary" aria-hidden="true" />
+                    <span className="truncate">{sharingLabel(document)}</span>
+                  </span>
+                </TableCell>
                 <TableCell
                   className="hidden text-secondary md:table-cell"
                   title={new Date(document.updated_at).toLocaleString()}
                 >
-                  {calculateTimeAgoShort(document.updated_at)} ago
+                  <span className="flex items-center gap-2">
+                    <CalendarDays className="size-3.5 shrink-0 text-tertiary" aria-hidden="true" />
+                    <span className="truncate">{calculateTimeAgoShort(document.updated_at)} ago</span>
+                  </span>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  {document.created_by ? (
+                  {creatorName ? (
                     <div className="flex items-center gap-2">
-                      <Avatar
-                        name={document.created_by.display_name}
-                        src={getFileURL(document.created_by.avatar_url)}
-                        size="sm"
-                      />
-                      <span className="max-w-32 truncate text-secondary">{document.created_by.display_name}</span>
+                      <Avatar name={creatorName} src={getFileURL(creator?.avatar_url ?? "")} size="sm" />
+                      <span className="max-w-32 truncate text-secondary">{creatorName}</span>
                     </div>
                   ) : (
-                    <span className="text-secondary">Unknown</span>
+                    <span className="flex items-center gap-2 text-tertiary">
+                      <UserRound className="size-3.5 shrink-0" aria-hidden="true" />
+                      Unknown
+                    </span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="!border-r-0 !px-2">
                   <ResourceActions document={document} canEdit={canEdit} onAction={onAction} />
                 </TableCell>
               </TableRow>

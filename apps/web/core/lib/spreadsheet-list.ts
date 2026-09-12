@@ -15,7 +15,9 @@ export const filterAndSortSpreadsheetDocuments = (
       (!normalizedQuery || document.name.toLocaleLowerCase().includes(normalizedQuery)) &&
       (status === "all" || document.status === status)
   );
-  return result.toSorted((left, right) => {
+  // The filtered array is already a copy; sort supports the app's ES target.
+  // oxlint-disable-next-line unicorn/no-array-sort
+  return result.sort((left, right) => {
     if (sort === "name-asc" || sort === "name-desc") {
       const comparison = left.name.localeCompare(right.name, undefined, { sensitivity: "base" });
       return sort === "name-asc" ? comparison : -comparison;
