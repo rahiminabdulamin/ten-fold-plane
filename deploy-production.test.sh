@@ -13,7 +13,7 @@ grist_css_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/proxy/grist-c
 [[ -f "$script_path" ]]
 grep -Fq 'rsync -az --delete' "$script_path"
 grep -Fq -- '--exclude .env' "$script_path"
-grep -Fq 'docker compose up --build migrator' "$script_path"
+grep -Fq 'docker compose run --rm --build migrator' "$script_path"
 grep -Fq 'GRIST_SESSION_SECRET' "$script_path"
 grep -Fq 'GRIST_PUBLIC_URL' "$script_path"
 grep -Fq 'CADDY_TLS_CERT_FILE' "$script_path"
@@ -29,9 +29,9 @@ grep -Fq 'api/orgs/current/workspaces' "$script_path"
 grep -Fq 'workspace.access === "owners"' "$script_path"
 grep -Fq 'body: JSON.stringify({name: "Ten-Fold"})' "$script_path"
 grep -Fq 'set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"' "$script_path"
-grep -Fq 'docker compose up -d --build --wait grist api worker beat-worker copilot web proxy' "$script_path"
+grep -Fq 'docker compose up -d --build --wait grist api worker beat-worker copilot web admin space live proxy' "$script_path"
 grep -Fq "docker inspect --format '{{json .State.Health}}'" "$script_path"
-grep -Fq 'docker compose logs --tail=200 grist' "$script_path"
+grep -Fq 'docker compose logs --tail=100 grist api worker beat-worker copilot web admin space live proxy' "$script_path"
 grep -Fq '178.128.104.112' "$script_path"
 grep -Fq "require('http').get('http://localhost:8484/status'" "$compose_path"
 grep -Fq 'vars grist_original_uri {uri}' "$proxy_path"
@@ -69,3 +69,56 @@ if grep -Fq 'request_header -X-Ten-Fold-User' "$proxy_path"; then
   echo 'Private Grist proxy must not delete the identity copied by forward_auth' >&2
   exit 1
 fi
+
+# Execute the real remote body with mocked external commands. No SSH, containers,
+# or public requests are used; environment writes stay inside this temporary tree.
+test_root="$(mktemp -d)"
+trap 'rm -rf -- "$test_root"' EXIT
+mkdir -p "$test_root/apps/api" "$test_root/apps/proxy"
+touch "$test_root/.env" "$test_root/apps/api/.env" "$test_root/apps/proxy/grist-custom.css"
+export DEPLOY_PATH="$test_root" PRODUCTION_URL="https://deployment.test"
+# Extract only the quoted remote heredoc, not the local rsync/SSH wrapper.
+remote_body="$(sed -n "/<<'REMOTE'$/,/^REMOTE$/p" "$script_path" | sed '1d;$d')"
+
+docker() {
+  printf '%s\n' "$*" >> "$DEPLOY_PATH/commands"
+  case "$*" in
+    "compose run --rm --build migrator") return "${MIGRATION_EXIT:-0}" ;;
+    "compose exec -T grist sha256sum /grist/static/custom.css")
+      sha256sum "$DEPLOY_PATH/apps/proxy/grist-custom.css" ;;
+    "compose exec -T grist node --input-type=module") cat >/dev/null; printf '1\n' ;;
+    "compose exec -T web cat /usr/share/caddy/html/index.html")
+      printf '<script src="/assets/manifest-current.js"></script>' ;;
+    *) return 0 ;;
+  esac
+}
+curl() {
+  if [[ "${PUBLIC_STATE:-current}" == "unreachable" ]]; then return 22; fi
+  printf '<script src="/assets/manifest-%s.js"></script>' "${PUBLIC_STATE:-current}"
+}
+export -f docker curl
+
+run_remote_case() {
+  local scenario="$1" migration_exit="$2" public_state="$3" expected_exit="$4"
+  : > "$test_root/commands"
+  local actual_exit=0
+  MIGRATION_EXIT="$migration_exit" PUBLIC_STATE="$public_state" bash -c "$remote_body" > "$test_root/result" 2>&1 || actual_exit=$?
+  [[ "$actual_exit" == "$expected_exit" ]] || {
+    echo "FAIL: $scenario (exit $actual_exit, expected $expected_exit)" >&2
+    cat "$test_root/result" >&2
+    exit 1
+  }
+  echo "PASS: $scenario"
+}
+
+run_remote_case "successful deployment verifies matching manifest" 0 current 0
+grep -Fq 'Verified public frontend: manifest-current.js' "$test_root/result"
+grep -Fq 'compose up -d --build --wait grist api worker beat-worker copilot web admin space live proxy' "$test_root/commands"
+run_remote_case "migration failure stops before app replacement" 7 current 7
+if grep -Fq 'compose up -d --build' "$test_root/commands"; then
+  echo "Apps were replaced after migration failure" >&2
+  exit 1
+fi
+run_remote_case "stale public frontend rejects deployment" 0 stale 1
+grep -Fq 'Frontend verification failed' "$test_root/result"
+run_remote_case "unreachable public frontend rejects deployment" 0 unreachable 22

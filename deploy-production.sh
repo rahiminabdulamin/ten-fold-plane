@@ -22,6 +22,11 @@ rsync -az --delete \
   --exclude .env \
   --exclude .env.local \
   --exclude .next \
+  --exclude build \
+  --exclude dist \
+  --exclude out \
+  --exclude .turbo \
+  --exclude .react-router \
   -e "ssh -i $DEPLOY_SSH_KEY" \
   "$REPOSITORY_ROOT/" "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
@@ -30,6 +35,10 @@ ssh -i "$DEPLOY_SSH_KEY" "${DEPLOY_USER}@${DEPLOY_HOST}" \
   "DEPLOY_PATH='$DEPLOY_PATH' PRODUCTION_URL='$PRODUCTION_URL' bash -s" <<'REMOTE'
 set -euo pipefail
 cd "$DEPLOY_PATH"
+command -v curl >/dev/null || {
+  echo "curl is required on the deployment host to verify the public frontend." >&2
+  exit 1
+}
 
 [[ -f .env && -f apps/api/.env ]] || {
   echo "Missing preserved production .env files in $DEPLOY_PATH" >&2
@@ -93,16 +102,34 @@ NODE
 }
 set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"
 
-docker compose up --build migrator
-if ! docker compose up -d --build --wait grist api worker beat-worker copilot web proxy; then
+docker compose run --rm --build migrator
+if ! docker compose up -d --build --wait grist api worker beat-worker copilot web admin space live proxy; then
   docker compose ps
   grist_container_id="$(docker compose ps -q grist)"
   if [[ -n "$grist_container_id" ]]; then
     docker inspect --format '{{json .State.Health}}' "$grist_container_id"
   fi
-  docker compose logs --tail=200 grist
+  docker compose logs --tail=100 grist api worker beat-worker copilot web admin space live proxy
   exit 1
 fi
+
+# Read the built artifact, then verify normal public HTML advertises that build.
+# Do not cache-bust the request: a stale edge-cached homepage must fail this check.
+manifest_pattern='manifest-[A-Za-z0-9_-]+\.js'
+web_html="$(docker compose exec -T web cat /usr/share/caddy/html/index.html)"
+expected_manifest="$(printf '%s' "$web_html" | grep -oE "$manifest_pattern" | sort -u || true)"
+[[ -n "$expected_manifest" && "$expected_manifest" != *$'\n'* ]] || {
+  echo "Unable to identify a single frontend manifest in the web container." >&2
+  exit 1
+}
+public_html="$(curl --fail --silent --show-error --location --connect-timeout 10 --max-time 30 "${PRODUCTION_URL%/}/")"
+public_manifest="$(printf '%s' "$public_html" | grep -oE "$manifest_pattern" | sort -u || true)"
+[[ "$public_manifest" == "$expected_manifest" ]] || {
+  echo "Frontend verification failed: container=$expected_manifest public=${public_manifest:-missing}" >&2
+  echo "Inspect the public proxy/cache and running web image before declaring deployment complete." >&2
+  exit 1
+}
+echo "Verified public frontend: $expected_manifest"
 REMOTE
 
 echo "Deployment complete: $PRODUCTION_URL"
