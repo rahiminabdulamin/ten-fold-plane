@@ -5,13 +5,15 @@ import pytest
 
 from plane.api.views.spreadsheet import (
     _can_recover_provisioning_operation,
+    _duplicate_document_fields,
     _grist_authorization_document_id,
     _grist_document_id_from_path,
+    _publication_values,
     _structural_actions,
     _validate_agent_payload,
 )
 from plane.integrations.grist import GristClient
-from plane.db.models import SpreadsheetOperation
+from plane.db.models import SpreadsheetDocument, SpreadsheetOperation
 
 
 @pytest.mark.unit
@@ -92,6 +94,34 @@ def test_failed_provisioning_operation_can_be_retried_once():
     operation = type("Operation", (), {"status": SpreadsheetOperation.Status.FAILED})()
 
     assert _can_recover_provisioning_operation(operation)
+
+
+def test_form_publication_defaults_to_the_document_section_and_a_secure_key():
+    document = type("Document", (), {"grist_form_view_section_id": 17})()
+
+    values = _publication_values(document, {"access": "authenticated"})
+
+    assert values["view_section_id"] == 17
+    assert values["access"] == "authenticated"
+    assert len(values["share_key"]) >= 32
+
+
+def test_duplicate_preserves_the_source_document_type():
+    source = type(
+        "Document",
+        (),
+        {
+            "document_type": SpreadsheetDocument.DocumentType.FORM,
+            "grist_form_view_id": 4,
+            "grist_form_view_section_id": 9,
+        },
+    )()
+
+    assert _duplicate_document_fields(source) == {
+        "document_type": SpreadsheetDocument.DocumentType.FORM,
+        "grist_form_view_id": 4,
+        "grist_form_view_section_id": 9,
+    }
 
 
 @pytest.mark.unit

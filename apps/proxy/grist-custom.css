@@ -162,6 +162,8 @@
   --grist-theme-menu-item-selected-fg: var(--tenfold-text-primary);
   --grist-theme-menu-item-selected-bg: var(--tenfold-accent-subtle);
   --grist-theme-menu-item-disabled-fg: var(--tenfold-text-disabled);
+  --weaseljs-selected-background-color: var(--tenfold-accent-subtle);
+  --weaseljs-selected-color: var(--tenfold-text-primary);
   --grist-theme-popup-bg: var(--tenfold-surface-1);
   --grist-theme-popup-secondary-bg: var(--tenfold-surface-2);
   --grist-theme-modal-bg: var(--tenfold-surface-1);

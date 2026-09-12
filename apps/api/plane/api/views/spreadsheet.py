@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 import re
+import secrets
 import uuid
 from datetime import timedelta
 from urllib.parse import urlsplit
@@ -9,6 +10,7 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.core import signing
 from django.db import transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from rest_framework import status
@@ -89,6 +91,22 @@ def _record_synchronous_failure(spreadsheet, error):
     spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
 
 
+def _duplicate_document_fields(source):
+    return {
+        "document_type": source.document_type,
+        "grist_form_view_id": source.grist_form_view_id,
+        "grist_form_view_section_id": source.grist_form_view_section_id,
+    }
+
+
+def _publication_values(spreadsheet, data):
+    return {
+        **data,
+        "view_section_id": data.get("view_section_id") or spreadsheet.grist_form_view_section_id,
+        "share_key": data.get("share_key") or secrets.token_urlsafe(32),
+    }
+
+
 def _grist_document_id_from_path(path):
     path = urlsplit(path).path
     path = re.sub(r"^/dw/self/v/[A-Za-z0-9_-]+(?=/)", "", path)
@@ -130,10 +148,21 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
         document_type = request.query_params.get("document_type", SpreadsheetDocument.DocumentType.SHEET)
         if document_type not in SpreadsheetDocument.DocumentType.values:
             return Response({"error": "invalid_document_type"}, status=status.HTTP_400_BAD_REQUEST)
-        items = SpreadsheetDocument.objects.filter(
-            workspace__slug=slug, project_id=project_id, document_type=document_type, deleted_at__isnull=True
-        ).exclude(status="archived")
-        return Response(SpreadsheetDocumentSerializer(items, many=True).data)
+        items = (
+            SpreadsheetDocument.objects.filter(
+                workspace__slug=slug, project_id=project_id, document_type=document_type, deleted_at__isnull=True
+            )
+            .exclude(status="archived")
+            .select_related("created_by")
+            .prefetch_related(
+                Prefetch(
+                    "form_publications",
+                    queryset=SpreadsheetFormPublication.objects.filter(deleted_at__isnull=True),
+                    to_attr="active_form_publications",
+                )
+            )
+        )
+        return Response(SpreadsheetDocumentSerializer(items, many=True, expand=["created_by"]).data)
 
     def post(self, request, slug, project_id):
         serializer = SpreadsheetDocumentSerializer(data=request.data)
@@ -249,7 +278,11 @@ class SpreadsheetDuplicateEndpoint(SpreadsheetBaseEndpoint):
             return Response({"error": "spreadsheet_not_ready"}, status=409)
         name = str(request.data.get("name", f"{source.name} copy")).strip()[:255]
         spreadsheet = SpreadsheetDocument.objects.create(
-            workspace=source.workspace, project=source.project, name=name, created_by=request.user
+            workspace=source.workspace,
+            project=source.project,
+            name=name,
+            **_duplicate_document_fields(source),
+            created_by=request.user,
         )
         _queue(
             spreadsheet,
@@ -272,10 +305,25 @@ class SpreadsheetFormsEndpoint(SpreadsheetBaseEndpoint):
 
     def post(self, request, slug, project_id, pk):
         spreadsheet = _document(slug, project_id, pk)
-        share_key = str(request.data.get("share_key", ""))
+        if spreadsheet.document_type != SpreadsheetDocument.DocumentType.FORM:
+            return Response({"error": "form_required"}, status=400)
+        if spreadsheet.status != SpreadsheetDocument.Status.READY:
+            return Response({"error": "spreadsheet_not_ready"}, status=409)
+        if not spreadsheet.grist_form_view_section_id:
+            return Response({"error": "form_section_unavailable"}, status=409)
+        values = _publication_values(spreadsheet, request.data)
+        share_key = str(values["share_key"])
         if not re.fullmatch(r"[A-Za-z0-9_-]{8,255}", share_key):
             return Response({"error": "invalid_share_key"}, status=400)
-        serializer = SpreadsheetFormPublicationSerializer(data=request.data)
+        publication = spreadsheet.form_publications.filter(
+            view_section_id=values["view_section_id"], deleted_at__isnull=True
+        ).first()
+        if publication:
+            serializer = SpreadsheetFormPublicationSerializer(publication, data=values, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(enabled=True)
+            return Response(serializer.data)
+        serializer = SpreadsheetFormPublicationSerializer(data=values)
         serializer.is_valid(raise_exception=True)
         publication = serializer.save(spreadsheet=spreadsheet, share_key=share_key)
         return Response(SpreadsheetFormPublicationSerializer(publication).data, status=201)

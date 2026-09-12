@@ -8,9 +8,21 @@ from .base import BaseSerializer
 
 
 class SpreadsheetDocumentSerializer(BaseSerializer):
+    publication = serializers.SerializerMethodField()
+
     class Meta:
         model = SpreadsheetDocument
-        fields = ["id", "name", "document_type", "status", "last_error_code", "created_at", "updated_at", "created_by"]
+        fields = [
+            "id",
+            "name",
+            "document_type",
+            "status",
+            "last_error_code",
+            "created_at",
+            "updated_at",
+            "created_by",
+            "publication",
+        ]
         read_only_fields = ["id", "status", "last_error_code", "created_at", "updated_at", "created_by"]
 
     def validate_name(self, value):
@@ -18,6 +30,16 @@ class SpreadsheetDocumentSerializer(BaseSerializer):
         if not value:
             raise serializers.ValidationError("A spreadsheet name is required.")
         return value
+
+    def get_publication(self, obj):
+        publications = getattr(obj, "active_form_publications", None)
+        if publications is None:
+            publications = obj.form_publications.filter(deleted_at__isnull=True)
+        publication = next(
+            (item for item in publications if item.view_section_id == obj.grist_form_view_section_id),
+            None,
+        )
+        return SpreadsheetFormPublicationSerializer(publication).data if publication else None
 
 
 class SpreadsheetFormPublicationSerializer(BaseSerializer):
