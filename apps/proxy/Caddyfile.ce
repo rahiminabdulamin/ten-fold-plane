@@ -21,6 +21,19 @@
 		reverse_proxy grist:8484
 	}
 
+	# Grist opens form previews at its canonical document URL rather than below
+	# /grist. Keep previews private and pass the signed-in editor identity through.
+	@grist_form_preview path_regexp grist_form_preview ^/[A-Za-z0-9_-]{12,}/[^/]+/f/[0-9]+(?:/.*)?$
+	handle @grist_form_preview {
+		vars grist_original_uri {uri}
+		forward_auth api:8000 {
+			uri /api/v1/internal/grist/authorize/
+			header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}
+			copy_headers X-Ten-Fold-User X-Ten-Fold-Name
+		}
+		reverse_proxy grist:8484
+	}
+
 	@grist_editor path /grist/* /o/ten-fold /o/ten-fold/* /dw/self/*
 	handle @grist_editor {
 		vars grist_original_uri {uri}
@@ -40,6 +53,16 @@
 			header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}
 		}
 		uri strip_prefix /grist-public
+		reverse_proxy grist:8484 {
+			header_up -X-Ten-Fold-User
+			header_up -X-Ten-Fold-Name
+		}
+	}
+
+	# Native Grist form publication URLs are capability URLs: the unguessable
+	# share key grants access, so they must reach Grist without editor identity.
+	@grist_native_form path_regexp grist_native_form ^/forms/[A-Za-z0-9_-]+/[0-9]+(?:/.*)?$
+	handle @grist_native_form {
 		reverse_proxy grist:8484 {
 			header_up -X-Ten-Fold-User
 			header_up -X-Ten-Fold-Name

@@ -106,6 +106,7 @@ def test_failed_provisioning_operation_can_be_retried_once():
         "/o/ten-fold/doc/g31document?embed=true",
         "/o/ten-fold/api/worker/g31document",
         "/dw/self/v/unknown/o/ten-fold/api/docs/g31document/tables",
+        "/g31document1/TEST/f/11",
     ],
 )
 def test_grist_forward_auth_extracts_document_from_supported_paths(path):

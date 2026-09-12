@@ -100,6 +100,11 @@ def _grist_document_id_from_path(path):
             r"/grist/o/ten-fold/(?!api(?:/|$)|doc(?:/|$))([A-Za-z0-9_-]+)/[^/]+(?:/.*)?",
             urlsplit(path).path,
         )
+    if not match:
+        match = re.fullmatch(
+            r"/([A-Za-z0-9_-]{12,})/[^/]+/f/[0-9]+(?:/.*)?",
+            urlsplit(path).path,
+        )
     return match.group(1) if match else None
 
 
