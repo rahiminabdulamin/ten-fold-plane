@@ -110,7 +110,6 @@ export const ModuleCardItem = observer(function ModuleCardItem(props: Props) {
 
   const handleEventPropagation = (e: SyntheticEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    e.preventDefault();
   };
 
   const handleModuleDetailsChange = async (payload: Partial<IModule>) => {

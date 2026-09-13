@@ -151,7 +151,6 @@ export const RelationIssueListItem = observer(function RelationIssueListItem(pro
             <div
               className="flex-shrink-0 text-13"
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
               }}
             >

@@ -171,7 +171,6 @@ export const SubIssuesListItem = observer(function SubIssuesListItem(props: Prop
             <div
               className="flex-shrink-0 text-13"
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
               }}
             >

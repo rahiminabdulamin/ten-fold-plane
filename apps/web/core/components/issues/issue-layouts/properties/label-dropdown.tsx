@@ -47,7 +47,6 @@ export interface ILabelDropdownProps {
 
 const preventPropagation = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
   event.stopPropagation();
-  event.preventDefault();
 };
 
 export function LabelDropdown(props: ILabelDropdownProps) {
