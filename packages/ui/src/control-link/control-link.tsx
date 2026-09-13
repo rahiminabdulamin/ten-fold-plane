@@ -24,7 +24,10 @@ export const ControlLink = React.forwardRef(function ControlLink(
   const LEFT_CLICK_EVENT_CODE = 0;
 
   const handleOnClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    if ((event.target as HTMLElement).closest("[data-work-item-property]")) return;
+    if ((event.target as HTMLElement).closest("[data-work-item-property]")) {
+      event.preventDefault();
+      return;
+    }
     const clickCondition = (event.metaKey || event.ctrlKey) && event.button === LEFT_CLICK_EVENT_CODE;
     if (!clickCondition) {
       event.preventDefault();
