@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import { usePopper } from "react-popper";
 import { SignalHigh } from "lucide-react";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Portal } from "@headlessui/react";
 import { ISSUE_PRIORITIES } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 // types
@@ -335,10 +335,11 @@ export function PriorityDropdown(props: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   // popper-js refs
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",
@@ -446,8 +447,11 @@ export function PriorityDropdown(props: Props) {
       renderByDefault={renderByDefault}
     >
       {isOpen && (
-        <Combobox.Options as="ul" className="fixed z-40" static>
-          <div
+        <Portal>
+          <Combobox.Options
+            as="div"
+            static
+            modal={false}
             className="my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none"
             ref={setPopperElement}
             style={styles.popper}
@@ -493,8 +497,8 @@ export function PriorityDropdown(props: Props) {
                 <p className="px-1.5 py-1 text-placeholder italic">{t("no_matching_results")}</p>
               )}
             </div>
-          </div>
-        </Combobox.Options>
+          </Combobox.Options>
+        </Portal>
       )}
     </ComboDropDown>
   );

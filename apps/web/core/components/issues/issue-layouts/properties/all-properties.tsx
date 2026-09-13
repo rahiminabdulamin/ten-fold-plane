@@ -194,7 +194,8 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
   };
 
   return (
-    <div className={className}>
+    // oxlint-disable-next-line jsx_a11y/click-events-have-key-events, jsx_a11y/no-static-element-interactions
+    <div className={className} onClick={handleEventPropagation} onPointerDown={handleEventPropagation}>
       {/* basic properties */}
       {/* state */}
       <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="state">

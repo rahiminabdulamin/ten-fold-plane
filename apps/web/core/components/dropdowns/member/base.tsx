@@ -88,22 +88,22 @@ export const MemberDropdownBase = observer(function MemberDropdownBase(props: TM
     if (!multiple) handleClose();
   };
 
-  const getDisplayName = (value: string | string[] | null, showUserDetails: boolean, placeholder: string = "") => {
-    if (Array.isArray(value)) {
-      if (value.length > 0) {
-        if (value.length === 1) {
-          return getUserDetails(value[0])?.display_name || placeholder;
+  const getDisplayName = (selectedValue: string | string[] | null, includeUserDetails: boolean, fallback = "") => {
+    if (Array.isArray(selectedValue)) {
+      if (selectedValue.length > 0) {
+        if (selectedValue.length === 1) {
+          return getUserDetails(selectedValue[0])?.display_name || fallback;
         } else {
-          return showUserDetails ? `${value.length} ${t("members").toLocaleLowerCase()}` : "";
+          return includeUserDetails ? `${selectedValue.length} ${t("members").toLocaleLowerCase()}` : "";
         }
       } else {
-        return placeholder;
+        return fallback;
       }
     } else {
-      if (showUserDetails && value) {
-        return getUserDetails(value)?.display_name || placeholder;
+      if (includeUserDetails && selectedValue) {
+        return getUserDetails(selectedValue)?.display_name || fallback;
       } else {
-        return placeholder;
+        return fallback;
       }
     }
   };
@@ -145,6 +145,7 @@ export const MemberDropdownBase = observer(function MemberDropdownBase(props: TM
         showTooltip={showTooltip}
         variant={buttonVariant}
         renderToolTipByDefault={renderByDefault}
+        asChild
       >
         {!hideIcon && <ButtonAvatars showTooltip={showTooltip} userIds={value} icon={icon} />}
         {BUTTON_VARIANTS_WITH_TEXT.includes(buttonVariant) && (
@@ -160,6 +161,7 @@ export const MemberDropdownBase = observer(function MemberDropdownBase(props: TM
   );
 
   return (
+    // oxlint-disable-next-line jsx_a11y/click-events-have-key-events, jsx_a11y/no-static-element-interactions
     <ComboDropDown
       as="div"
       ref={dropdownRef}

@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { usePopper } from "react-popper";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Portal } from "@headlessui/react";
 // plane imports
 import { useTranslation } from "@plane/i18n";
 import { StateGroupIcon } from "@plane/propel/icons";
@@ -77,7 +77,7 @@ export const WorkItemStateDropdownBase = observer(function WorkItemStateDropdown
   const inputRef = useRef<HTMLInputElement | null>(null);
   // popper-js refs
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   // states
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -89,6 +89,7 @@ export const WorkItemStateDropdownBase = observer(function WorkItemStateDropdown
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",
@@ -172,6 +173,7 @@ export const WorkItemStateDropdownBase = observer(function WorkItemStateDropdown
         showTooltip={showTooltip}
         variant={buttonVariant}
         renderToolTipByDefault={renderByDefault}
+        asChild
       >
         {isInitializing ? (
           <Spinner className="h-3.5 w-3.5" />
@@ -214,8 +216,11 @@ export const WorkItemStateDropdownBase = observer(function WorkItemStateDropdown
       renderByDefault={renderByDefault}
     >
       {isOpen && (
-        <Combobox.Options as="ul" className="fixed z-40" static>
-          <div
+        <Portal>
+          <Combobox.Options
+            as="div"
+            static
+            modal={false}
             className="my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none"
             ref={setPopperElement}
             style={styles.popper}
@@ -253,8 +258,8 @@ export const WorkItemStateDropdownBase = observer(function WorkItemStateDropdown
                 <p className="px-1.5 py-1 text-placeholder italic">{t("loading")}</p>
               )}
             </div>
-          </div>
-        </Combobox.Options>
+          </Combobox.Options>
+        </Portal>
       )}
     </ComboDropDown>
   );

@@ -9,7 +9,7 @@ import type { Placement } from "@popperjs/core";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import { usePopper } from "react-popper";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Portal } from "@headlessui/react";
 // plane imports
 import { Avatar } from "@makeplane/propel/components/avatar";
 import { useTranslation } from "@plane/i18n";
@@ -51,7 +51,7 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   // states
   const [query, setQuery] = useState("");
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   // plane hooks
   const { t } = useTranslation();
   // store hooks
@@ -131,8 +131,12 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
   );
 
   return (
-    <Combobox.Options as="ul" data-prevent-outside-click static>
-      <div
+    <Portal>
+      <Combobox.Options
+        as="div"
+        data-prevent-outside-click
+        static
+        modal={false}
         className={cn(
           "z-40 my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none",
           optionsClassName
@@ -199,7 +203,7 @@ export const MemberOptions = observer(function MemberOptions(props: Props) {
             <p className="px-1.5 py-1 text-placeholder italic">{t("loading")}</p>
           )}
         </div>
-      </div>
-    </Combobox.Options>
+      </Combobox.Options>
+    </Portal>
   );
 });
