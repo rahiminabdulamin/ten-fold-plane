@@ -24,7 +24,11 @@ export const ControlLink = React.forwardRef(function ControlLink(
   const LEFT_CLICK_EVENT_CODE = 0;
 
   const handleOnClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    if ((event.target as HTMLElement).closest("[data-work-item-property]")) {
+    if (
+      (event.target as Element).closest(
+        "[data-work-item-property], button, input, select, textarea, [role='button'], [role='combobox']"
+      )
+    ) {
       event.preventDefault();
       return;
     }
