@@ -55,6 +55,7 @@ function Portal({ children, container, asChild = false }: PortalProps) {
 const MenuContext = React.createContext<{
   closeAllSubmenus: () => void;
   registerSubmenu: (closeSubmenu: () => void) => () => void;
+  setSubmenuHovered: (hovered: boolean) => void;
 } | null>(null);
 
 function CustomMenu(props: ICustomMenuDropdownProps) {
@@ -88,12 +89,21 @@ function CustomMenu(props: ICustomMenuDropdownProps) {
   const [referenceElement, setReferenceElement] = React.useState<HTMLButtonElement | null>(null);
   const [popperElement, setPopperElement] = React.useState<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
   // refs
   const dropdownRef = React.useRef<HTMLDivElement | null>(null);
   const submenuClosersRef = React.useRef<Set<() => void>>(new Set());
+  const submenuHoveredRef = React.useRef(false);
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "auto",
+    strategy: "fixed",
+    modifiers: [
+      {
+        name: "preventOverflow",
+        options: { padding: 8 },
+      },
+    ],
   });
 
   const closeAllSubmenus = React.useCallback(() => {
@@ -106,6 +116,12 @@ function CustomMenu(props: ICustomMenuDropdownProps) {
       submenuClosersRef.current.delete(closeSubmenu);
     };
   }, []);
+
+  const setSubmenuHovered = React.useCallback((hovered: boolean) => {
+    submenuHoveredRef.current = hovered;
+  }, []);
+
+  React.useEffect(() => setMounted(true), []);
 
   const openDropdown = () => {
     setIsOpen(true);
@@ -151,51 +167,23 @@ function CustomMenu(props: ICustomMenuDropdownProps) {
   const handleMouseLeave = () => {
     if (openOnHover && isOpen) {
       setTimeout(() => {
-        // Only close if menu is still open
-        if (isOpen) {
+        if (isOpen && !submenuHoveredRef.current) {
           closeDropdown();
         }
-      }, 150); // Small delay to allow moving to submenu
+      }, 150);
     }
   };
 
   useOutsideClickDetector(dropdownRef, closeDropdown, useCaptureForOutsideClick);
 
-  // Custom handler for submenu portal clicks
-  React.useEffect(() => {
-    const handleDocumentClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const isSubmenuClick = target.closest('[data-prevent-outside-click="true"]');
-      const isMainMenuClick = dropdownRef.current?.contains(target);
-
-      // If it's a submenu click or main menu click, don't close
-      if (isSubmenuClick || isMainMenuClick) {
-        return;
-      }
-
-      // If menu is open and it's an outside click, close it
-      if (isOpen) {
-        closeDropdown();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleDocumentClick, useCaptureForOutsideClick);
-
-      return () => {
-        document.removeEventListener("mousedown", handleDocumentClick, useCaptureForOutsideClick);
-      };
-    }
-  }, [isOpen, closeDropdown, useCaptureForOutsideClick]);
-
   const menuContextValue = React.useMemo(
-    () => ({ closeAllSubmenus, registerSubmenu }),
-    [closeAllSubmenus, registerSubmenu]
+    () => ({ closeAllSubmenus, registerSubmenu, setSubmenuHovered }),
+    [closeAllSubmenus, registerSubmenu, setSubmenuHovered]
   );
 
-  let menuItems = (
+  const menuItems = (
     <Menu.Items
-      data-prevent-outside-click={!!portalElement}
+      data-prevent-outside-click
       className={cn(
         "fixed z-30 translate-y-0",
         menuItemsClassName
@@ -222,9 +210,7 @@ function CustomMenu(props: ICustomMenuDropdownProps) {
     </Menu.Items>
   );
 
-  if (portalElement) {
-    menuItems = ReactDOM.createPortal(menuItems, portalElement);
-  }
+  const portalledMenuItems = mounted ? ReactDOM.createPortal(menuItems, portalElement ?? document.body) : null;
 
   return (
     <Menu
@@ -236,7 +222,6 @@ function CustomMenu(props: ICustomMenuDropdownProps) {
       role="presentation"
       onClick={(e) => {
         e.stopPropagation();
-        e.preventDefault();
         handleOnClick();
       }}
       onMouseEnter={handleMouseEnter}
@@ -299,7 +284,7 @@ function CustomMenu(props: ICustomMenuDropdownProps) {
               )}
             </>
           )}
-          {isOpen && menuItems}
+          {isOpen && portalledMenuItems}
         </>
       )}
     </Menu>
@@ -437,20 +422,10 @@ function SubMenu(props: ICustomSubMenuProps) {
             )}
             data-prevent-outside-click="true"
             onMouseEnter={() => {
-              // Notify parent menu that we're hovering over submenu
-              const mainMenuElement = document.querySelector('[data-main-menu="true"]');
-              if (mainMenuElement) {
-                const mouseEnterEvent = new MouseEvent("mouseenter", { bubbles: true });
-                mainMenuElement.dispatchEvent(mouseEnterEvent);
-              }
+              menuContext?.setSubmenuHovered(true);
             }}
             onMouseLeave={() => {
-              // Notify parent menu that we're leaving submenu
-              const mainMenuElement = document.querySelector('[data-main-menu="true"]');
-              if (mainMenuElement) {
-                const mouseLeaveEvent = new MouseEvent("mouseleave", { bubbles: true });
-                mainMenuElement.dispatchEvent(mouseLeaveEvent);
-              }
+              menuContext?.setSubmenuHovered(false);
             }}
           >
             <SubMenuContext.Provider value={subMenuContextValue}>{children}</SubMenuContext.Provider>

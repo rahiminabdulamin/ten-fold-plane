@@ -47,7 +47,6 @@ export interface ILabelDropdownProps {
 
 const preventPropagation = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
   event.stopPropagation();
-  event.preventDefault();
 };
 
 export function LabelDropdown(props: ILabelDropdownProps) {
@@ -132,6 +131,7 @@ export function LabelDropdown(props: ILabelDropdownProps) {
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",
@@ -252,7 +252,7 @@ export function LabelDropdown(props: ILabelDropdownProps) {
         multiple
       >
         {isOpen && (
-          <Combobox.Options as="ul" className="fixed z-40" static>
+          <Combobox.Options as="ul" className="fixed z-40" data-prevent-outside-click static>
             <div
               className={`z-40 my-1 h-auto w-48 rounded-sm border border-strong bg-surface-1 px-2 py-2.5 text-caption-sm-regular whitespace-nowrap shadow-raised-200 focus:outline-none ${optionsClassName}`}
               ref={setPopperElement}

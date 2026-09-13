@@ -7,7 +7,8 @@
 import { Popover as HeadlessReactPopover, Transition } from "@headlessui/react";
 import { MoreVerticalOutline } from "@makeplane/propel/icons";
 import type { Ref } from "react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 // helpers
 import { cn } from "../utils";
@@ -31,10 +32,14 @@ export function Popover(props: TPopover) {
   const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   // Headless UI v2 types Panel's ref as Ref<HTMLElement> rather than the concrete tag.
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // react-popper derived values
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: popperPosition,
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",
@@ -63,24 +68,29 @@ export function Popover(props: TPopover) {
         </HeadlessReactPopover.Button>
       </div>
 
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 translate-y-1"
-        enterTo="opacity-100 translate-y-0"
-        leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 translate-y-0"
-        leaveTo="opacity-0 translate-y-1"
-      >
-        <HeadlessReactPopover.Panel
-          ref={setPopperElement}
-          style={styles.popper}
-          {...attributes.popper}
-          className={cn("absolute top-full left-0 z-20 mt-2 w-screen max-w-xs", panelClassName)}
-        >
-          {children}
-        </HeadlessReactPopover.Panel>
-      </Transition>
+      {mounted &&
+        createPortal(
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <HeadlessReactPopover.Panel
+              data-prevent-outside-click
+              ref={setPopperElement}
+              style={styles.popper}
+              {...attributes.popper}
+              className={cn("absolute top-full left-0 z-20 mt-2 w-screen max-w-xs", panelClassName)}
+            >
+              {children}
+            </HeadlessReactPopover.Panel>
+          </Transition>,
+          document.body
+        )}
     </HeadlessReactPopover>
   );
 }

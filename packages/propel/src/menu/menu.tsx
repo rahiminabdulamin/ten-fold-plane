@@ -10,18 +10,6 @@ import { ChevronDownOutline, ChevronRightOutline, MoreHorizontalOutline } from "
 import { cn } from "../utils/classname";
 import type { TMenuProps, TSubMenuProps, TMenuItemProps } from "./types";
 
-// Context for main menu to communicate with submenus
-const MenuContext = React.createContext<{
-  closeAllSubmenus: () => void;
-  registerSubmenu: (closeSubmenu: () => void) => () => void;
-} | null>(null);
-
-// SubMenu context for closing submenu from nested items
-const SubMenuContext = React.createContext<{ closeSubmenu: () => void } | null>(null);
-
-// Hook to use submenu context
-const useSubMenu = () => React.useContext(SubMenuContext);
-
 // SubMenu implementation
 function SubMenu(props: TSubMenuProps) {
   const { children, trigger, disabled = false, className = "" } = props;
@@ -33,7 +21,7 @@ function SubMenu(props: TSubMenuProps) {
         <ChevronRightOutline />
       </BaseMenu.SubmenuTrigger>
       <BaseMenu.Portal>
-        <BaseMenu.Positioner className={""} alignOffset={-4} sideOffset={-4}>
+        <BaseMenu.Positioner className="z-30" alignOffset={-4} sideOffset={-4} collisionPadding={8}>
           <BaseMenu.Popup className={className}>{children} </BaseMenu.Popup>
         </BaseMenu.Positioner>
       </BaseMenu.Portal>
@@ -43,8 +31,6 @@ function SubMenu(props: TSubMenuProps) {
 
 function MenuItem(props: TMenuItemProps) {
   const { children, disabled = false, onClick, className } = props;
-  const submenuContext = useSubMenu();
-
   return (
     <BaseMenu.Item
       disabled={disabled}
@@ -56,9 +42,7 @@ function MenuItem(props: TMenuItemProps) {
         className
       )}
       onClick={(e) => {
-        close();
         onClick?.(e);
-        submenuContext?.closeSubmenu();
       }}
     >
       {children}
@@ -87,52 +71,26 @@ function Menu(props: TMenuProps) {
     onMenuClose,
     tabIndex,
     openOnHover = false,
-    handleOpenChange = () => {},
+    handleOpenChange: onOpenChange = () => {},
   } = props;
 
   const [isOpen, setIsOpen] = React.useState(false);
-  // refs
-  const submenuClosersRef = React.useRef<Set<() => void>>(new Set());
 
-  const closeAllSubmenus = React.useCallback(() => {
-    submenuClosersRef.current.forEach((closeSubmenu) => closeSubmenu());
-  }, []);
-
-  const registerSubmenu = React.useCallback((closeSubmenu: () => void) => {
-    submenuClosersRef.current.add(closeSubmenu);
-    return () => {
-      submenuClosersRef.current.delete(closeSubmenu);
-    };
-  }, []);
-  const openDropdown = () => {
-    setIsOpen(true);
-  };
-
-  const closeDropdown = React.useCallback(() => {
-    if (isOpen) {
-      closeAllSubmenus();
-      onMenuClose?.();
-    }
-    setIsOpen(false);
-  }, [isOpen, closeAllSubmenus, onMenuClose]);
-
-  const handleMenuButtonClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (isOpen) {
-      closeDropdown();
-    } else {
-      openDropdown();
-    }
-    if (menuButtonOnClick) menuButtonOnClick();
-  };
+  const handleOpenChange = React.useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+      onOpenChange(open);
+      if (!open && isOpen) onMenuClose?.();
+    },
+    [isOpen, onMenuClose, onOpenChange]
+  );
 
   return (
-    <BaseMenu.Root openOnHover={openOnHover} onOpenChange={handleOpenChange}>
+    <BaseMenu.Root open={isOpen} openOnHover={openOnHover} onOpenChange={handleOpenChange}>
       {customButton ? (
         <BaseMenu.Trigger
           type="button"
-          onClick={handleMenuButtonClick}
+          onClick={menuButtonOnClick}
           className={cn(customButtonClassName, "outline-none")}
           tabIndex={customButtonTabIndex}
           disabled={disabled}
@@ -145,7 +103,7 @@ function Menu(props: TMenuProps) {
           {ellipsis || verticalEllipsis ? (
             <BaseMenu.Trigger
               type="button"
-              onClick={handleMenuButtonClick}
+              onClick={menuButtonOnClick}
               disabled={disabled}
               className={`relative grid place-items-center rounded-sm p-1 text-secondary outline-none hover:text-primary ${
                 disabled ? "cursor-not-allowed" : "cursor-pointer hover:bg-layer-1"
@@ -163,7 +121,7 @@ function Menu(props: TMenuProps) {
               } ${noBorder ? "" : "shadow-sm border border-strong focus:outline-none"} ${
                 disabled ? "cursor-not-allowed text-secondary" : "cursor-pointer hover:bg-layer-1"
               } ${buttonClassName}`}
-              onClick={handleMenuButtonClick}
+              onClick={menuButtonOnClick}
               tabIndex={customButtonTabIndex}
               disabled={disabled}
               aria-label={ariaLabel}
@@ -177,6 +135,7 @@ function Menu(props: TMenuProps) {
       <BaseMenu.Portal>
         <BaseMenu.Positioner
           align={"start"}
+          collisionPadding={8}
           className={cn(
             "fixed z-30 translate-y-0",
             menuItemsClassName
@@ -196,7 +155,7 @@ function Menu(props: TMenuProps) {
             )}
             data-main-menu="true"
           >
-            <MenuContext.Provider value={{ closeAllSubmenus, registerSubmenu }}>{children}</MenuContext.Provider>
+            {children}
           </BaseMenu.Popup>
         </BaseMenu.Positioner>
       </BaseMenu.Portal>

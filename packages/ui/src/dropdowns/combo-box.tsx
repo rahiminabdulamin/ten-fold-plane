@@ -7,11 +7,13 @@
 import { Combobox } from "@headlessui/react";
 import type { ElementType, KeyboardEventHandler, ReactNode, Ref } from "react";
 import React, { Fragment, forwardRef, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   as?: ElementType | undefined;
   ref?: Ref<HTMLElement> | undefined;
   tabIndex?: number | undefined;
+  role?: React.AriaRole;
   className?: string | undefined;
   value?: string | string[] | null;
   onChange?: (value: any) => void;
@@ -29,10 +31,15 @@ const ComboDropDown = forwardRef(function ComboDropDown(props: Props, ref) {
   const dropDownButtonRef = useRef<HTMLDivElement | null>(null);
 
   const [shouldRender, setShouldRender] = useState(renderByDefault);
+  const [mounted, setMounted] = useState(false);
 
   const onHover = () => {
     setShouldRender(true);
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const element = dropDownButtonRef.current as any;
@@ -59,7 +66,7 @@ const ComboDropDown = forwardRef(function ComboDropDown(props: Props, ref) {
     // @ts-expect-error
     <Combobox {...rest} ref={ref}>
       <Combobox.Button as={Fragment}>{button}</Combobox.Button>
-      {children}
+      {mounted && createPortal(children, document.body)}
     </Combobox>
   );
 });
