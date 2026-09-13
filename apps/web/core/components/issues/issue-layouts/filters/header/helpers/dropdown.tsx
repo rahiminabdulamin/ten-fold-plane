@@ -75,13 +75,7 @@ export function FiltersDropdown(props: Props) {
                   </Button>
                 </div>
                 <div className="flex @4xl:hidden">
-                  <Button
-                    disabled={disabled}
-                    ref={setReferenceElement}
-                    variant="secondary"
-                    tabIndex={tabIndex}
-                    size="lg"
-                  >
+                  <Button disabled={disabled} variant="secondary" tabIndex={tabIndex} size="lg">
                     {miniIcon || title}
                   </Button>
                 </div>
