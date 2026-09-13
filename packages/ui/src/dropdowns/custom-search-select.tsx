@@ -141,7 +141,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
             {isOpen &&
               createPortal(
                 <Combobox.Options
-                  as="div"
+                  as="ul"
                   data-prevent-outside-click
                   static
                   ref={setPopperElement}
