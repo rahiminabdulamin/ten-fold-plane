@@ -12,6 +12,7 @@ type Props = {
   as?: ElementType | undefined;
   ref?: Ref<HTMLElement> | undefined;
   tabIndex?: number | undefined;
+  role?: React.AriaRole;
   className?: string | undefined;
   value?: string | string[] | null;
   onChange?: (value: any) => void;
