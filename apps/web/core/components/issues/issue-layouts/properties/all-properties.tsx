@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 
+import type { SyntheticEvent } from "react";
 import { useCallback, useMemo } from "react";
 import { xor } from "lodash-es";
 import { observer } from "mobx-react";
@@ -55,7 +56,9 @@ export interface IIssueProperties {
   isEpic?: boolean;
 }
 
-const handleEventPropagation = () => undefined;
+const handleEventPropagation = (event: SyntheticEvent<HTMLDivElement>) => {
+  event.stopPropagation();
+};
 
 export const IssueProperties = observer(function IssueProperties(props: IIssueProperties) {
   const { issue, updateIssue, displayProperties, isReadOnly, className, isEpic = false } = props;
