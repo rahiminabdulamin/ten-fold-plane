@@ -74,7 +74,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
 
   const closeDropdown = () => {
     setIsOpen(false);
-    onClose && onClose();
+    if (onClose) onClose();
   };
 
   const handleKeyDown = useDropdownKeyDown(openDropdown, closeDropdown, isOpen);
@@ -86,6 +86,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
   };
 
   return (
+    // oxlint-disable-next-line jsx_a11y/no-static-element-interactions
     <Combobox
       as="div"
       ref={dropdownRef}
@@ -139,16 +140,19 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
             )}
             {isOpen &&
               createPortal(
-                <Combobox.Options as="ul" data-prevent-outside-click static>
-                  <div
-                    className={cn(
-                      "z-30 my-1 min-w-48 overflow-y-scroll rounded-md border-[0.5px] border-subtle-1 bg-surface-1 py-2.5 text-11 whitespace-nowrap focus:outline-none",
-                      optionsClassName
-                    )}
-                    ref={setPopperElement}
-                    style={styles.popper}
-                    {...attributes.popper}
-                  >
+                <Combobox.Options
+                  as="div"
+                  data-prevent-outside-click
+                  static
+                  ref={setPopperElement}
+                  style={styles.popper}
+                  {...attributes.popper}
+                  className={cn(
+                    "z-30 my-1 min-w-48 overflow-y-scroll rounded-md border-[0.5px] border-subtle-1 bg-surface-1 py-2.5 text-11 whitespace-nowrap focus:outline-none",
+                    optionsClassName
+                  )}
+                >
+                  <div>
                     <div className="mx-2 flex items-center gap-1.5 rounded-sm border border-subtle px-2">
                       <SearchOutline className="h-3.5 w-3.5 text-placeholder" />
                       <Combobox.Input
@@ -172,6 +176,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
                       {filteredOptions ? (
                         filteredOptions.length > 0 ? (
                           filteredOptions.map((option) => (
+                            // oxlint-disable-next-line jsx_a11y/click-events-have-key-events
                             <Combobox.Option
                               as="li"
                               key={option.value}

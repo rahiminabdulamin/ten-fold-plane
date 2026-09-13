@@ -38,11 +38,10 @@ export function FiltersDropdown(props: Props) {
   } = props;
 
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | HTMLDivElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "auto",
-    strategy: "fixed",
   });
 
   return (
@@ -76,7 +75,13 @@ export function FiltersDropdown(props: Props) {
                   </Button>
                 </div>
                 <div className="flex @4xl:hidden">
-                  <Button disabled={disabled} variant="secondary" tabIndex={tabIndex} size="lg">
+                  <Button
+                    disabled={disabled}
+                    ref={setReferenceElement}
+                    variant="secondary"
+                    tabIndex={tabIndex}
+                    size="lg"
+                  >
                     {miniIcon || title}
                   </Button>
                 </div>
@@ -93,13 +98,13 @@ export function FiltersDropdown(props: Props) {
             leaveTo="opacity-0 translate-y-1"
           >
             {/** translate-y-0 is a hack to create new stacking context. Required for safari  */}
-            <Popover.Panel
-              ref={setPopperElement}
-              style={styles.popper}
-              {...attributes.popper}
-              className="z-40 my-1 translate-y-0 overflow-hidden rounded-sm border border-subtle bg-surface-1 shadow-raised-100"
-            >
-              <div>
+            <Popover.Panel className="fixed z-40 translate-y-0">
+              <div
+                className="my-1 overflow-hidden rounded-sm border border-subtle bg-surface-1 shadow-raised-100"
+                ref={setPopperElement}
+                style={styles.popper}
+                {...attributes.popper}
+              >
                 <div className="flex max-h-[30rem] w-[18.75rem] flex-col overflow-hidden lg:max-h-[37.5rem]">
                   {children}
                 </div>
