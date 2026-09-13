@@ -21,7 +21,7 @@ type Props = {
   multiple?: boolean;
   renderByDefault?: boolean;
   button: ReactNode;
-  children: ReactNode | ((slot: { open: boolean }) => ReactNode);
+  children: ReactNode;
 };
 
 const ComboDropDown = forwardRef(function ComboDropDown(props: Props, ref) {
@@ -59,12 +59,8 @@ const ComboDropDown = forwardRef(function ComboDropDown(props: Props, ref) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     <Combobox {...rest} ref={ref}>
-      {({ open }) => (
-        <>
-          <Combobox.Button as={Fragment}>{button}</Combobox.Button>
-          {typeof children === "function" ? children({ open }) : children}
-        </>
-      )}
+      <Combobox.Button as={Fragment}>{button}</Combobox.Button>
+      {children}
     </Combobox>
   );
 });
