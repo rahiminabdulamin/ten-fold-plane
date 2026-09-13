@@ -173,6 +173,14 @@ public_manifest="$(printf '%s' "$public_html" | grep -oE "$manifest_pattern" | s
   exit 1
 }
 echo "Verified public frontend: $expected_manifest"
+deployment_stage="public form stylesheet verification"
+public_css_hash="$(curl --fail --silent --show-error --location --connect-timeout 10 --max-time 30 \
+  "${PRODUCTION_URL%/}/grist/form-base.css" | sha256sum | cut -d ' ' -f 1)"
+[[ "$public_css_hash" == "$grist_css_expected" ]] || {
+  echo "Public form stylesheet does not match deployed CSS (missing, stale, or HTML response)." >&2
+  exit 1
+}
+echo "Verified public form stylesheet: $public_css_hash"
 echo "Verified deployed source: $DEPLOY_SOURCE_SHA"
 REMOTE
 

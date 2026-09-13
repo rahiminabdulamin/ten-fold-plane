@@ -25,7 +25,7 @@
 
 	# The wrapper above receives the document Referer; this import contains only static styles.
 	handle /grist/form-base.css {
-		rewrite * /custom.css
+		rewrite * /v/unknown/custom.css
 		reverse_proxy grist:8484 {
 			header_down Cache-Control "no-store, max-age=0"
 		}

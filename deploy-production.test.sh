@@ -114,6 +114,15 @@ docker() {
 }
 curl() {
   if [[ "${PUBLIC_STATE:-current}" == "unreachable" ]]; then return 22; fi
+  if [[ "${*: -1}" == */grist/form-base.css ]]; then
+    case "${CSS_STATE:-current}" in
+      missing) return 22 ;;
+      html) printf '<!doctype html><title>Not found</title>' ;;
+      stale) printf 'body { color: green; }' ;;
+      *) cat "$DEPLOY_PATH/apps/proxy/grist-custom.css" ;;
+    esac
+    return
+  fi
   printf '<script src="/assets/manifest-%s.js"></script>' "${PUBLIC_STATE:-current}"
 }
 export -f docker curl
@@ -146,6 +155,14 @@ export IMAGE_SOURCE="old-source"
 run_remote_case "matching public and container manifests cannot hide stale source" 0 current 1
 grep -Fq 'Running web image does not match uploaded source' "$test_root/result"
 unset IMAGE_SOURCE
+
+export CSS_STATE=missing
+run_remote_case "missing public form CSS rejects deployment" 0 current 22
+export CSS_STATE=html
+run_remote_case "HTML in place of form CSS rejects deployment" 0 current 1
+export CSS_STATE=stale
+run_remote_case "stale public form CSS rejects deployment" 0 current 1
+unset CSS_STATE
 
 # Run actual local preflight against this checkout. Stub rsync so the test
 # deliberately ends before any upload or SSH, even when a real key is present.
