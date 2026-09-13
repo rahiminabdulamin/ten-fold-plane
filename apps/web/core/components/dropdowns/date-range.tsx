@@ -7,10 +7,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { Placement } from "@popperjs/core";
 import { observer } from "mobx-react";
-import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
 import { ArrowNarrowRightOutline, CalendarOutline, CloseOutline, DueDateOutline } from "@makeplane/propel/icons";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Portal } from "@headlessui/react";
 // plane imports
 import { useTranslation } from "@plane/i18n";
 // ui
@@ -102,7 +101,7 @@ export const DateRangeDropdown = observer(function DateRangeDropdown(props: Prop
     customTooltipContent,
     customTooltipHeading,
     defaultOpen = false,
-    renderInPortal = false,
+    renderInPortal = true,
   } = props;
   // states
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -114,7 +113,7 @@ export const DateRangeDropdown = observer(function DateRangeDropdown(props: Prop
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   // popper-js refs
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
@@ -183,6 +182,7 @@ export const DateRangeDropdown = observer(function DateRangeDropdown(props: Prop
         showTooltip={showTooltip}
         variant={buttonVariant}
         renderToolTipByDefault={renderByDefault}
+        asChild
       >
         {mergeDates ? (
           // Merged date display
@@ -255,32 +255,34 @@ export const DateRangeDropdown = observer(function DateRangeDropdown(props: Prop
   );
 
   const comboOptions = (
-    <Combobox.Options as="ul" data-prevent-outside-click static>
-      <div
-        className="z-40 my-1 overflow-hidden rounded-md border-[0.5px] border-subtle-1 bg-surface-1"
-        ref={setPopperElement}
-        style={styles.popper}
-        {...attributes.popper}
-      >
-        <Calendar
-          className="rounded-md border border-subtle p-3 text-12"
-          captionLayout="dropdown"
-          selected={dateRange}
-          onSelect={(val: DateRange | undefined) => {
-            onSelect?.(val);
-          }}
-          mode="range"
-          disabled={disabledDays}
-          showOutsideDays
-          fixedWeeks
-          weekStartsOn={startOfWeek}
-          initialFocus
-        />
-      </div>
+    <Combobox.Options
+      as="div"
+      data-prevent-outside-click
+      static
+      modal={false}
+      className="z-40 my-1 overflow-hidden rounded-md border-[0.5px] border-subtle-1 bg-surface-1"
+      ref={setPopperElement}
+      style={styles.popper}
+      {...attributes.popper}
+    >
+      <Calendar
+        className="rounded-md border border-subtle p-3 text-12"
+        captionLayout="dropdown"
+        selected={dateRange}
+        onSelect={(val: DateRange | undefined) => {
+          onSelect?.(val);
+        }}
+        mode="range"
+        disabled={disabledDays}
+        showOutsideDays
+        fixedWeeks
+        weekStartsOn={startOfWeek}
+        initialFocus
+      />
     </Combobox.Options>
   );
 
-  const Options = renderInPortal ? createPortal(comboOptions, document.body) : comboOptions;
+  const Options = renderInPortal ? <Portal>{comboOptions}</Portal> : comboOptions;
 
   return (
     <ComboDropDown

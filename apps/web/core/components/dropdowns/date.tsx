@@ -8,7 +8,7 @@ import React, { useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { usePopper } from "react-popper";
 import { CalendarOutline, CloseOutline } from "@makeplane/propel/icons";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Portal } from "@headlessui/react";
 // ui
 import type { Matcher } from "@plane/propel/calendar";
 import { Calendar } from "@plane/propel/calendar";
@@ -78,7 +78,7 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
   const startOfWeek = data?.start_of_the_week;
   // popper-js refs
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
@@ -142,6 +142,7 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
         showTooltip={showTooltip}
         variant={buttonVariant}
         renderToolTipByDefault={renderByDefault}
+        asChild
       >
         {!hideIcon && icon}
         {BUTTON_VARIANTS_WITH_TEXT.includes(buttonVariant) && (
@@ -180,8 +181,12 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
       renderByDefault={renderByDefault}
     >
       {isOpen && (
-        <Combobox.Options as="ul" data-prevent-outside-click static>
-          <div
+        <Portal>
+          <Combobox.Options
+            as="div"
+            data-prevent-outside-click
+            static
+            modal={false}
             className={cn(
               "z-40 my-1 overflow-hidden rounded-md border-[0.5px] border-strong bg-surface-1 shadow-raised-200",
               optionsClassName
@@ -205,8 +210,8 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
               fixedWeeks
               weekStartsOn={startOfWeek}
             />
-          </div>
-        </Combobox.Options>
+          </Combobox.Options>
+        </Portal>
       )}
     </ComboDropDown>
   );
