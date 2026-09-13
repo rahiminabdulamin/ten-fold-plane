@@ -92,7 +92,7 @@ export const DashboardWidgets = observer(function DashboardWidgets() {
             const isEnabled = widgetsMap[key]?.is_enabled;
             if (!WidgetComponent || !isEnabled) return null;
             return (
-              <div key={key} className="py-4">
+              <div key={key} className={key === "recents" ? "rounded-lg bg-layer-1 py-4" : "py-4"}>
                 <WidgetComponent workspaceSlug={workspaceSlug.toString()} />
               </div>
             );
