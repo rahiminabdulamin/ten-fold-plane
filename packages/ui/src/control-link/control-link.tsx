@@ -24,6 +24,7 @@ export const ControlLink = React.forwardRef(function ControlLink(
   const LEFT_CLICK_EVENT_CODE = 0;
 
   const handleOnClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if ((event.target as HTMLElement).closest("[data-work-item-property]")) return;
     const clickCondition = (event.metaKey || event.ctrlKey) && event.button === LEFT_CLICK_EVENT_CODE;
     if (!clickCondition) {
       event.preventDefault();
@@ -34,6 +35,7 @@ export const ControlLink = React.forwardRef(function ControlLink(
   // if disabled but still has a ref or a className then it has to be rendered without a href
   if (disabled && (ref || className))
     return (
+      // oxlint-disable-next-line jsx_a11y/anchor-is-valid
       <a ref={ref} className={className}>
         {children}
       </a>
