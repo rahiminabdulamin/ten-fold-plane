@@ -92,6 +92,7 @@ export const SubWorkItemTitleActions = observer(function SubWorkItemTitleActions
       className="flex items-center gap-2"
       onClick={(e) => {
         e.stopPropagation();
+        e.preventDefault();
       }}
     >
       <SubIssueDisplayFilters

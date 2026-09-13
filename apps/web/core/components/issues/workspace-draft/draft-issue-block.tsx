@@ -190,6 +190,7 @@ export const DraftIssueBlock = observer(function DraftIssueBlock(props: Props) {
                 "lg:flex": !isSidebarCollapsed,
               })}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
               }}
             >
