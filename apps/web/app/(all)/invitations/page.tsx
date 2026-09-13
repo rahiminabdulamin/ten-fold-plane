@@ -6,6 +6,7 @@
 
 import { useState } from "react";
 import { observer } from "mobx-react";
+import Image from "../../compat/next/image";
 import Link from "next/link";
 
 import useSWR, { mutate } from "swr";
@@ -15,7 +16,6 @@ import { ROLE } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 // types
 import { Button } from "@plane/propel/button";
-import { PlaneLogo } from "@plane/propel/icons";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { IWorkspaceMemberInvitation } from "@plane/types";
 import { truncateText } from "@plane/utils";
@@ -23,11 +23,12 @@ import { truncateText } from "@plane/utils";
 import emptyInvitation from "@/app/assets/empty-state/invitation.svg?url";
 // components
 import { EmptyState } from "@/components/common/empty-state";
+import { SwitchAccountDropdown } from "@/components/onboarding/switch-account-dropdown";
 import { WorkspaceLogo } from "@/components/workspace/logo";
 import { USER_WORKSPACES_LIST } from "@plane/constants";
 // hooks
 import { useWorkspace } from "@/hooks/store/use-workspace";
-import { useUser, useUserProfile } from "@/hooks/store/user";
+import { useUserProfile } from "@/hooks/store/user";
 import { useAppRouter } from "@/hooks/use-app-router";
 // services
 import { AuthenticationWrapper } from "@/lib/wrappers/authentication-wrapper";
@@ -44,7 +45,6 @@ function UserInvitationsPage() {
   const router = useAppRouter();
   // store hooks
   const { t } = useTranslation();
-  const { data: currentUser } = useUser();
   const { updateUserProfile } = useUserProfile();
 
   const { fetchWorkspaces } = useWorkspace();
@@ -64,7 +64,7 @@ function UserInvitationsPage() {
     }
   };
 
-  const submitInvitations = () => {
+  const submitInvitations = async () => {
     if (invitationsRespond.length === 0) {
       setToast({
         type: TOAST_TYPE.ERROR,
@@ -76,36 +76,23 @@ function UserInvitationsPage() {
 
     setIsJoiningWorkspaces(true);
 
-    workspaceService
-      .joinWorkspaces({ invitations: invitationsRespond })
-      .then(() => {
-        mutate(USER_WORKSPACES_LIST);
-        const firstInviteId = invitationsRespond[0];
-        const redirectWorkspace = invitations?.find((i) => i.id === firstInviteId)?.workspace;
-        updateUserProfile({ last_workspace_id: redirectWorkspace?.id })
-          .then(() => {
-            setIsJoiningWorkspaces(false);
-            fetchWorkspaces().then(() => {
-              router.push(`/${redirectWorkspace?.slug}`);
-            });
-          })
-          .catch(() => {
-            setToast({
-              type: TOAST_TYPE.ERROR,
-              title: t("error"),
-              message: t("something_went_wrong_please_try_again"),
-            });
-            setIsJoiningWorkspaces(false);
-          });
-      })
-      .catch((_err) => {
-        setToast({
-          type: TOAST_TYPE.ERROR,
-          title: t("error"),
-          message: t("something_went_wrong_please_try_again"),
-        });
-        setIsJoiningWorkspaces(false);
+    try {
+      await workspaceService.joinWorkspaces({ invitations: invitationsRespond });
+      mutate(USER_WORKSPACES_LIST);
+      const firstInviteId = invitationsRespond[0];
+      const redirectWorkspace = invitations?.find((i) => i.id === firstInviteId)?.workspace;
+      await updateUserProfile({ last_workspace_id: redirectWorkspace?.id });
+      setIsJoiningWorkspaces(false);
+      await fetchWorkspaces();
+      router.push(`/${redirectWorkspace?.slug}`);
+    } catch {
+      setToast({
+        type: TOAST_TYPE.ERROR,
+        title: t("error"),
+        message: t("something_went_wrong_please_try_again"),
       });
+      setIsJoiningWorkspaces(false);
+    }
   };
 
   return (
@@ -117,10 +104,16 @@ function UserInvitationsPage() {
             href="/"
             className="absolute top-1/2 left-5 z-10 grid -translate-y-1/2 place-items-center px-3 sm:top-12 sm:left-1/2 sm:-translate-x-[15px] sm:translate-y-0 sm:px-0 sm:py-5 md:left-1/3"
           >
-            <PlaneLogo className="h-9 w-auto text-primary" />
+            <Image
+              src="/branding/tenfold-logo-long-rebrand-v4.png"
+              alt="Ten-Fold"
+              width={221}
+              height={36}
+              className="h-auto w-[221px]"
+            />
           </Link>
-          <div className="absolute top-1/4 right-4 -translate-y-1/2 text-13 text-primary sm:fixed sm:top-12 sm:right-16 sm:translate-y-0 sm:py-5">
-            {currentUser?.email}
+          <div className="absolute top-1/4 right-4 -translate-y-1/2 sm:fixed sm:top-12 sm:right-16 sm:translate-y-0 sm:py-5">
+            <SwitchAccountDropdown />
           </div>
         </div>
         {invitations ? (
@@ -134,9 +127,10 @@ function UserInvitationsPage() {
                     const isSelected = invitationsRespond.includes(invitation.id);
 
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={invitation.id}
-                        className={`flex cursor-pointer items-center gap-2 rounded-sm border px-3.5 py-5 ${
+                        className={`flex w-full cursor-pointer items-center gap-2 rounded-sm border px-3.5 py-5 text-left ${
                           isSelected ? "border-accent-strong" : "border-subtle hover:bg-layer-1"
                         }`}
                         onClick={() => handleInvitation(invitation, isSelected ? "withdraw" : "accepted")}
@@ -155,7 +149,7 @@ function UserInvitationsPage() {
                         <span className={`flex-shrink-0 ${isSelected ? "text-accent-primary" : "text-secondary"}`}>
                           <TickCircleOutline className="h-5 w-5" />
                         </span>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

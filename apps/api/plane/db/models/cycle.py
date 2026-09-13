@@ -46,7 +46,7 @@ def get_default_display_properties():
         "created_on": True,
         "due_date": True,
         "estimate": True,
-        "key": True,
+        "key": False,
         "labels": True,
         "link": True,
         "priority": True,

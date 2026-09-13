@@ -5,8 +5,8 @@
  */
 
 import { observer } from "mobx-react";
+import Image from "../../../app/compat/next/image";
 // plane imports
-import { PlaneLockup } from "@plane/propel/icons";
 import { ChevronLeftOutline } from "@makeplane/propel/icons";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import type { TOnboardingStep } from "@plane/types";
@@ -84,7 +84,13 @@ export const OnboardingHeader = observer(function OnboardingHeader(props: Onboar
               <ChevronLeftOutline className="size-6 text-placeholder" />
             </button>
           )}
-          <PlaneLockup height={20} width={95} className="text-primary" />
+          <Image
+            src="/branding/tenfold-logo-long-rebrand-v4.png"
+            alt="Ten-Fold"
+            width={190}
+            height={40}
+            className="h-5 w-auto"
+          />
         </div>
         <SwitchAccountDropdown fullName={userName} />
       </div>

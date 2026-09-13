@@ -17,11 +17,13 @@ import {
 } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
+import { Combobox } from "@plane/propel/combobox";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
+import { ChevronDownOutline } from "@makeplane/propel/icons";
 // import { Tooltip } from "@makeplane/propel/components/tooltip";
 // import { EIssuesStoreType } from "@plane/types";
 import type { TWorkItemFilterExpression } from "@plane/types";
-import { CustomSearchSelect, CustomSelect } from "@plane/ui";
+import { CustomSelect } from "@plane/ui";
 // import { WorkspaceLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/workspace-level";
 // import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
 import { useProject } from "@/hooks/store/use-project";
@@ -155,26 +157,31 @@ export const ExportForm = observer(function ExportForm(props: Props) {
               name="project"
               disabled={!isMember && (!hasProjects || !canPerformAnyCreateAction)}
               render={({ field: { value, onChange } }) => (
-                <CustomSearchSelect
+                <Combobox
+                  multiSelect
                   value={value ?? []}
-                  onChange={(val: string[]) => onChange(val)}
-                  options={options}
-                  input
-                  label={
-                    value && value.length > 0
-                      ? value
-                          .map((projectId) => {
-                            const projectDetails = getProjectById(projectId);
-
-                            return projectDetails?.identifier;
-                          })
-                          .join(", ")
-                      : "All projects"
-                  }
-                  optionsClassName="max-w-48 sm:max-w-[532px]"
-                  placement="bottom-end"
-                  multiple
-                />
+                  onValueChange={(nextValue) => onChange(nextValue as string[])}
+                >
+                  <Combobox.Button className="flex w-full items-center justify-between gap-2 rounded-sm border-[0.5px] border-strong px-3 py-2 text-13">
+                    <span className="truncate">
+                      {value && value.length > 0
+                        ? value.map((projectId) => getProjectById(projectId)?.identifier).join(", ")
+                        : "All projects"}
+                    </span>
+                    <ChevronDownOutline className="h-3 w-3 shrink-0" />
+                  </Combobox.Button>
+                  <Combobox.Options showSearch searchPlaceholder="Search" className="w-48 sm:w-[532px]" maxHeight="md">
+                    {options?.flatMap((option) =>
+                      option.value
+                        ? [
+                            <Combobox.Option key={option.value} value={option.value}>
+                              {option.content}
+                            </Combobox.Option>,
+                          ]
+                        : []
+                    )}
+                  </Combobox.Options>
+                </Combobox>
               )}
             />
           }

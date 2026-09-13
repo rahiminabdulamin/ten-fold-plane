@@ -6,7 +6,7 @@
 
 import { observer } from "mobx-react";
 // plane imports
-import { CustomSearchSelect } from "@plane/ui";
+import { Combobox } from "@plane/propel/combobox";
 import { cn } from "@plane/utils";
 // hooks
 import useTimezone from "@/hooks/use-timezone";
@@ -39,20 +39,34 @@ export const TimezoneSelect = observer(function TimezoneSelect(props: TTimezoneS
 
   return (
     <div>
-      <CustomSearchSelect
+      <Combobox
         value={value}
-        label={value && selectedValue ? selectedValue(value) : label}
-        options={isDisabled || disabled ? [] : timezones}
-        onChange={onChange}
-        buttonClassName={cn(buttonClassName, "border border-subtle-1", {
-          "border-danger-strong": error,
-        })}
-        className={cn("rounded-md", className)}
-        optionsClassName={cn("w-72", optionsClassName)}
-        input
+        onValueChange={(nextValue) => onChange(nextValue as string)}
         disabled={isDisabled || disabled}
-        placement="bottom-end"
-      />
+      >
+        <Combobox.Button
+          className={cn(
+            "flex w-full items-center justify-between gap-1 rounded-sm border-[0.5px] border-strong px-3 py-2 text-13",
+            buttonClassName,
+            { "border-danger-strong": error }
+          )}
+        >
+          {value && selectedValue ? selectedValue(value) : label}
+        </Combobox.Button>
+        <Combobox.Options
+          showSearch
+          searchPlaceholder="Search"
+          maxHeight="md"
+          className={cn("w-72", optionsClassName)}
+          positionerClassName={className}
+        >
+          {(isDisabled || disabled ? [] : timezones).map((timezone) => (
+            <Combobox.Option key={timezone.value} value={timezone.value}>
+              {timezone.content}
+            </Combobox.Option>
+          ))}
+        </Combobox.Options>
+      </Combobox>
     </div>
   );
 });

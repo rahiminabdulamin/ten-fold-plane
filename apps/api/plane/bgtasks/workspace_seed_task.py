@@ -42,6 +42,7 @@ from plane.db.models import (
     IssueView,
     User,
     BotTypeEnum,
+    DEFAULT_STATES,
 )
 
 logger = logging.getLogger("plane.worker")
@@ -70,10 +71,7 @@ def read_seed_file(filename):
 
 
 def create_project_and_member(workspace: Workspace, bot_user: User) -> Dict[int, uuid.UUID]:
-    """Creates a project and associated members for a workspace.
-
-    Creates a new Tutorial project and sets up all necessary
-    member associations and user properties.
+    """Creates a blank default project and its member associations.
 
     Args:
         workspace: The workspace to create the project in
@@ -81,7 +79,6 @@ def create_project_and_member(workspace: Workspace, bot_user: User) -> Dict[int,
     Returns:
         A mapping of seed project IDs to actual project IDs
     """
-    project_seeds = read_seed_file("projects.json")
     project_identifier = "".join(ch for ch in workspace.name if ch.isalnum())[:5]
 
     # Create members
@@ -89,87 +86,71 @@ def create_project_and_member(workspace: Workspace, bot_user: User) -> Dict[int,
 
     projects_map: Dict[int, uuid.UUID] = {}
 
-    if not project_seeds:
-        logger.warning("Task: workspace_seed_task -> No project seeds found. Skipping project creation.")
-        return projects_map
+    project = Project(
+        workspace=workspace,
+        name="Untitled",
+        identifier=project_identifier,
+        created_by_id=bot_user.id,
+    )
+    project.save(created_by_id=bot_user.id, disable_auto_set_user=True)
 
-    for project_seed in project_seeds:
-        project_id = project_seed.pop("id")
-        # Use a predictable instructional project name for every new workspace.
-        project_seed.pop("name", None)
-        project_seed.pop("identifier", None)
+    # Create project members
+    ProjectMember.objects.bulk_create(
+        [
+            ProjectMember(
+                project=project,
+                member_id=workspace_member["member_id"],
+                role=workspace_member["role"],
+                workspace_id=workspace.id,
+                created_by_id=bot_user.id,
+            )
+            for workspace_member in workspace_members
+        ]
+    )
 
-        project = Project(
-            **project_seed,
-            workspace=workspace,
-            name="Tutorial",
-            identifier=project_identifier,
-            created_by_id=bot_user.id,
-            # Enable all views in seed data
-            cycle_view=True,
-            module_view=True,
-            issue_views_view=True,
-        )
-        project.save(created_by_id=bot_user.id, disable_auto_set_user=True)
-
-        # Create project members
-        ProjectMember.objects.bulk_create(
-            [
-                ProjectMember(
-                    project=project,
-                    member_id=workspace_member["member_id"],
-                    role=workspace_member["role"],
-                    workspace_id=workspace.id,
-                    created_by_id=bot_user.id,
-                )
-                for workspace_member in workspace_members
-            ]
-        )
-
-        # Create issue user properties
-        ProjectUserProperty.objects.bulk_create(
-            [
-                ProjectUserProperty(
-                    project=project,
-                    user_id=workspace_member["member_id"],
-                    workspace_id=workspace.id,
-                    display_filters={
-                        "layout": "list",
-                        "calendar": {"layout": "month", "show_weekends": True},
-                        "group_by": "state",
-                        "order_by": "sort_order",
-                        "sub_issue": True,
-                        "sub_group_by": None,
-                        "show_empty_groups": True,
-                    },
-                    display_properties={
-                        "key": True,
-                        "link": True,
-                        "cycle": False,
-                        "state": True,
-                        "labels": False,
-                        "modules": False,
-                        "assignee": True,
-                        "due_date": False,
-                        "estimate": True,
-                        "priority": True,
-                        "created_on": True,
-                        "issue_type": True,
-                        "start_date": False,
-                        "updated_on": True,
-                        "customer_count": True,
-                        "sub_issue_count": False,
-                        "attachment_count": False,
-                        "customer_request_count": True,
-                    },
-                    created_by_id=bot_user.id,
-                )
-                for workspace_member in workspace_members
-            ]
-        )
-        # update map
-        projects_map[project_id] = project.id
-        logger.info(f"Task: workspace_seed_task -> Project {project_id} created")
+    # Create issue user properties
+    ProjectUserProperty.objects.bulk_create(
+        [
+            ProjectUserProperty(
+                project=project,
+                user_id=workspace_member["member_id"],
+                workspace_id=workspace.id,
+                display_filters={
+                    "layout": "list",
+                    "calendar": {"layout": "month", "show_weekends": True},
+                    "group_by": "state",
+                    "order_by": "sort_order",
+                    "sub_issue": True,
+                    "sub_group_by": None,
+                    "show_empty_groups": True,
+                },
+                display_properties={
+                    "key": False,
+                    "link": True,
+                    "cycle": False,
+                    "state": True,
+                    "labels": False,
+                    "modules": False,
+                    "assignee": True,
+                    "due_date": False,
+                    "estimate": True,
+                    "priority": True,
+                    "created_on": True,
+                    "issue_type": True,
+                    "start_date": False,
+                    "updated_on": True,
+                    "customer_count": True,
+                    "sub_issue_count": False,
+                    "attachment_count": False,
+                    "customer_request_count": True,
+                },
+                created_by_id=bot_user.id,
+            )
+            for workspace_member in workspace_members
+        ]
+    )
+    projects_map[1] = project.id
+    logger.info(f"Task: workspace_seed_task -> Project {project.id} created")
 
     return projects_map
 
@@ -187,19 +168,12 @@ def create_project_states(
         A mapping of seed state IDs to actual state IDs
     """
 
-    state_seeds = read_seed_file("states.json")
     state_map: Dict[int, uuid.UUID] = {}
 
-    if not state_seeds:
-        return state_map
-
-    for state_seed in state_seeds:
-        state_id = state_seed.pop("id")
-        project_id = state_seed.pop("project_id")
-
+    for state_id, state_seed in enumerate(DEFAULT_STATES, start=1):
         state = State(
             **state_seed,
-            project_id=project_map[project_id],
+            project_id=project_map[1],
             workspace=workspace,
             created_by_id=bot_user.id,
         )
@@ -503,13 +477,10 @@ def create_views(workspace: Workspace, project_map: Dict[int, uuid.UUID], bot_us
 
 @shared_task
 def workspace_seed(workspace_id: uuid.UUID) -> None:
-    """Seeds a new workspace with initial project data.
+    """Creates the blank default project for a new workspace.
 
-    Creates a complete workspace setup including:
-    - Projects and project members
-    - Project states
-    - Project labels
-    - Issues and their associations
+    Creates one ``Untitled`` project with its members and standard workflow
+    states, without tutorial content.
 
     Args:
         workspace_id: ID of the workspace to seed
@@ -540,29 +511,10 @@ def workspace_seed(workspace_id: uuid.UUID) -> None:
             company_role="",
         )
 
-        # Create the instructional project.
+        # Create one blank workspace with standard workflow states.
         project_map = create_project_and_member(workspace, bot_user)
 
-        # Create project states
-        state_map = create_project_states(workspace, project_map, bot_user)
-
-        # Create project labels
-        label_map = create_project_labels(workspace, project_map, bot_user)
-
-        # Create project cycles
-        cycle_map = create_cycles(workspace, project_map, bot_user)
-
-        # Create project modules
-        module_map = create_modules(workspace, project_map, bot_user)
-
-        # create project issues
-        create_project_issues(workspace, project_map, state_map, label_map, cycle_map, module_map, bot_user)
-
-        # create project views
-        create_views(workspace, project_map, bot_user)
-
-        # create project pages
-        create_pages(workspace, project_map, bot_user)
+        create_project_states(workspace, project_map, bot_user)
 
         logger.info(f"Task: workspace_seed_task -> Workspace {workspace_id} seeded successfully")
         return

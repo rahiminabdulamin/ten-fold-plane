@@ -36,6 +36,7 @@ export interface IDropdownProps {
   onOpen?: () => void;
   optionsClassName?: string;
   placement?: Placement;
+  portal?: boolean;
   tabIndex?: number;
   useCaptureForOutsideClick?: boolean;
   defaultOpen?: boolean;

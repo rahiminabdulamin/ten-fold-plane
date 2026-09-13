@@ -9,9 +9,8 @@ import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import { Ban } from "lucide-react";
 import { Avatar } from "@makeplane/propel/components/avatar";
+import { Combobox } from "@plane/propel/combobox";
 import { EUserProjectRoles } from "@plane/types";
-// plane ui
-import { CustomSearchSelect } from "@plane/ui";
 // helpers
 import { getFileURL } from "@plane/utils";
 // hooks
@@ -66,9 +65,8 @@ export const MemberSelect = observer(function MemberSelect(props: Props) {
   const selectedOption = projectId ? getProjectMemberDetails(value, projectId.toString()) : null;
 
   return (
-    <CustomSearchSelect
-      value={value}
-      label={
+    <Combobox value={value} onValueChange={(nextValue) => onChange(nextValue as string)} disabled={isDisabled}>
+      <Combobox.Button className="flex w-full items-center justify-between gap-1 rounded-sm border-[0.5px] border-strong !bg-surface-1 !px-3 !py-2 text-13">
         <div className="flex h-3.5 items-center gap-2">
           {selectedOption && (
             <Avatar
@@ -87,27 +85,20 @@ export const MemberSelect = observer(function MemberSelect(props: Props) {
             </div>
           )}
         </div>
-      }
-      buttonClassName="!px-3 !py-2 bg-surface-1"
-      options={
-        options &&
-        options && [
-          ...options,
-          {
-            value: "none",
-            query: "none",
-            content: (
-              <div className="flex items-center gap-2">
-                <Ban className="h-3.5 w-3.5 rotate-90 text-placeholder" />
-                <span className="py-0.5 text-13 text-placeholder">None</span>
-              </div>
-            ),
-          },
-        ]
-      }
-      maxHeight="md"
-      onChange={onChange}
-      disabled={isDisabled}
-    />
+      </Combobox.Button>
+      <Combobox.Options showSearch searchPlaceholder="Search" maxHeight="md" className="w-48">
+        {options?.map((option) => (
+          <Combobox.Option key={option.value} value={option.value}>
+            {option.content}
+          </Combobox.Option>
+        ))}
+        <Combobox.Option value="none">
+          <div className="flex items-center gap-2">
+            <Ban className="h-3.5 w-3.5 rotate-90 text-placeholder" />
+            <span className="py-0.5 text-13 text-placeholder">None</span>
+          </div>
+        </Combobox.Option>
+      </Combobox.Options>
+    </Combobox>
   );
 });

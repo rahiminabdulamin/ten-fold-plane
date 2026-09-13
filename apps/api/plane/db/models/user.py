@@ -41,11 +41,11 @@ def get_mobile_default_onboarding():
 
 def get_default_product_tour():
     return {
-        "work_items": False,
-        "cycles": False,
-        "modules": False,
-        "intake": False,
-        "pages": False,
+        "work_items": True,
+        "cycles": True,
+        "modules": True,
+        "intake": True,
+        "pages": True,
     }
 
 
@@ -227,7 +227,7 @@ class Profile(TimeAuditModel):
     theme = models.JSONField(default=dict)
     is_app_rail_docked = models.BooleanField(default=True)
     # Onboarding
-    is_tour_completed = models.BooleanField(default=False)
+    is_tour_completed = models.BooleanField(default=True)
     onboarding_step = models.JSONField(default=get_default_onboarding)
     use_case = models.TextField(blank=True, null=True)
     role = models.CharField(max_length=300, null=True, blank=True)  # job role
@@ -254,7 +254,7 @@ class Profile(TimeAuditModel):
     background_color = models.CharField(max_length=255, default=get_random_color)
 
     # navigation tour
-    is_navigation_tour_completed = models.BooleanField(default=False)
+    is_navigation_tour_completed = models.BooleanField(default=True)
 
     # marketing
     has_marketing_email_consent = models.BooleanField(default=False)

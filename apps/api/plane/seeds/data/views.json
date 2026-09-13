@@ -16,7 +16,7 @@
       "show_empty_groups": false
     },
     "display_properties": {
-      "key": true,
+      "key": false,
       "link": true,
       "cycle": true,
       "state": true,

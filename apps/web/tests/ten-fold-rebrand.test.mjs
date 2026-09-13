@@ -53,6 +53,22 @@ test("Ten-Fold brand marks link home, use the long workspace logo, and label loa
   assert.match(spinner, /text-\[#BFBFBF\]/);
 });
 
+test("invitations and onboarding use the Ten-Fold wordmark", async () => {
+  const [invitations, onboardingHeader] = await Promise.all([
+    read("app/(all)/invitations/page.tsx"),
+    read("core/components/onboarding/header.tsx"),
+  ]);
+
+  assert.match(invitations, /tenfold-logo-long-rebrand-v4\.png/);
+  assert.match(onboardingHeader, /tenfold-logo-long-rebrand-v4\.png/);
+  assert.match(invitations, /width=\{221\}/);
+  assert.match(invitations, /height=\{36\}/);
+  assert.match(invitations, /<SwitchAccountDropdown/);
+  assert.doesNotMatch(invitations, /\{currentUser\?\.email\}/);
+  assert.doesNotMatch(invitations, /PlaneLogo/);
+  assert.doesNotMatch(onboardingHeader, /PlaneLockup/);
+});
+
 test("Ten-Fold removes unavailable onboarding and profile surfaces", async () => {
   const [home, profileSidebar, profileForm, userMenu, sidebarWrapper] = await Promise.all([
     read("core/components/home/home-dashboard-widgets.tsx"),
@@ -141,17 +157,31 @@ test("sidebar legal links replace Community and project presentation omits edita
 });
 
 test("project UI polish hides disabled chrome and keeps select popovers anchored", async () => {
-  const [projectHeader, settingsHeader, settingsItems, sidebarWrapper, customSelect, customSearchSelect] =
-    await Promise.all([
-      read("core/components/navigation/project-header-button.tsx"),
-      read("core/components/settings/project/sidebar/header.tsx"),
-      read("core/components/settings/project/sidebar/item-categories.tsx"),
-      read("core/components/sidebar/sidebar-wrapper.tsx"),
-      read("../../packages/ui/src/dropdowns/custom-select.tsx"),
-      read("../../packages/ui/src/dropdowns/custom-search-select.tsx"),
-    ]);
+  const [
+    projectHeader,
+    projectSwitcher,
+    settingsHeader,
+    settingsItems,
+    sidebarWrapper,
+    customSelect,
+    customSearchSelect,
+  ] = await Promise.all([
+    read("core/components/navigation/project-header-button.tsx"),
+    read("core/components/navigation/project-header.tsx"),
+    read("core/components/settings/project/sidebar/header.tsx"),
+    read("core/components/settings/project/sidebar/item-categories.tsx"),
+    read("core/components/sidebar/sidebar-wrapper.tsx"),
+    read("../../packages/ui/src/dropdowns/custom-select.tsx"),
+    read("../../packages/ui/src/dropdowns/custom-search-select.tsx"),
+  ]);
+  const [timezoneSelect, memberSelect, exportForm] = await Promise.all([
+    read("core/components/global/timezone-select.tsx"),
+    read("core/components/project/member-select.tsx"),
+    read("core/components/exporter/export-form.tsx"),
+  ]);
 
   assert.doesNotMatch(projectHeader, /<Logo /);
+  assert.match(projectSwitcher, /<CustomSearchSelect/);
   assert.doesNotMatch(settingsHeader, /<Logo /);
   assert.match(settingsItems, /FEATURE_VISIBILITY\.CYCLES/);
   assert.match(settingsItems, /FEATURE_VISIBILITY\.MODULES/);
@@ -159,6 +189,26 @@ test("project UI polish hides disabled chrome and keeps select popovers anchored
   assert.match(sidebarWrapper, /gap-1\.5/);
   assert.match(customSelect, /<Combobox\.Button[\s\S]*ref=\{setReferenceElement\}/);
   assert.match(customSearchSelect, /<Combobox\.Button[\s\S]*ref=\{setReferenceElement\}/);
+  assert.match(customSelect, /strategy:\s*"fixed"/);
+  assert.match(customSelect, /\{\(\{ open \}\) =>/);
+  assert.match(customSearchSelect, /\{\(\{ open \}[^)]*\) =>/);
+  assert.match(customSelect, /<Combobox\.Options[\s\S]*ref=\{setPopperElement\}/);
+  assert.match(customSearchSelect, /<Combobox\.Options[\s\S]*ref=\{setPopperElement\}/);
+  assert.match(customSearchSelect, /<Combobox\.Input[\s\S]*onMouseDown=\{\(event\) => event\.stopPropagation\(\)\}/);
+  assert.match(
+    customSearchSelect,
+    /vertical-scrollbar[^>]*onMouseDown=\{\(event\) => event\.stopPropagation\(\)\}[\s\S]*onWheel=\{\(event\) => event\.stopPropagation\(\)\}/
+  );
+  assert.doesNotMatch(customSelect, /useOutsideClickDetector|const \[isOpen/);
+  assert.doesNotMatch(customSearchSelect, /useOutsideClickDetector|const \[isOpen/);
+  assert.match(customSearchSelect, /portal = true/);
+  assert.match(customSearchSelect, /import \{ Combobox, Portal \} from "@headlessui\/react"/);
+  assert.match(customSearchSelect, /<Portal>/);
+  assert.doesNotMatch(customSearchSelect, /createPortal/);
+  assert.match(timezoneSelect, /<Combobox\.Options[\s\S]*showSearch/);
+  assert.match(memberSelect, /<Combobox\.Options showSearch/);
+  assert.match(exportForm, /<Combobox\.Options[\s\S]*showSearch/);
+  assert.doesNotMatch(exportForm, /CustomSearchSelect/);
   assert.doesNotMatch(customSelect, /Combobox\.Button as=\{React\.Fragment\}/);
   assert.doesNotMatch(customSearchSelect, /Combobox\.Button as=\{React\.Fragment\}/);
 });
