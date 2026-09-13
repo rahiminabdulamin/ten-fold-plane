@@ -16,12 +16,6 @@ export type TControlLink = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   draggable?: boolean;
 };
 
-const isInteractiveTarget = (eventTarget: EventTarget | null) =>
-  eventTarget instanceof Element &&
-  !!eventTarget.closest(
-    "[data-work-item-property], button, input, select, textarea, [role='button'], [role='combobox']"
-  );
-
 export const ControlLink = React.forwardRef(function ControlLink(
   props: TControlLink,
   ref: React.ForwardedRef<HTMLAnchorElement>
@@ -29,12 +23,15 @@ export const ControlLink = React.forwardRef(function ControlLink(
   const { href, onClick, children, target = "_blank", disabled = false, className, draggable = false, ...rest } = props;
   const LEFT_CLICK_EVENT_CODE = 0;
 
-  const handleOnClickCapture = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    if (isInteractiveTarget(event.target)) event.preventDefault();
-  };
-
   const handleOnClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    if (isInteractiveTarget(event.target)) return;
+    if (
+      (event.target as Element).closest(
+        "[data-work-item-property], button, input, select, textarea, [role='button'], [role='combobox']"
+      )
+    ) {
+      event.preventDefault();
+      return;
+    }
     const clickCondition = (event.metaKey || event.ctrlKey) && event.button === LEFT_CLICK_EVENT_CODE;
     if (!clickCondition) {
       event.preventDefault();
@@ -58,7 +55,6 @@ export const ControlLink = React.forwardRef(function ControlLink(
     <a
       href={href}
       target={target}
-      onClickCapture={handleOnClickCapture}
       onClick={handleOnClick}
       {...rest}
       ref={ref}
