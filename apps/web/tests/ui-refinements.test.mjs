@@ -93,6 +93,11 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /window\.addEventListener\("pointerup", stopResize, true\)/);
   assert.match(copilot, /<header[\s\S]*className="flex h-\[51px\] items-center justify-between/);
   assert.match(copilot, /onPointerDown:\s*startLauncherDrag/);
+  assert.match(copilot, /launcherPositionRef\.current = position;\s*document\.documentElement\.style\.setProperty/);
+  assert.match(
+    copilot,
+    /const stopDrag = \(releaseEvent: PointerEvent\)[\s\S]*setLauncherPosition\(launcherPositionRef\.current\)/
+  );
   assert.match(styles, /--copilot-panel-width/);
   assert.match(styles, /--copilot-launcher-left/);
   assert.match(styles, /--copilot-launcher-top/);

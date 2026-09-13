@@ -220,14 +220,17 @@ function PlaneTools() {
       const start = dragStart.current;
       if (!start) return;
       start.moved ||= Math.abs(moveEvent.clientX - start.pointerX) + Math.abs(moveEvent.clientY - start.pointerY) > 4;
-      setLauncherPosition(
-        clampLauncherPosition({
-          x: start.x + moveEvent.clientX - start.pointerX,
-          y: start.y + moveEvent.clientY - start.pointerY,
-        })
-      );
+      const position = clampLauncherPosition({
+        x: start.x + moveEvent.clientX - start.pointerX,
+        y: start.y + moveEvent.clientY - start.pointerY,
+      });
+      launcherPositionRef.current = position;
+      document.documentElement.style.setProperty("--copilot-launcher-left", `${position.x}px`);
+      document.documentElement.style.setProperty("--copilot-launcher-top", `${position.y}px`);
     };
-    const stopDrag = () => {
+    const stopDrag = (releaseEvent: PointerEvent) => {
+      if (releaseEvent.pointerId !== event.pointerId) return;
+      if (launcherPositionRef.current) setLauncherPosition(launcherPositionRef.current);
       window.removeEventListener("pointermove", drag);
       window.removeEventListener("pointerup", stopDrag);
     };
