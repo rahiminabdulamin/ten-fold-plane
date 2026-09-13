@@ -19,8 +19,8 @@ import { Tooltip } from "@makeplane/propel/components/tooltip";
 import type { TIssue, IIssueDisplayProperties, IIssueMap } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
 // ui
-import { ControlLink, DropIndicator } from "@plane/ui";
-import { cn, generateWorkItemLink } from "@plane/utils";
+import { DropIndicator } from "@plane/ui";
+import { cn } from "@plane/utils";
 // components
 import RenderIfVisible from "@/components/core/render-if-visible-HOC";
 import { HIGHLIGHT_CLASS, getIssueBlockId } from "@/components/issues/issue-layouts/utils";
@@ -28,7 +28,6 @@ import { IssueIdentifier } from "@/components/issues/issue-detail/issue-identifi
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useKanbanView } from "@/hooks/store/use-kanban-view";
-import { useProject } from "@/hooks/store/use-project";
 import useIssuePeekOverviewRedirection from "@/hooks/use-issue-peek-overview-redirection";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // local components
@@ -155,12 +154,11 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
     isEpic = false,
   } = props;
 
-  const cardRef = useRef<HTMLAnchorElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
   // router
   const { workspaceSlug: routerWorkspaceSlug } = useParams();
   const workspaceSlug = routerWorkspaceSlug?.toString();
   // hooks
-  const { getProjectIdentifierById } = useProject();
   const { getIsIssuePeeked } = useIssueDetail(isEpic ? EIssueServiceType.EPICS : EIssueServiceType.ISSUES);
   const { handleRedirection } = useIssuePeekOverviewRedirection(isEpic);
   const { isMobile } = usePlatformOS();
@@ -178,17 +176,6 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
   const canEditIssueProperties = canEditProperties(issue?.project_id ?? undefined);
 
   const isDragAllowed = canDragIssuesInCurrentGrouping && !issue?.tempId && canEditIssueProperties;
-  const projectIdentifier = getProjectIdentifierById(issue?.project_id);
-
-  const workItemLink = generateWorkItemLink({
-    workspaceSlug,
-    projectId: issue?.project_id,
-    issueId,
-    projectIdentifier,
-    sequenceId: issue?.sequence_id,
-    isEpic,
-    isArchived: !!issue?.archived_at,
-  });
 
   useOutsideClickDetector(cardRef, () => {
     cardRef?.current?.classList?.remove(HIGHLIGHT_CLASS);
@@ -256,9 +243,9 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
           }
         }}
       >
-        <ControlLink
+        {/* oxlint-disable-next-line jsx_a11y/click-events-have-key-events, jsx_a11y/no-static-element-interactions */}
+        <div
           id={getIssueBlockId(issueId, groupId, subGroupId)}
-          href={workItemLink}
           ref={cardRef}
           className={cn(
             "block w-full rounded-lg border border-subtle bg-layer-2 p-3 text-13 shadow-raised-100 outline-[0.5px] outline-transparent transition-all hover:border-strong hover:shadow-raised-200",
@@ -266,8 +253,13 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
             { "border border-accent-strong hover:border-accent-strong": getIsIssuePeeked(issue.id) },
             { "z-[100] bg-layer-1": isCurrentBlockDragging }
           )}
-          onClick={() => handleIssuePeekOverview(issue)}
-          disabled={!!issue?.tempId}
+          onClick={(event) => {
+            if (
+              (event.target as Element).closest("button, input, select, textarea, [role='button'], [role='combobox']")
+            )
+              return;
+            if (!issue?.tempId) handleIssuePeekOverview(issue);
+          }}
         >
           <RenderIfVisible
             classNames="space-y-2"
@@ -287,7 +279,7 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
               isEpic={isEpic}
             />
           </RenderIfVisible>
-        </ControlLink>
+        </div>
       </div>
     </>
   );

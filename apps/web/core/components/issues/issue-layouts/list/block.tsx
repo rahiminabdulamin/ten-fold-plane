@@ -17,8 +17,8 @@ import { Tooltip } from "@makeplane/propel/components/tooltip";
 import type { TIssue, IIssueDisplayProperties, TIssueMap } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
 // ui
-import { Spinner, ControlLink, Row } from "@plane/ui";
-import { cn, generateWorkItemLink } from "@plane/utils";
+import { Spinner, Row } from "@plane/ui";
+import { cn } from "@plane/utils";
 // components
 import { MultipleSelectEntityAction } from "@/components/core/multiple-select";
 import { IssueProperties } from "@/components/issues/issue-layouts/properties";
@@ -159,22 +159,16 @@ export const IssueBlock = observer(function IssueBlock(props: IssueBlockProps) {
     ? calculateIdentifierWidth(projectIdentifier?.length ?? 0, maxSequenceId)
     : 0;
 
-  const workItemLink = generateWorkItemLink({
-    workspaceSlug,
-    projectId: issue?.project_id,
-    issueId,
-    projectIdentifier,
-    sequenceId: issue?.sequence_id,
-    isEpic,
-    isArchived: !!issue?.archived_at,
-  });
   return (
-    <ControlLink
+    // oxlint-disable-next-line jsx_a11y/click-events-have-key-events, jsx_a11y/no-static-element-interactions
+    <div
       id={`issue-${issue.id}`}
-      href={workItemLink}
-      onClick={() => handleIssuePeekOverview(issue)}
+      onClick={(event) => {
+        if ((event.target as Element).closest("button, input, select, textarea, [role='button'], [role='combobox']"))
+          return;
+        if (!issue?.tempId && !issue?.is_draft) handleIssuePeekOverview(issue);
+      }}
       className="w-full cursor-pointer"
-      disabled={!!issue?.tempId || issue?.is_draft}
     >
       <Row
         ref={issueRef}
@@ -318,6 +312,6 @@ export const IssueBlock = observer(function IssueBlock(props: IssueBlockProps) {
           )}
         </div>
       </Row>
-    </ControlLink>
+    </div>
   );
 });
