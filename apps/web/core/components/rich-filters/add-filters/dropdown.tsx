@@ -94,6 +94,7 @@ export const AddFilterDropdown = observer(function AddFilterDropdown<
       <Popover.Panel
         placement="bottom-start"
         sideOffset={4}
+        positionerClassName="z-[9999]"
         className="z-[9999] w-56 rounded-md border-[0.5px] border-subtle-1 bg-surface-1 py-2.5 text-11 shadow-raised-200"
       >
         <div className="mx-2 flex items-center gap-1.5 rounded-sm border border-subtle px-2">
@@ -105,7 +106,7 @@ export const AddFilterDropdown = observer(function AddFilterDropdown<
             placeholder="Search"
           />
         </div>
-        <div className="vertical-scrollbar mt-2 max-h-96 space-y-1 overflow-y-auto px-2">
+        <div className="vertical-scrollbar mt-2 scrollbar-xs max-h-96 space-y-1 overflow-y-auto px-2">
           {filteredOptions.map((option) => (
             <button
               key={option.value}
