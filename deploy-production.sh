@@ -47,6 +47,7 @@ rsync -az --delete \
   --exclude dist \
   --exclude out \
   --exclude .turbo \
+  --exclude .ruff_cache \
   --exclude .react-router \
   -e "ssh -i $DEPLOY_SSH_KEY" \
   "$REPOSITORY_ROOT/" "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"

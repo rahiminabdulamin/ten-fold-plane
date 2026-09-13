@@ -13,6 +13,7 @@ grist_css_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/apps/proxy/grist-c
 [[ -f "$script_path" ]]
 grep -Fq 'rsync -az --delete' "$script_path"
 grep -Fq -- '--exclude .env' "$script_path"
+grep -Fq -- '--exclude .ruff_cache' "$script_path"
 grep -Fq 'docker compose run --rm --build migrator' "$script_path"
 grep -Fq 'GRIST_SESSION_SECRET' "$script_path"
 grep -Fq 'GRIST_PUBLIC_URL' "$script_path"
