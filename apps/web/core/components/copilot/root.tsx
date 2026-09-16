@@ -34,6 +34,7 @@ import {
 import {
   confirmDeleted,
   isCanonicalRecord,
+  logWorkItemListTrace,
   logToolOutcome,
   MutationGuard,
   mutationFingerprint,
@@ -551,9 +552,26 @@ function PlaneTools() {
           );
           const issues = Array.isArray(response.results) ? response.results : [];
           const data = toWorkItemRecords(issues);
+          logWorkItemListTrace({
+            projectId: targetProjectId,
+            dateFrom,
+            dateTo,
+            stateGroup,
+            resultCount: data.length,
+            status: "success",
+          });
           return { ...toolResult("list_work_items", `Found ${data.length} work items.`), data };
         } catch (error) {
-          return toolError("list_work_items", error);
+          const result = toolError("list_work_items", error);
+          logWorkItemListTrace({
+            projectId: targetProjectId,
+            dateFrom,
+            dateTo,
+            stateGroup,
+            resultCount: null,
+            status: result.status,
+          });
+          return result;
         }
       },
     },

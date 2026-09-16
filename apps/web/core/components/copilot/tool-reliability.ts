@@ -84,6 +84,37 @@ type OutcomeLogger = (entry: {
   affectedCount: number;
 }) => void;
 
+type WorkItemListTraceLogger = (entry: {
+  event: "copilot_list_work_items";
+  projectId: string;
+  dateFrom: string | null;
+  dateTo: string | null;
+  stateGroup: string | null;
+  resultCount: number | null;
+  status: ToolResult["status"];
+}) => void;
+
+export function logWorkItemListTrace(options: {
+  projectId: string;
+  dateFrom?: string;
+  dateTo?: string;
+  stateGroup?: string;
+  resultCount: number | null;
+  status: ToolResult["status"];
+  logger?: WorkItemListTraceLogger;
+}): void {
+  const { projectId, dateFrom, dateTo, stateGroup, resultCount, status, logger = console.info } = options;
+  logger({
+    event: "copilot_list_work_items",
+    projectId,
+    dateFrom: dateFrom ?? null,
+    dateTo: dateTo ?? null,
+    stateGroup: stateGroup ?? null,
+    resultCount,
+    status,
+  });
+}
+
 export function logToolOutcome(
   result: ToolResult,
   options: {

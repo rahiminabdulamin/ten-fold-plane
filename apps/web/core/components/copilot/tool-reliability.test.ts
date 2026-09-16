@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   confirmDeleted,
   isCanonicalRecord,
+  logWorkItemListTrace,
   logToolOutcome,
   MutationGuard,
   mutationFingerprint,
@@ -93,5 +94,29 @@ describe("copilot tool reliability", () => {
       affectedCount: 1,
     });
     expect(JSON.stringify(logger.mock.calls)).not.toContain("secret title");
+  });
+
+  it("logs the resolved work-item list scope without work-item content", () => {
+    const logger = vi.fn();
+
+    logWorkItemListTrace({
+      projectId: "project-1",
+      dateFrom: "2026-10-01",
+      dateTo: "2026-10-31",
+      stateGroup: undefined,
+      resultCount: 2,
+      status: "success",
+      logger,
+    });
+
+    expect(logger).toHaveBeenCalledWith({
+      event: "copilot_list_work_items",
+      projectId: "project-1",
+      dateFrom: "2026-10-01",
+      dateTo: "2026-10-31",
+      stateGroup: null,
+      resultCount: 2,
+      status: "success",
+    });
   });
 });
