@@ -13,6 +13,7 @@ export interface AgentScenario {
   prompt: string;
   expectedCalls: Array<{ name: string; arguments?: Record<string, unknown> }>;
   prohibitedCalls?: string[];
+  prohibitedArgumentKeys?: Array<{ name: string; keys: string[] }>;
   maxCalls?: Record<string, number>;
   terminalStatus: AgentTrace["terminalStatus"];
 }
@@ -51,6 +52,7 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
         arguments: { projectId: "project-1", dateFrom: "2026-10-01", dateTo: "2026-10-31" },
       },
     ],
+    prohibitedArgumentKeys: [{ name: "list_work_items", keys: ["stateGroup"] }],
     terminalStatus: "success",
   },
   {
@@ -146,6 +148,13 @@ export function evaluateScenario(
   }
   for (const prohibited of scenario.prohibitedCalls ?? []) {
     if (trace.calls.some(({ name }) => name === prohibited)) reasons.push(`Prohibited call ${prohibited} was used.`);
+  }
+  for (const { name, keys } of scenario.prohibitedArgumentKeys ?? []) {
+    for (const call of trace.calls.filter((candidate) => candidate.name === name)) {
+      for (const key of keys) {
+        if (Object.hasOwn(call.arguments, key)) reasons.push(`Prohibited argument ${key} was used for ${name}.`);
+      }
+    }
   }
   for (const [name, maximum] of Object.entries(scenario.maxCalls ?? {})) {
     if (trace.calls.filter((call) => call.name === name).length > maximum)

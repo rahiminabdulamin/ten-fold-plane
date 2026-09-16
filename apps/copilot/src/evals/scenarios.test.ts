@@ -98,6 +98,25 @@ describe("agent reliability scenarios", () => {
       },
     ],
     [
+      "yearless-month-selected-workspace",
+      {
+        calls: [
+          { name: "find_project", arguments: { query: "Programmes" } },
+          { name: "get_current_datetime", arguments: {} },
+          {
+            name: "list_work_items",
+            arguments: {
+              projectId: "project-1",
+              dateFrom: "2026-10-01",
+              dateTo: "2026-10-31",
+              stateGroup: "unstarted",
+            },
+          },
+        ],
+        terminalStatus: "success",
+      },
+    ],
+    [
       "schema-backed-assignment",
       { calls: [{ name: "update_work_item", arguments: { issueId: "issue-1" } }], terminalStatus: "success" },
     ],
