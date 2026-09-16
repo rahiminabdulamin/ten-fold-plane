@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file=../../.env --env-file=.env src/main.ts",
+    "eval:live": "tsx src/evals/live.ts",
     "start": "tsx src/main.ts",
     "test": "vitest run",
     "check:types": "tsc --noEmit",

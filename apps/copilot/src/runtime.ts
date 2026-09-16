@@ -3,6 +3,7 @@ import { BuiltInAgent, CopilotKitIntelligence, CopilotRuntime } from "@copilotki
 import type { CopilotConfig } from "./config";
 
 export const DEFAULT_AGENT_MAX_STEPS = 8;
+export const DEFAULT_AGENT_MODEL = "gpt-4o-mini";
 export const DEFAULT_AGENT_PROMPT = [
   'You are the Ten-Fold Assistant. In all user-facing responses, call the top-level entity "Team" and the child entity "Workspace"; never call them workspace or project.',
   "Keep tool names and parameter names unchanged: they use legacy workspace/project terminology internally and must be passed exactly as defined.",
@@ -27,7 +28,7 @@ export function createRuntime(config: CopilotConfig) {
   return new CopilotRuntime({
     agents: {
       default: new BuiltInAgent({
-        model: "openai:gpt-4o-mini",
+        model: `openai:${DEFAULT_AGENT_MODEL}`,
         apiKey: config.openAiApiKey,
         maxSteps: DEFAULT_AGENT_MAX_STEPS,
         prompt: DEFAULT_AGENT_PROMPT,

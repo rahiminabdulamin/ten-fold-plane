@@ -42,7 +42,9 @@ const passingTraces: Record<string, AgentTrace> = {
     terminalStatus: "failure",
   },
   "partial-batch": {
-    calls: [{ name: "create_work_items", arguments: { projectId: "project-1", items: [{ title: "One" }, { title: "Two" }] } }],
+    calls: [
+      { name: "create_work_items", arguments: { projectId: "project-1", items: [{ title: "One" }, { title: "Two" }] } },
+    ],
     terminalStatus: "partial_success",
   },
   "uncertain-update": {
@@ -67,12 +69,36 @@ describe("agent reliability scenarios", () => {
       "named-workspace-backlog",
       { calls: [...passingTraces["named-workspace-backlog"].calls].toReversed(), terminalStatus: "success" },
     ],
-    ["relative-date-range", { calls: [{ name: "list_work_items", arguments: { projectId: "project-1" } }], terminalStatus: "success" }],
-    ["schema-backed-assignment", { calls: [{ name: "update_work_item", arguments: { issueId: "issue-1" } }], terminalStatus: "success" }],
-    ["multi-item-batch", { calls: [{ name: "create_work_item", arguments: { title: "One" } }], terminalStatus: "success" }],
-    ["ambiguous-workspace", { calls: [...passingTraces["ambiguous-workspace"].calls, { name: "create_work_item", arguments: { title: "Wrong" } }], terminalStatus: "failure" }],
+    [
+      "relative-date-range",
+      { calls: [{ name: "list_work_items", arguments: { projectId: "project-1" } }], terminalStatus: "success" },
+    ],
+    [
+      "schema-backed-assignment",
+      { calls: [{ name: "update_work_item", arguments: { issueId: "issue-1" } }], terminalStatus: "success" },
+    ],
+    [
+      "multi-item-batch",
+      { calls: [{ name: "create_work_item", arguments: { title: "One" } }], terminalStatus: "success" },
+    ],
+    [
+      "ambiguous-workspace",
+      {
+        calls: [
+          ...passingTraces["ambiguous-workspace"].calls,
+          { name: "create_work_item", arguments: { title: "Wrong" } },
+        ],
+        terminalStatus: "failure",
+      },
+    ],
     ["partial-batch", { ...passingTraces["partial-batch"], terminalStatus: "success" }],
-    ["uncertain-update", { calls: [...passingTraces["uncertain-update"].calls, ...passingTraces["uncertain-update"].calls], terminalStatus: "uncertain" }],
+    [
+      "uncertain-update",
+      {
+        calls: [...passingTraces["uncertain-update"].calls, ...passingTraces["uncertain-update"].calls],
+        terminalStatus: "uncertain",
+      },
+    ],
     ["confirmed-deletion", { calls: [], terminalStatus: "success" }],
   ] as const)("rejects a nonconforming %s trace", (id, trace) => {
     const scenario = AGENT_SCENARIOS.find((candidate) => candidate.id === id);

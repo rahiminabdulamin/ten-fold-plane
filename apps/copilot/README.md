@@ -28,3 +28,19 @@ at `/api/copilotkit`. Set `OPENAI_API_KEY`, `CPK_INTELLIGENCE_API_KEY`,
 in the root `.env`; set the same identity secret in `apps/api/.env`.
 
 The runtime never receives Plane browser cookies or calls Plane CRUD APIs.
+
+## Agent reliability evaluations
+
+The normal test suite includes deterministic, offline agent scenarios:
+
+```sh
+pnpm --filter @plane/copilot test
+```
+
+An opt-in live evaluation sends the same scenarios to the configured OpenAI model:
+
+```sh
+OPENAI_API_KEY=... pnpm --filter @plane/copilot eval:live
+```
+
+The live command is developer-facing, paid, and nondeterministic, so it is intentionally excluded from normal CI. It exposes only fake tools backed by static fixtures; it imports no Plane services and cannot read or mutate Plane data. Its local report contains scenario IDs, tool names, and pass/fail reasons, not prompt or fixture contents.
