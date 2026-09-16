@@ -8,13 +8,16 @@ import {
 
 const normalize = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(normalize);
-  if (value && typeof value === "object")
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>)
-        // oxlint-disable-next-line unicorn/prefer-array-to-sorted -- web targets ES2022.
-        .toSorted(([left], [right]) => left.localeCompare(right))
-        .map(([key, nested]) => [key, normalize(nested)])
-    );
+  if (value && typeof value === "object") {
+    const ordered: Record<string, unknown> = {};
+    for (const key of Object.keys(value).reduce<string[]>((keys, nextKey) => {
+      const index = keys.findIndex((candidate) => candidate.localeCompare(nextKey) > 0);
+      keys.splice(index === -1 ? keys.length : index, 0, nextKey);
+      return keys;
+    }, []))
+      ordered[key] = normalize((value as Record<string, unknown>)[key]);
+    return ordered;
+  }
   return value;
 };
 
@@ -45,18 +48,16 @@ export function isCanonicalRecord(value: unknown): value is { id: string; name: 
   );
 }
 
-const comparable = (value: unknown) => {
-  if (!Array.isArray(value)) return value;
-  // oxlint-disable-next-line unicorn/prefer-array-to-sorted -- web targets ES2022.
-  return [...value].toSorted();
-};
-
 export function requestedFieldsMatch(actual: Record<string, unknown>, expected: Record<string, unknown>): boolean {
-  return Object.entries(expected).every(
-    ([key, value]) =>
-      Object.is(comparable(actual[key]), comparable(value)) ||
-      JSON.stringify(comparable(actual[key])) === JSON.stringify(comparable(value))
-  );
+  return Object.entries(expected).every(([key, value]) => {
+    const actualValue = actual[key];
+    if (!Array.isArray(value)) return Object.is(actualValue, value);
+    return (
+      Array.isArray(actualValue) &&
+      actualValue.length === value.length &&
+      value.every((expectedItem) => actualValue.some((actualItem) => Object.is(actualItem, expectedItem)))
+    );
+  });
 }
 
 export async function confirmDeleted(
