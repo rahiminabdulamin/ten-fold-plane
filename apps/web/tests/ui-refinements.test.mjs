@@ -74,6 +74,9 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.doesNotMatch(copilot, /preserveSidebarOpen/);
   assert.doesNotMatch(copilot, /chat-toggle-button"\]'\)\?\.click\(\)/);
   assert.match(copilot, /const sidebarToggleButton = useMemo/);
+  assert.match(copilot, /const renderToolActivity\s*=/);
+  assert.match(copilot, /data-testid="copilot-tool-activity"/);
+  assert.match(copilot, /render: renderToolActivity\("Looking up Workspaces…"\)/);
   assert.match(copilot, /onPointerDown={startResize}/);
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
   assert.match(copilot, /event\.stopPropagation\(\)/);
@@ -114,6 +117,10 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(styles, /\.cpk\\:max-w-3xl\.cpk\\:mx-auto/);
   assert.match(styles, /margin-inline:\s*0 !important/);
   assert.match(styles, /\[data-testid="copilot-chat-input"\][\s\S]*border-radius:\s*0\.5rem !important/);
+  assert.match(
+    styles,
+    /\[data-testid="copilot-assistant-message"\]:has\(> div:only-child > div:only-child:empty\)\s*\{\s*display:\s*none !important/
+  );
   assert.match(styles, /\[data-testid\^="copilot-"\]\[data-testid\$="-message"\] > div/);
   assert.match(styles, /\[data-copilotkit\] textarea[\s\S]*width:\s*100%/);
   assert.match(

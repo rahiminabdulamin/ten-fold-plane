@@ -60,6 +60,17 @@ const COPILOT_SIDEBAR_LABELS = { modalHeaderTitle: "Ten-Fold Assistant" };
 
 type LauncherPosition = { x: number; y: number };
 
+const renderToolActivity =
+  (activity: string) =>
+  ({ status }: { status: string }) => {
+    if (status !== "executing" && status !== "inProgress") return null;
+    return (
+      <p data-testid="copilot-tool-activity" role="status" className="my-1 text-13 text-tertiary">
+        {activity}
+      </p>
+    );
+  };
+
 const finishTool = <T extends ToolResult>(result: T, startedAt: number, correlationId: string): T => {
   logToolOutcome(result, { startedAt, correlationId });
   return result;
@@ -308,6 +319,7 @@ function PlaneTools() {
       description:
         "Get the user's current local date, time, and timezone. Use before resolving relative dates or times.",
       parameters: z.object({}),
+      render: renderToolActivity("Checking the current time…"),
       handler: async () => {
         const timeZone = user?.user_timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
         const data = getUserLocalDateTime(timeZone);
@@ -323,6 +335,7 @@ function PlaneTools() {
       description:
         "Get the current Workspace's assignable work-item states, labels, members, estimate points, and available work-item types. Use before resolving a name to an ID.",
       parameters: z.object({ projectId: z.string().uuid().optional() }),
+      render: renderToolActivity("Loading Workspace details…"),
       handler: async ({ projectId: requestedProjectId }) => {
         const targetProjectId = requestedProjectId ?? projectId;
         if (!workspace || !targetProjectId)
@@ -367,6 +380,7 @@ function PlaneTools() {
       name: "list_projects",
       description: "List up to 20 Workspaces in the current Team.",
       parameters: z.object({}),
+      render: renderToolActivity("Looking up Workspaces…"),
       handler: async () => {
         if (!workspace) return { ok: false, message: "A Team is required.", retryable: false };
         try {
@@ -387,6 +401,7 @@ function PlaneTools() {
       description:
         "Find up to 20 Workspaces in the current Team by name or identifier. Use this before work-item operations when the user names a Workspace.",
       parameters: z.object({ query: z.string().min(1).max(255) }),
+      render: renderToolActivity("Looking up Workspaces…"),
       handler: async ({ query }) => {
         if (!workspace) return { ok: false, message: "A Team is required.", retryable: false };
         try {
@@ -417,6 +432,7 @@ function PlaneTools() {
       name: "create_project",
       description: "Create one Workspace in the current Team.",
       parameters: z.object({ name: z.string().min(1).max(255), identifier: z.string().min(1).max(20).optional() }),
+      render: renderToolActivity("Creating the Workspace…"),
       handler: async ({ name, identifier }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
@@ -452,6 +468,7 @@ function PlaneTools() {
       name: "update_project",
       description: "Update the name of one Workspace in the current Team.",
       parameters: z.object({ projectId: z.string().uuid(), name: z.string().min(1).max(255) }),
+      render: renderToolActivity("Updating the Workspace…"),
       handler: async ({ projectId: targetProjectId, name }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
@@ -489,6 +506,7 @@ function PlaneTools() {
       name: "get_project",
       description: "Get one Workspace by its canonical ID.",
       parameters: z.object({ projectId: z.string().uuid() }),
+      render: renderToolActivity("Loading the Workspace…"),
       handler: async ({ projectId: targetProjectId }) => {
         if (!workspace) return { ok: false, message: "A Team is required.", retryable: false };
         try {
@@ -520,6 +538,7 @@ function PlaneTools() {
           .regex(/^\d{4}-\d{2}-\d{2}$/)
           .optional(),
       }),
+      render: renderToolActivity("Checking work items…"),
       handler: async ({ projectId: requestedProjectId, stateGroup, dateFrom, dateTo }) => {
         const targetProjectId = requestedProjectId ?? projectId;
         if (!workspace || !targetProjectId)
@@ -550,6 +569,7 @@ function PlaneTools() {
         title: z.string().min(1).max(255),
         projectId: z.string().uuid().optional(),
       }),
+      render: renderToolActivity("Creating the work item…"),
       handler: async ({ projectId: requestedProjectId, ...input }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
@@ -588,6 +608,7 @@ function PlaneTools() {
       description:
         "Create multiple work items in one Workspace. Use this for a list of two or more items. For a named Workspace, pass the canonical ID returned by find_project. Each item is attempted independently; include time and location in description when supplied.",
       parameters: createWorkItemsSchema,
+      render: renderToolActivity("Creating work items…"),
       handler: async ({ projectId: requestedProjectId, items }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
@@ -643,6 +664,7 @@ function PlaneTools() {
       name: "get_work_item",
       description: "Get one work item in the current Workspace by its canonical work-item ID.",
       parameters: z.object({ issueId: z.string().uuid() }),
+      render: renderToolActivity("Loading the work item…"),
       handler: async ({ issueId }) => {
         if (!workspace || !projectId)
           return { ok: false, message: "A current Workspace is required.", retryable: false };
@@ -663,6 +685,7 @@ function PlaneTools() {
       name: "open_work_item",
       description: "Navigate to a work item in the current Workspace.",
       parameters: z.object({ issueId: z.string().uuid() }),
+      render: renderToolActivity("Opening the work item…"),
       handler: async ({ issueId }) => {
         if (!workspace || !projectId)
           return { ok: false, message: "A current Workspace is required.", retryable: false };
@@ -683,6 +706,7 @@ function PlaneTools() {
         .refine(({ issueId: _issueId, ...changes }) => Object.values(changes).some((value) => value !== undefined), {
           message: "Provide at least one work-item field to update.",
         }),
+      render: renderToolActivity("Updating the work item…"),
       handler: async ({ issueId, ...changes }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
@@ -812,6 +836,7 @@ function PlaneTools() {
         table: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/),
         limit: z.number().int().min(1).max(100).default(50),
       }),
+      render: renderToolActivity("Checking the spreadsheet…"),
       handler: async ({ table, limit }) => {
         if (!workspace || !projectId || !spreadsheetId)
           return toolError("query_spreadsheet", "Open a spreadsheet first.");

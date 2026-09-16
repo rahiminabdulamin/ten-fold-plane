@@ -185,6 +185,10 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   padding-block: 0 !important;
 }
 
+[data-copilot-sidebar] [data-testid="copilot-assistant-message"]:has(> div:only-child > div:only-child:empty) {
+  display: none !important;
+}
+
 [data-copilotkit] [data-testid^="copilot-"][data-testid$="-message"],
 [data-copilotkit] [data-testid^="copilot-"][data-testid$="-message"] :is(p, li, td, th, code, pre, span, strong, em) {
   font-size: 13px;
