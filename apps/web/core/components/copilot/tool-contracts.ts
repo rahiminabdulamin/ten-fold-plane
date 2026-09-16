@@ -4,12 +4,26 @@ export interface ProjectLookupRecord {
   identifier: string;
 }
 
+export type ToolStatus = "success" | "partial_success" | "failure" | "uncertain";
+
+export type ToolErrorCategory =
+  | "validation"
+  | "permission"
+  | "not_found"
+  | "conflict"
+  | "rate_limit"
+  | "network"
+  | "timeout"
+  | "unexpected";
+
 export interface ToolResult {
   ok: boolean;
+  status: ToolStatus;
   operation: string;
   affectedIds: string[];
   message: string;
   retryable: boolean;
+  errorCategory?: ToolErrorCategory;
 }
 
 export const WORK_ITEM_STATE_GROUPS = ["backlog", "unstarted", "started", "completed", "cancelled"] as const;
@@ -72,12 +86,62 @@ export async function createWorkItemsSequentially<TItem, TValue>(
 }
 
 export function toolResult(operation: string, message: string, affectedIds: string[] = []): ToolResult {
-  return { ok: true, operation, affectedIds, message, retryable: false };
+  return { ok: true, status: "success", operation, affectedIds, message, retryable: false };
 }
 
-export function toolError(operation: string, _error: unknown): ToolResult {
+export function toolPartialResult(operation: string, message: string, affectedIds: string[] = []): ToolResult {
+  return { ok: false, status: "partial_success", operation, affectedIds, message, retryable: false };
+}
+
+export function toolUncertainResult(
+  operation: string,
+  affectedIds: string[] = [],
+  message = "The final result could not be verified. Check the current state before trying again."
+): ToolResult {
+  return { ok: false, status: "uncertain", operation, affectedIds, message, retryable: false };
+}
+
+export function toolValidationError(operation: string, message: string, affectedIds: string[] = []): ToolResult {
+  return {
+    ok: false,
+    status: "failure",
+    operation,
+    affectedIds,
+    message,
+    retryable: false,
+    errorCategory: "validation",
+  };
+}
+
+type StructuredError = { code?: unknown; response?: { status?: unknown } };
+
+export function classifyToolError(error: unknown): { category: ToolErrorCategory; retryable: boolean } {
+  const structured = error && typeof error === "object" ? (error as StructuredError) : {};
+  const status = structured.response?.status;
+  if (status === 400) return { category: "validation", retryable: false };
+  if (status === 401 || status === 403) return { category: "permission", retryable: false };
+  if (status === 404) return { category: "not_found", retryable: false };
+  if (status === 409) return { category: "conflict", retryable: false };
+  if (status === 429) return { category: "rate_limit", retryable: true };
+  if (structured.code === "ECONNABORTED" || structured.code === "ETIMEDOUT")
+    return { category: "timeout", retryable: true };
+  if (structured.code === "ERR_NETWORK" || structured.code === "ECONNRESET")
+    return { category: "network", retryable: true };
+  return { category: "unexpected", retryable: false };
+}
+
+export function toolError(operation: string, error: unknown, options: { mutation?: boolean } = {}): ToolResult {
   const label = operation.replace(/_/g, " ");
-  return { ok: false, operation, affectedIds: [], message: `Unable to ${label} right now.`, retryable: false };
+  const { category, retryable } = classifyToolError(error);
+  return {
+    ok: false,
+    status: "failure",
+    operation,
+    affectedIds: [],
+    message: `Unable to ${label} right now.`,
+    retryable: options.mutation ? false : retryable,
+    errorCategory: category,
+  };
 }
 
 export function findProjectMatches(projects: ProjectLookupRecord[], query: string): ProjectLookupRecord[] {
@@ -94,6 +158,8 @@ export function findProjectMatches(projects: ProjectLookupRecord[], query: strin
 }
 
 export function buildWorkItemQuery(stateGroup?: WorkItemStateGroup, dateFrom?: string, dateTo?: string) {
+  if (Boolean(dateFrom) !== Boolean(dateTo)) throw new Error("Provide both dateFrom and dateTo.");
+  if (dateFrom && dateTo && dateFrom > dateTo) throw new Error("dateFrom must not be after dateTo.");
   return {
     per_page: "20",
     ...(stateGroup ? { state_group: stateGroup } : {}),

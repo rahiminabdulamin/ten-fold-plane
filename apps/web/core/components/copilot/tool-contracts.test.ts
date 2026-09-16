@@ -1,14 +1,52 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  createWorkItemsSequentially,
   buildWorkItemQuery,
+  classifyToolError,
+  createWorkItemsSequentially,
   getUserLocalDateTime,
+  toolError,
+  toolPartialResult,
+  toolResult,
+  toolUncertainResult,
   toWorkItemPayload,
   toWorkItemRecords,
 } from "./tool-contracts";
 
 describe("work-item tool contracts", () => {
+  it("distinguishes verified, partial, and uncertain outcomes", () => {
+    expect(toolResult("create_work_item", "Created.")).toMatchObject({
+      ok: true,
+      status: "success",
+      retryable: false,
+    });
+    expect(toolPartialResult("create_work_items", "Created 1 of 2.", ["issue-1"])).toMatchObject({
+      ok: false,
+      status: "partial_success",
+    });
+    expect(toolUncertainResult("update_work_item", ["issue-1"])).toMatchObject({
+      ok: false,
+      status: "uncertain",
+      retryable: false,
+    });
+  });
+
+  it("classifies structured service errors without exposing them", () => {
+    expect(classifyToolError({ response: { status: 403 } })).toEqual({ category: "permission", retryable: false });
+    expect(classifyToolError({ response: { status: 429 } })).toEqual({ category: "rate_limit", retryable: true });
+    expect(classifyToolError({ code: "ECONNABORTED" })).toEqual({ category: "timeout", retryable: true });
+    expect(classifyToolError({ code: "ERR_NETWORK" })).toEqual({ category: "network", retryable: true });
+  });
+
+  it("never marks a failed mutation as retryable", () => {
+    expect(toolError("create_work_item", { response: { status: 429 } }, { mutation: true })).toMatchObject({
+      ok: false,
+      status: "failure",
+      errorCategory: "rate_limit",
+      retryable: false,
+    });
+  });
+
   it("sends the requested Backlog bucket to the Plane API", () => {
     expect(buildWorkItemQuery("backlog")).toEqual({ per_page: "20", state_group: "backlog" });
   });
@@ -18,6 +56,13 @@ describe("work-item tool contracts", () => {
       per_page: "20",
       target_date__range: "2026-09-07,2026-09-30",
     });
+  });
+
+  it("rejects incomplete or reversed target-date ranges", () => {
+    expect(() => buildWorkItemQuery(undefined, "2026-09-17")).toThrow("both dateFrom and dateTo");
+    expect(() => buildWorkItemQuery(undefined, "2026-09-18", "2026-09-17")).toThrow(
+      "dateFrom must not be after dateTo"
+    );
   });
 
   it("reports the current date and time in the user's timezone", () => {
