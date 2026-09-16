@@ -1,0 +1,143 @@
+export interface AgentTraceCall {
+  name: string;
+  arguments: Record<string, unknown>;
+}
+
+export interface AgentTrace {
+  calls: AgentTraceCall[];
+  terminalStatus: "success" | "partial_success" | "failure" | "uncertain";
+}
+
+export interface AgentScenario {
+  id: string;
+  prompt: string;
+  expectedCalls: Array<{ name: string; arguments?: Record<string, unknown> }>;
+  prohibitedCalls?: string[];
+  maxCalls?: Record<string, number>;
+  terminalStatus: AgentTrace["terminalStatus"];
+}
+
+export const AGENT_SCENARIOS: AgentScenario[] = [
+  {
+    id: "named-workspace-backlog",
+    prompt: "List the Backlog work items in the Marketing Workspace.",
+    expectedCalls: [
+      { name: "find_project", arguments: { query: "Marketing" } },
+      { name: "list_work_items", arguments: { projectId: "project-1", stateGroup: "backlog" } },
+    ],
+    terminalStatus: "success",
+  },
+  {
+    id: "relative-date-range",
+    prompt: "List work items due in the next week.",
+    expectedCalls: [
+      { name: "get_current_datetime" },
+      {
+        name: "list_work_items",
+        arguments: { projectId: "project-1", dateFrom: "2026-09-17", dateTo: "2026-09-24" },
+      },
+    ],
+    terminalStatus: "success",
+  },
+  {
+    id: "schema-backed-assignment",
+    prompt: "Assign the launch task to Alex.",
+    expectedCalls: [
+      { name: "get_work_item_schema", arguments: { projectId: "project-1" } },
+      { name: "update_work_item", arguments: { issueId: "issue-1", assigneeIds: ["member-1"] } },
+    ],
+    terminalStatus: "success",
+  },
+  {
+    id: "multi-item-batch",
+    prompt: "In Marketing create work items One, Two, and Three.",
+    expectedCalls: [
+      { name: "find_project", arguments: { query: "Marketing" } },
+      {
+        name: "create_work_items",
+        arguments: { projectId: "project-1", items: [{ title: "One" }, { title: "Two" }, { title: "Three" }] },
+      },
+    ],
+    prohibitedCalls: ["create_work_item"],
+    maxCalls: { create_work_items: 1 },
+    terminalStatus: "success",
+  },
+  {
+    id: "ambiguous-workspace",
+    prompt: "Create a work item in Mobile.",
+    expectedCalls: [{ name: "find_project", arguments: { query: "Mobile" } }],
+    prohibitedCalls: ["create_work_item", "create_work_items"],
+    terminalStatus: "failure",
+  },
+  {
+    id: "partial-batch",
+    prompt: "Create work items One and Two; one fixture creation will fail.",
+    expectedCalls: [
+      { name: "create_work_items", arguments: { projectId: "project-1", items: [{ title: "One" }, { title: "Two" }] } },
+    ],
+    maxCalls: { create_work_items: 1 },
+    terminalStatus: "partial_success",
+  },
+  {
+    id: "uncertain-update",
+    prompt: "Set the launch task priority to high; the fixture result is uncertain.",
+    expectedCalls: [{ name: "update_work_item", arguments: { issueId: "issue-1", priority: "high" } }],
+    maxCalls: { update_work_item: 1 },
+    terminalStatus: "uncertain",
+  },
+  {
+    id: "confirmed-deletion",
+    prompt: "Delete the Old task after confirmation.",
+    expectedCalls: [{ name: "confirm_delete_work_item", arguments: { issueId: "issue-1", name: "Old task" } }],
+    prohibitedCalls: ["delete_work_item"],
+    maxCalls: { confirm_delete_work_item: 1 },
+    terminalStatus: "success",
+  },
+];
+
+const partiallyMatches = (actual: unknown, expected: unknown): boolean => {
+  if (Array.isArray(expected))
+    return (
+      Array.isArray(actual) &&
+      actual.length === expected.length &&
+      expected.every((item, index) => partiallyMatches(actual[index], item))
+    );
+  if (expected && typeof expected === "object")
+    return (
+      Boolean(actual) &&
+      typeof actual === "object" &&
+      Object.entries(expected as Record<string, unknown>).every(([key, value]) =>
+        partiallyMatches((actual as Record<string, unknown>)[key], value)
+      )
+    );
+  return Object.is(actual, expected);
+};
+
+export function evaluateScenario(
+  scenario: AgentScenario,
+  trace: AgentTrace | undefined
+): { pass: boolean; reasons: string[] } {
+  if (!trace) return { pass: false, reasons: ["No trace was produced."] };
+  const reasons: string[] = [];
+  let cursor = 0;
+  for (const expected of scenario.expectedCalls) {
+    const index = trace.calls.findIndex(
+      (call, callIndex) =>
+        callIndex >= cursor &&
+        call.name === expected.name &&
+        (expected.arguments === undefined || partiallyMatches(call.arguments, expected.arguments))
+    );
+    if (index === -1) reasons.push(`Missing ordered call ${expected.name}.`);
+    else cursor = index + 1;
+  }
+  for (const prohibited of scenario.prohibitedCalls ?? []) {
+    if (trace.calls.some(({ name }) => name === prohibited)) reasons.push(`Prohibited call ${prohibited} was used.`);
+  }
+  for (const [name, maximum] of Object.entries(scenario.maxCalls ?? {})) {
+    if (trace.calls.filter((call) => call.name === name).length > maximum)
+      reasons.push(`Call ${name} exceeded its maximum of ${maximum}.`);
+  }
+  if (trace.terminalStatus !== scenario.terminalStatus)
+    reasons.push(`Expected terminal status ${scenario.terminalStatus}, received ${trace.terminalStatus}.`);
+  return { pass: reasons.length === 0, reasons };
+}

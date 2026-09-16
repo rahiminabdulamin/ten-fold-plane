@@ -19,6 +19,12 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain("projectId");
   });
 
+  it("requires truthful terminal outcomes without automatic mutation retries", () => {
+    expect(DEFAULT_AGENT_PROMPT).toContain("partial_success, failure, or uncertain");
+    expect(DEFAULT_AGENT_PROMPT).toContain("Never automatically repeat a mutation after an uncertain result");
+    expect(DEFAULT_AGENT_PROMPT).toContain("Never invent IDs, tool results, or mutation results");
+  });
+
   it("creates the default gpt-4o-mini agent without exposing credentials", () => {
     expect(() =>
       createRuntime({
