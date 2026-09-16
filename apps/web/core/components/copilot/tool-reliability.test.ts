@@ -30,9 +30,14 @@ describe("copilot tool reliability", () => {
       return "created";
     });
 
-    const duplicate = await guard.run("same", async () => "duplicate");
+    const duplicate = await guard.run("same", async () => "duplicate", "create_work_item");
 
-    expect(duplicate).toMatchObject({ ok: false, status: "failure", errorCategory: "validation" });
+    expect(duplicate).toMatchObject({
+      ok: false,
+      status: "failure",
+      operation: "create_work_item",
+      errorCategory: "validation",
+    });
     expect(calls).toBe(1);
     release();
     await expect(first).resolves.toBe("created");

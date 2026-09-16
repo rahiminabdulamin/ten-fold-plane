@@ -17,15 +17,28 @@ import { getRetryDelay } from "@/lib/retry-delay";
 
 import {
   buildWorkItemQuery,
+  classifyToolError,
   createWorkItemsSequentially,
   findProjectMatches,
   getUserLocalDateTime,
+  type ToolResult,
   toWorkItemPayload,
   toWorkItemRecords,
   toolError,
+  toolPartialResult,
   toolResult,
+  toolUncertainResult,
+  toolValidationError,
   WORK_ITEM_STATE_GROUPS,
 } from "./tool-contracts";
+import {
+  confirmDeleted,
+  isCanonicalRecord,
+  logToolOutcome,
+  MutationGuard,
+  mutationFingerprint,
+  requestedFieldsMatch,
+} from "./tool-reliability";
 
 const projectService = new ProjectService();
 const issueService = new IssueService();
@@ -35,6 +48,7 @@ const memberService = new ProjectMemberService();
 const estimateService = new EstimateService();
 const workspaceService = new WorkspaceService();
 const spreadsheetService = new SpreadsheetService();
+const mutationGuard = new MutationGuard();
 const COPILOT_PANEL_WIDTH_STORAGE_KEY = "tenfold-copilot-panel-width";
 const COPILOT_LAUNCHER_POSITION_STORAGE_KEY = "tenfold-copilot-launcher-position";
 const DEFAULT_COPILOT_PANEL_WIDTH = 360;
@@ -45,6 +59,18 @@ const LAUNCHER_GUTTER = 24;
 const COPILOT_SIDEBAR_LABELS = { modalHeaderTitle: "Ten-Fold Assistant" };
 
 type LauncherPosition = { x: number; y: number };
+
+const finishTool = <T extends ToolResult>(result: T, startedAt: number, correlationId: string): T => {
+  logToolOutcome(result, { startedAt, correlationId });
+  return result;
+};
+
+const mutationFailure = (operation: string, error: unknown, affectedIds: string[] = []) => {
+  const category = classifyToolError(error).category;
+  return category === "network" || category === "timeout"
+    ? toolUncertainResult(operation, affectedIds)
+    : toolError(operation, error, { mutation: true });
+};
 
 type SpreadsheetChangeConfirmationProps = {
   workspace: string;
@@ -392,19 +418,30 @@ function PlaneTools() {
       description: "Create one Workspace in the current Team.",
       parameters: z.object({ name: z.string().min(1).max(255), identifier: z.string().min(1).max(20).optional() }),
       handler: async ({ name, identifier }) => {
-        if (!workspace) return { ok: false, message: "A Team is required.", retryable: false };
-        try {
-          const project = await projectService.createProject(workspace, {
-            name,
-            ...(identifier ? { identifier } : {}),
-          });
-          return {
-            ...toolResult("create_project", `Created ${project.name}.`, [project.id]),
-            data: { id: project.id, name: project.name },
-          };
-        } catch (error) {
-          return toolError("create_project", error);
-        }
+        const startedAt = Date.now();
+        const correlationId = crypto.randomUUID();
+        if (!workspace)
+          return finishTool(toolValidationError("create_project", "A Team is required."), startedAt, correlationId);
+        const result = await mutationGuard.run(
+          mutationFingerprint("create_project", workspace, { name, identifier }),
+          async () => {
+            try {
+              const project = await projectService.createProject(workspace, {
+                name,
+                ...(identifier ? { identifier } : {}),
+              });
+              if (!isCanonicalRecord(project)) return toolUncertainResult("create_project");
+              return {
+                ...toolResult("create_project", `Created ${project.name}.`, [project.id]),
+                data: { id: project.id, name: project.name },
+              };
+            } catch (error) {
+              return mutationFailure("create_project", error);
+            }
+          },
+          "create_project"
+        );
+        return finishTool(result, startedAt, correlationId);
       },
     },
     [workspace]
@@ -416,16 +453,32 @@ function PlaneTools() {
       description: "Update the name of one Workspace in the current Team.",
       parameters: z.object({ projectId: z.string().uuid(), name: z.string().min(1).max(255) }),
       handler: async ({ projectId: targetProjectId, name }) => {
-        if (!workspace) return { ok: false, message: "A Team is required.", retryable: false };
-        try {
-          const project = await projectService.updateProject(workspace, targetProjectId, { name });
-          return {
-            ...toolResult("update_project", `Updated ${project.name}.`, [project.id]),
-            data: { id: project.id, name: project.name },
-          };
-        } catch (error) {
-          return toolError("update_project", error);
-        }
+        const startedAt = Date.now();
+        const correlationId = crypto.randomUUID();
+        if (!workspace)
+          return finishTool(toolValidationError("update_project", "A Team is required."), startedAt, correlationId);
+        const result = await mutationGuard.run(
+          mutationFingerprint("update_project", workspace, targetProjectId, { name }),
+          async () => {
+            try {
+              await projectService.updateProject(workspace, targetProjectId, { name });
+              const project = await projectService.getProject(workspace, targetProjectId);
+              if (
+                !isCanonicalRecord(project) ||
+                !requestedFieldsMatch(project as unknown as Record<string, unknown>, { name })
+              )
+                return toolUncertainResult("update_project", [targetProjectId]);
+              return {
+                ...toolResult("update_project", `Updated ${project.name}.`, [project.id]),
+                data: { id: project.id, name: project.name },
+              };
+            } catch (error) {
+              return mutationFailure("update_project", error, [targetProjectId]);
+            }
+          },
+          "update_project"
+        );
+        return finishTool(result, startedAt, correlationId);
       },
     },
     [workspace]
@@ -498,18 +551,32 @@ function PlaneTools() {
         projectId: z.string().uuid().optional(),
       }),
       handler: async ({ projectId: requestedProjectId, ...input }) => {
+        const startedAt = Date.now();
+        const correlationId = crypto.randomUUID();
         const targetProjectId = requestedProjectId ?? projectId;
         if (!workspace || !targetProjectId)
-          return { ok: false, message: "Find a Workspace first, then provide its ID.", retryable: false };
-        try {
-          const issue = await issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(input));
-          return {
-            ...toolResult("create_work_item", `Created ${issue.name}.`, [issue.id]),
-            data: { id: issue.id, name: issue.name },
-          };
-        } catch (error) {
-          return toolError("create_work_item", error);
-        }
+          return finishTool(
+            toolValidationError("create_work_item", "Find a Workspace first, then provide its ID."),
+            startedAt,
+            correlationId
+          );
+        const result = await mutationGuard.run(
+          mutationFingerprint("create_work_item", workspace, targetProjectId, input),
+          async () => {
+            try {
+              const issue = await issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(input));
+              if (!isCanonicalRecord(issue)) return toolUncertainResult("create_work_item");
+              return {
+                ...toolResult("create_work_item", `Created ${issue.name}.`, [issue.id]),
+                data: { id: issue.id, name: issue.name },
+              };
+            } catch (error) {
+              return mutationFailure("create_work_item", error);
+            }
+          },
+          "create_work_item"
+        );
+        return finishTool(result, startedAt, correlationId);
       },
     },
     [workspace, projectId]
@@ -522,27 +589,50 @@ function PlaneTools() {
         "Create multiple work items in one Workspace. Use this for a list of two or more items. For a named Workspace, pass the canonical ID returned by find_project. Each item is attempted independently; include time and location in description when supplied.",
       parameters: createWorkItemsSchema,
       handler: async ({ projectId: requestedProjectId, items }) => {
+        const startedAt = Date.now();
+        const correlationId = crypto.randomUUID();
         const targetProjectId = requestedProjectId ?? projectId;
         if (!workspace || !targetProjectId)
-          return { ok: false, message: "Find a Workspace first, then provide its ID.", retryable: false };
+          return finishTool(
+            toolValidationError("create_work_items", "Find a Workspace first, then provide its ID."),
+            startedAt,
+            correlationId
+          );
 
-        const results = await createWorkItemsSequentially(items, async (item) =>
-          issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(item))
+        const result = await mutationGuard.run(
+          mutationFingerprint("create_work_items", workspace, targetProjectId, items),
+          async () => {
+            const results = await createWorkItemsSequentially(items, async (item) =>
+              issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(item))
+            );
+            const created = results.created
+              .filter(({ value }) => isCanonicalRecord(value))
+              .map(({ item, value }) => ({ id: value.id, name: item.title }));
+            const invalidCount = results.created.length - created.length;
+            const failed = results.failed.map(({ item, message }) => ({ name: item.title, message }));
+            const affectedIds = created.map(({ id }) => id);
+            const message =
+              failed.length || invalidCount
+                ? `Created ${created.length} of ${items.length} work items. ${failed.length + invalidCount} item(s) failed or could not be verified.`
+                : `Created ${created.length} work items.`;
+            const hasAmbiguousFailure =
+              invalidCount > 0 ||
+              results.failed.some(({ error }) => {
+                const category = classifyToolError(error).category;
+                return category === "network" || category === "timeout";
+              });
+            const outcome = hasAmbiguousFailure
+              ? toolUncertainResult("create_work_items", affectedIds, message)
+              : failed.length && created.length
+                ? toolPartialResult("create_work_items", message, affectedIds)
+                : failed.length
+                  ? toolError("create_work_items", results.failed[0].error, { mutation: true })
+                  : toolResult("create_work_items", message, affectedIds);
+            return { ...outcome, data: { created, failed } };
+          },
+          "create_work_items"
         );
-        const created = results.created.map(({ item, value }) => ({ id: value.id, name: item.title }));
-        const failed = results.failed.map(({ item, message }) => ({ name: item.title, message }));
-        const message = failed.length
-          ? `Created ${created.length} of ${items.length} work items. ${failed.length} item(s) failed.`
-          : `Created ${created.length} work items.`;
-
-        return {
-          ok: failed.length === 0,
-          operation: "create_work_items",
-          affectedIds: created.map(({ id }) => id),
-          message,
-          retryable: false,
-          data: { created, failed },
-        };
+        return finishTool(result, startedAt, correlationId);
       },
     },
     [workspace, projectId]
@@ -594,17 +684,34 @@ function PlaneTools() {
           message: "Provide at least one work-item field to update.",
         }),
       handler: async ({ issueId, ...changes }) => {
+        const startedAt = Date.now();
+        const correlationId = crypto.randomUUID();
         if (!workspace || !projectId)
-          return { ok: false, message: "A current Workspace is required.", retryable: false };
-        try {
-          const issue = await issueService.patchIssue(workspace, projectId, issueId, toWorkItemPayload(changes));
-          return {
-            ...toolResult("update_work_item", `Updated ${issue.name}.`, [issue.id]),
-            data: toWorkItemRecords([issue])[0],
-          };
-        } catch (error) {
-          return toolError("update_work_item", error);
-        }
+          return finishTool(
+            toolValidationError("update_work_item", "A current Workspace is required."),
+            startedAt,
+            correlationId
+          );
+        const payload = toWorkItemPayload(changes);
+        const result = await mutationGuard.run(
+          mutationFingerprint("update_work_item", workspace, projectId, issueId, payload),
+          async () => {
+            try {
+              await issueService.patchIssue(workspace, projectId, issueId, payload);
+              const issue = await issueService.retrieve(workspace, projectId, issueId);
+              if (!isCanonicalRecord(issue) || !requestedFieldsMatch(issue, payload))
+                return toolUncertainResult("update_work_item", [issueId]);
+              return {
+                ...toolResult("update_work_item", `Updated ${issue.name}.`, [issue.id]),
+                data: toWorkItemRecords([issue])[0],
+              };
+            } catch (error) {
+              return mutationFailure("update_work_item", error, [issueId]);
+            }
+          },
+          "update_work_item"
+        );
+        return finishTool(result, startedAt, correlationId);
       },
     },
     [workspace, projectId]
@@ -618,18 +725,25 @@ function PlaneTools() {
       render: ({ args, status, respond }) => {
         const execute = async () => {
           if (!workspace || !projectId || !respond) return;
-          try {
-            await issueService.deleteIssue(workspace, projectId, args.issueId);
-            respond(toolResult("delete_work_item", `Deleted ${args.name}.`, [args.issueId]));
-          } catch {
-            respond({
-              ok: false,
-              operation: "delete_work_item",
-              affectedIds: [args.issueId],
-              message: "Deletion failed.",
-              retryable: false,
-            });
-          }
+          const startedAt = Date.now();
+          const correlationId = crypto.randomUUID();
+          const result = await mutationGuard.run(
+            mutationFingerprint("delete_work_item", workspace, projectId, args.issueId),
+            async () => {
+              try {
+                await issueService.deleteIssue(workspace, projectId, args.issueId);
+              } catch (error) {
+                const category = classifyToolError(error).category;
+                if (category !== "network" && category !== "timeout")
+                  return toolError("delete_work_item", error, { mutation: true });
+              }
+              return confirmDeleted("delete_work_item", args.issueId, () =>
+                issueService.retrieve(workspace, projectId, args.issueId)
+              );
+            },
+            "delete_work_item"
+          );
+          respond(finishTool(result, startedAt, correlationId));
         };
         if (status !== "executing" || !respond) return <p>Preparing deletion confirmation…</p>;
         return (
@@ -637,15 +751,7 @@ function PlaneTools() {
             <p>Delete {args.name}? This cannot be undone.</p>
             <button
               type="button"
-              onClick={() =>
-                respond({
-                  ok: false,
-                  operation: "delete_work_item",
-                  affectedIds: [args.issueId],
-                  message: "Deletion cancelled.",
-                  retryable: false,
-                })
-              }
+              onClick={() => respond(toolValidationError("delete_work_item", "Deletion cancelled.", [args.issueId]))}
             >
               Cancel
             </button>
@@ -728,18 +834,25 @@ function PlaneTools() {
       render: ({ args, status, respond }) => {
         const execute = async () => {
           if (!workspace || !respond) return;
-          try {
-            await projectService.deleteProject(workspace, args.projectId);
-            respond(toolResult("delete_project", `Deleted ${args.name}.`, [args.projectId]));
-          } catch {
-            respond({
-              ok: false,
-              operation: "delete_project",
-              affectedIds: [args.projectId],
-              message: "Deletion failed.",
-              retryable: false,
-            });
-          }
+          const startedAt = Date.now();
+          const correlationId = crypto.randomUUID();
+          const result = await mutationGuard.run(
+            mutationFingerprint("delete_project", workspace, args.projectId),
+            async () => {
+              try {
+                await projectService.deleteProject(workspace, args.projectId);
+              } catch (error) {
+                const category = classifyToolError(error).category;
+                if (category !== "network" && category !== "timeout")
+                  return toolError("delete_project", error, { mutation: true });
+              }
+              return confirmDeleted("delete_project", args.projectId, () =>
+                projectService.getProject(workspace, args.projectId)
+              );
+            },
+            "delete_project"
+          );
+          respond(finishTool(result, startedAt, correlationId));
         };
         if (status !== "executing" || !respond) return <p>Preparing deletion confirmation…</p>;
         return (
@@ -747,15 +860,7 @@ function PlaneTools() {
             <p>Delete {args.name}? This cannot be undone.</p>
             <button
               type="button"
-              onClick={() =>
-                respond({
-                  ok: false,
-                  operation: "delete_project",
-                  affectedIds: [args.projectId],
-                  message: "Deletion cancelled.",
-                  retryable: false,
-                })
-              }
+              onClick={() => respond(toolValidationError("delete_project", "Deletion cancelled.", [args.projectId]))}
             >
               Cancel
             </button>

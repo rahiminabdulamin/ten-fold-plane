@@ -48,3 +48,21 @@ test("the assistant exposes the complete editable work-item schema and live proj
   );
   assert.match(runtime, /call get_current_datetime before resolving it/);
 });
+
+test("the assistant routes mutations through reliability controls", async () => {
+  const root = await read("core/components/copilot/root.tsx");
+
+  assert.match(root, /new MutationGuard\(\)/);
+  assert.match(root, /mutationFingerprint\("create_project"/);
+  assert.match(root, /mutationFingerprint\("create_work_item"/);
+  assert.match(root, /mutationFingerprint\("create_work_items"/);
+  assert.match(root, /mutationFingerprint\("update_project"/);
+  assert.match(root, /mutationFingerprint\("update_work_item"/);
+  assert.match(root, /mutationFingerprint\("delete_project"/);
+  assert.match(root, /mutationFingerprint\("delete_work_item"/);
+  assert.match(root, /requestedFieldsMatch\(/);
+  assert.match(root, /confirmDeleted\(/);
+  assert.match(root, /logToolOutcome\(/);
+  assert.match(root, /toolPartialResult\(/);
+  assert.match(root, /\{ mutation: true \}/);
+});

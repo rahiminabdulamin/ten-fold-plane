@@ -11,6 +11,7 @@ const normalize = (value: unknown): unknown => {
   if (value && typeof value === "object")
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>)
+        // oxlint-disable-next-line unicorn/prefer-array-to-sorted -- web targets ES2022.
         .toSorted(([left], [right]) => left.localeCompare(right))
         .map(([key, nested]) => [key, normalize(nested)])
     );
@@ -24,9 +25,9 @@ export function mutationFingerprint(operation: string, ...parts: unknown[]): str
 export class MutationGuard {
   private readonly inFlight = new Set<string>();
 
-  async run<T>(fingerprint: string, mutation: () => Promise<T>): Promise<T | ToolResult> {
+  async run<T>(fingerprint: string, mutation: () => Promise<T>, operation = "mutation"): Promise<T | ToolResult> {
     if (this.inFlight.has(fingerprint))
-      return toolValidationError("mutation", "An identical change is already in progress.");
+      return toolValidationError(operation, "An identical change is already in progress.");
     this.inFlight.add(fingerprint);
     try {
       return await mutation();
@@ -44,7 +45,11 @@ export function isCanonicalRecord(value: unknown): value is { id: string; name: 
   );
 }
 
-const comparable = (value: unknown) => (Array.isArray(value) ? [...value].toSorted() : value);
+const comparable = (value: unknown) => {
+  if (!Array.isArray(value)) return value;
+  // oxlint-disable-next-line unicorn/prefer-array-to-sorted -- web targets ES2022.
+  return [...value].toSorted();
+};
 
 export function requestedFieldsMatch(actual: Record<string, unknown>, expected: Record<string, unknown>): boolean {
   return Object.entries(expected).every(

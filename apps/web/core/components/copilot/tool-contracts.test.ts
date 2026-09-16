@@ -129,7 +129,7 @@ describe("work-item tool contracts", () => {
         { item: "First", value: { id: "first" } },
         { item: "Last", value: { id: "last" } },
       ],
-      failed: [{ item: "Broken", message: "Request failed" }],
+      failed: [{ item: "Broken", message: "Unable to create work item.", error: expect.any(Error) }],
     });
   });
 

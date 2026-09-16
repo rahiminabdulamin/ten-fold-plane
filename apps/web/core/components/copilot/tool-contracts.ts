@@ -68,17 +68,17 @@ export async function createWorkItemsSequentially<TItem, TValue>(
   create: (item: TItem) => Promise<TValue>
 ): Promise<{
   created: { item: TItem; value: TValue }[];
-  failed: { item: TItem; message: string }[];
+  failed: { item: TItem; message: string; error: unknown }[];
 }> {
   const created: { item: TItem; value: TValue }[] = [];
-  const failed: { item: TItem; message: string }[] = [];
+  const failed: { item: TItem; message: string; error: unknown }[] = [];
 
   for (const item of items) {
     try {
       // oxlint-disable-next-line eslint(no-await-in-loop) -- preserve request order and stop after the first failure.
       created.push({ item, value: await create(item) });
     } catch (error) {
-      failed.push({ item, message: error instanceof Error ? error.message : "Request failed" });
+      failed.push({ item, message: "Unable to create work item.", error });
     }
   }
 
