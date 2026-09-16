@@ -21,6 +21,7 @@ const objectParameters = {
 const fakeTools = [
   "find_project",
   "list_work_items",
+  "list_month_events",
   "get_current_datetime",
   "get_work_item_schema",
   "update_work_item",
@@ -64,6 +65,7 @@ const fakeOutput = (scenario: AgentScenario, call: AgentTraceCall): string => {
     case "get_work_item_schema":
       return JSON.stringify({ ok: true, data: { members: [{ id: "member-1", name: "Alex" }] } });
     case "list_work_items":
+    case "list_month_events":
       return JSON.stringify({ ok: true, status: "success", data: [{ id: "issue-1", name: "Launch" }] });
     case "create_work_items":
       return JSON.stringify({ ok: scenario.id !== "partial-batch", status: scenario.terminalStatus });

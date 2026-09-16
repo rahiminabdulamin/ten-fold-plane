@@ -5,6 +5,7 @@ import {
   classifyToolError,
   createWorkItemsSequentially,
   getUserLocalDateTime,
+  getMonthDateRange,
   toolError,
   toolPartialResult,
   toolResult,
@@ -70,6 +71,13 @@ describe("work-item tool contracts", () => {
       date: "2026-09-08",
       time: "00:30",
       timeZone: "Asia/Singapore",
+    });
+  });
+
+  it("resolves a named month to the current year without a state filter", () => {
+    expect(getMonthDateRange("October", "2026-09-17")).toEqual({
+      dateFrom: "2026-10-01",
+      dateTo: "2026-10-31",
     });
   });
 

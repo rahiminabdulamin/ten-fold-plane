@@ -27,8 +27,23 @@ export interface ToolResult {
 }
 
 export const WORK_ITEM_STATE_GROUPS = ["backlog", "unstarted", "started", "completed", "cancelled"] as const;
+export const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
 
 export type WorkItemStateGroup = (typeof WORK_ITEM_STATE_GROUPS)[number];
+export type MonthName = (typeof MONTH_NAMES)[number];
 
 type WorkItemRecordSource = {
   id: string;
@@ -187,6 +202,14 @@ export function getUserLocalDateTime(timeZone: string, now: Date = new Date()) {
     time: `${values.hour}:${values.minute}`,
     timeZone,
   };
+}
+
+export function getMonthDateRange(month: MonthName, currentDate: string) {
+  const year = Number(currentDate.slice(0, 4));
+  const monthIndex = MONTH_NAMES.indexOf(month);
+  const monthNumber = String(monthIndex + 1).padStart(2, "0");
+  const lastDay = String(new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate()).padStart(2, "0");
+  return { dateFrom: `${year}-${monthNumber}-01`, dateTo: `${year}-${monthNumber}-${lastDay}` };
 }
 
 const toDescriptionHtml = (description: string | null) => {

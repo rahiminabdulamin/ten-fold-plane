@@ -46,13 +46,9 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
       "The user selected the Programmes Workspace after being asked to choose. What events are coming up for October?",
     expectedCalls: [
       { name: "find_project", arguments: { query: "Programmes" } },
-      { name: "get_current_datetime" },
-      {
-        name: "list_work_items",
-        arguments: { projectId: "project-1", dateFrom: "2026-10-01", dateTo: "2026-10-31" },
-      },
+      { name: "list_month_events", arguments: { projectId: "project-1", month: "October" } },
     ],
-    prohibitedArgumentKeys: [{ name: "list_work_items", keys: ["stateGroup"] }],
+    prohibitedCalls: ["list_work_items"],
     terminalStatus: "success",
   },
   {

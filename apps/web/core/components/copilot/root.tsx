@@ -20,7 +20,9 @@ import {
   classifyToolError,
   createWorkItemsSequentially,
   findProjectMatches,
+  getMonthDateRange,
   getUserLocalDateTime,
+  MONTH_NAMES,
   type ToolResult,
   toWorkItemPayload,
   toWorkItemRecords,
@@ -312,6 +314,51 @@ function PlaneTools() {
       ),
     }),
     [resetLauncherPosition]
+  );
+
+  useFrontendTool(
+    {
+      name: "list_month_events",
+      description:
+        "List all events in a named calendar month for the current year. Use this for requests such as upcoming events in October. It always includes every work-item state.",
+      parameters: z.object({ projectId: z.string().uuid().optional(), month: z.enum(MONTH_NAMES) }),
+      render: renderToolActivity("Checking monthly events…"),
+      handler: async ({ projectId: requestedProjectId, month }) => {
+        const targetProjectId = requestedProjectId ?? projectId;
+        if (!workspace || !targetProjectId)
+          return { ok: false, message: "Find a Workspace first, then provide its ID.", retryable: false };
+        const timeZone = user?.user_timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
+        const { dateFrom, dateTo } = getMonthDateRange(month, getUserLocalDateTime(timeZone).date);
+        try {
+          const response = await issueService.getIssues(
+            workspace,
+            targetProjectId,
+            buildWorkItemQuery(undefined, dateFrom, dateTo)
+          );
+          const issues = Array.isArray(response.results) ? response.results : [];
+          const data = toWorkItemRecords(issues);
+          logWorkItemListTrace({
+            projectId: targetProjectId,
+            dateFrom,
+            dateTo,
+            resultCount: data.length,
+            status: "success",
+          });
+          return { ...toolResult("list_month_events", `Found ${data.length} events.`), data };
+        } catch (error) {
+          const result = toolError("list_month_events", error);
+          logWorkItemListTrace({
+            projectId: targetProjectId,
+            dateFrom,
+            dateTo,
+            resultCount: null,
+            status: result.status,
+          });
+          return result;
+        }
+      },
+    },
+    [workspace, projectId, user?.user_timezone]
   );
 
   useFrontendTool(

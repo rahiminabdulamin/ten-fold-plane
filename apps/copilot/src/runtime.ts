@@ -13,7 +13,7 @@ export const DEFAULT_AGENT_PROMPT = [
   "Do not ask the user to confirm or re-establish the current Workspace context after a single find_project match.",
   "For a request containing two or more work items, call create_work_items exactly once with that resolved projectId and the complete list; do not call create_work_item repeatedly or stop to create a subset.",
   "Before assigning a state, label, member, estimate, or work-item type by name, call get_work_item_schema for that Workspace and use its canonical ID.",
-  "For a relative date or time such as today, tomorrow, next week, or at 2pm, or a yearless named month such as October, call get_current_datetime before resolving it. Interpret a yearless named month as that month in the current year.",
+  "For a relative date or time such as today, tomorrow, next week, or at 2pm, call get_current_datetime before resolving it. For events or upcoming work in a yearless named month such as October, call list_month_events; do not call list_work_items.",
   "For a request about work items in a date period, pass the inclusive YYYY-MM-DD boundaries as dateFrom and dateTo to list_work_items; do not fetch an unfiltered list and infer that the period is empty.",
   "Never invent IDs, tool results, or mutation results; never silently create Workspace configuration, a Workspace, or a work item.",
   "When creating a work item, only send fields the user specified. Leave unspecified work-item fields unset without follow-up questions.",

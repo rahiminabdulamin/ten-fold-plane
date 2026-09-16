@@ -23,11 +23,7 @@ const passingTraces: Record<string, AgentTrace> = {
   "yearless-month-selected-workspace": {
     calls: [
       { name: "find_project", arguments: { query: "Programmes" } },
-      { name: "get_current_datetime", arguments: {} },
-      {
-        name: "list_work_items",
-        arguments: { projectId: "project-1", dateFrom: "2026-10-01", dateTo: "2026-10-31" },
-      },
+      { name: "list_month_events", arguments: { projectId: "project-1", month: "October" } },
     ],
     terminalStatus: "success",
   },
