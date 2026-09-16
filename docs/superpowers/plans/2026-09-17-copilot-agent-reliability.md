@@ -34,7 +34,7 @@
 - Produces: `ToolStatus`, `ToolErrorCategory`, expanded `ToolResult`, `toolPartialResult()`, `toolUncertainResult()`, `toolValidationError()`, `classifyToolError()`, and stricter `buildWorkItemQuery()`.
 - Consumers: all Copilot handlers in Task 3.
 
-- [ ] **Step 1: Write failing outcome and error-classification tests**
+- [x] **Step 1: Write failing outcome and error-classification tests**
 
 Add tests asserting these exact behaviors:
 
@@ -61,13 +61,13 @@ expect(classifyToolError({ code: "ERR_NETWORK" })).toEqual({ category: "network"
 
 Also assert that mutation-mode `toolError("create_work_item", error, { mutation: true })` always has `retryable: false`, while preserving the classified category.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `pnpm exec vitest run apps/web/core/components/copilot/tool-contracts.test.ts`
 
 Expected: FAIL because the new exports and `status` field do not exist.
 
-- [ ] **Step 3: Implement the minimal stable outcome contract**
+- [x] **Step 3: Implement the minimal stable outcome contract**
 
 Define:
 
@@ -96,24 +96,24 @@ export interface ToolResult {
 
 Classify structured `response.status` values `400`, `401/403`, `404`, `409`, and `429`; classify `ECONNABORTED`/`ETIMEDOUT` as timeout and `ERR_NETWORK`/`ECONNRESET` as network; use unexpected otherwise. Generate only fixed safe messages from the operation and category.
 
-- [ ] **Step 4: Write failing date-range validation tests**
+- [x] **Step 4: Write failing date-range validation tests**
 
 ```ts
 expect(() => buildWorkItemQuery(undefined, "2026-09-17", undefined)).toThrow("both dateFrom and dateTo");
 expect(() => buildWorkItemQuery(undefined, "2026-09-18", "2026-09-17")).toThrow("dateFrom must not be after dateTo");
 ```
 
-- [ ] **Step 5: Run the focused test and verify RED**
+- [x] **Step 5: Run the focused test and verify RED**
 
 Run the command from Step 2.
 
 Expected: FAIL because incomplete and reversed ranges are currently accepted or dropped.
 
-- [ ] **Step 6: Enforce complete ordered date ranges**
+- [x] **Step 6: Enforce complete ordered date ranges**
 
 Make `buildWorkItemQuery()` throw a fixed validation error when exactly one boundary is present or when `dateFrom > dateTo`. Keep `{ per_page: "20" }` and the existing state/date query parameter names unchanged.
 
-- [ ] **Step 7: Run focused tests and commit**
+- [x] **Step 7: Run focused tests and commit**
 
 Run: `pnpm exec vitest run apps/web/core/components/copilot/tool-contracts.test.ts`
 
@@ -139,7 +139,7 @@ git commit -m "feat: classify copilot tool outcomes"
 - Produces: `mutationFingerprint()`, `MutationGuard.run()`, `isCanonicalRecord()`, `requestedFieldsMatch()`, `confirmDeleted()`, and `logToolOutcome()`.
 - Consumers: mutation handlers in Task 3.
 
-- [ ] **Step 1: Write failing fingerprint and guard tests**
+- [x] **Step 1: Write failing fingerprint and guard tests**
 
 Cover key-order independence, different scopes producing different fingerprints, one service invocation for two concurrent identical calls, duplicate failure status, and fingerprint release after resolve and reject:
 
@@ -163,17 +163,17 @@ release();
 await expect(first).resolves.toBe("created");
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `pnpm exec vitest run apps/web/core/components/copilot/tool-reliability.test.ts`
 
 Expected: FAIL because the module does not exist.
 
-- [ ] **Step 3: Implement stable normalization and the in-memory guard**
+- [x] **Step 3: Implement stable normalization and the in-memory guard**
 
 Use a recursive JSON normalizer that sorts object keys and preserves array order. Implement `MutationGuard` with a private `Set<string>` and `finally` cleanup. Its duplicate result must be a `validation` failure and must never invoke the callback.
 
-- [ ] **Step 4: Write failing reconciliation-helper tests**
+- [x] **Step 4: Write failing reconciliation-helper tests**
 
 Assert:
 
@@ -193,17 +193,17 @@ expect(
 
 For `confirmDeleted()`, assert that a retrieval producing classified `not_found` returns success, a returned record produces `uncertain`, and a network error produces `uncertain`.
 
-- [ ] **Step 5: Run the focused test and verify RED**
+- [x] **Step 5: Run the focused test and verify RED**
 
 Run the command from Step 2.
 
 Expected: FAIL because reconciliation helpers do not exist.
 
-- [ ] **Step 6: Implement minimal reconciliation helpers**
+- [x] **Step 6: Implement minimal reconciliation helpers**
 
 `requestedFieldsMatch()` compares only keys present in the expected object; scalar values use `Object.is`, and arrays compare after sorting copies. `confirmDeleted(operation, affectedId, retrieve)` calls `retrieve` once and returns a verified success only for a classified not-found error; all other results are uncertain.
 
-- [ ] **Step 7: Run focused tests and commit**
+- [x] **Step 7: Run focused tests and commit**
 
 Before the final run, add a logging test that passes a spy callback to `logToolOutcome()`. Assert that its single structured argument contains only `correlationId`, `operation`, `status`, optional `errorCategory`, `durationMs`, and `affectedCount`; assert that neither tool arguments nor messages are accepted by the function. Implement it with `Date.now()` timing and `crypto.randomUUID()` supplied by the caller so the helper remains deterministic in tests.
 
@@ -231,11 +231,11 @@ git commit -m "feat: guard copilot mutations"
 - Consumes: all Task 1 outcome functions and Task 2 mutation helpers.
 - Produces: guarded and reconciled project/work-item mutations without changing public tool names or parameter schemas.
 
-- [ ] **Step 1: Extend source-contract tests before handler changes**
+- [x] **Step 1: Extend source-contract tests before handler changes**
 
 Require `root.tsx` to instantiate one module-level or component-stable `MutationGuard`, fingerprint every project/work-item create, update, batch, and delete, pass `{ mutation: true }` to mutation error conversion, call `requestedFieldsMatch()` after updates, and call `confirmDeleted()` after deletes. Require batch results to include `partial_success` when created and failed arrays are both non-empty. Require every tool handler and confirmed mutation path to call `logToolOutcome()` with the final structured result and no user arguments or result message.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run:
 
@@ -246,19 +246,19 @@ node --test apps/web/tests/complete-work-item-agent-schema.test.mjs
 
 Expected: source-contract test FAIL because handlers do not use the new controls.
 
-- [ ] **Step 3: Guard create handlers and validate canonical responses**
+- [x] **Step 3: Guard create handlers and validate canonical responses**
 
 Wrap `create_project`, `create_work_item`, and `create_work_items` in `MutationGuard.run()` using fingerprints containing operation, Team slug, canonical project scope, and normalized mutation input. Validate each returned `{ id, name }` with `isCanonicalRecord()`. Convert ambiguous create failures to `uncertain`; do not search by name and do not retry.
 
-- [ ] **Step 4: Guard and reconcile update handlers**
+- [x] **Step 4: Guard and reconcile update handlers**
 
 For `update_project`, retrieve the project after the update and compare `{ name }`. For `update_work_item`, retrieve the item after patching and compare the Plane payload keys supplied by `toWorkItemPayload(changes)`. Return success only when requested fields match; otherwise return uncertain.
 
-- [ ] **Step 5: Guard and reconcile confirmed deletes**
+- [x] **Step 5: Guard and reconcile confirmed deletes**
 
 Keep the existing confirmation UI and captured arguments. After `deleteIssue()` or `deleteProject()`, call `confirmDeleted()` with the corresponding retrieve function. Disable each confirmation button while its guarded execution is in flight. Cancellation returns a normal `failure` result with `errorCategory: "validation"`, not an exception.
 
-- [ ] **Step 6: Return exact batch outcomes**
+- [x] **Step 6: Return exact batch outcomes**
 
 Keep sequential per-item attempts. Validate each created record, preserve every failed item, and return:
 
@@ -271,7 +271,7 @@ Never retry an item automatically.
 
 Log each completed tool execution through `logToolOutcome()`. Generate the correlation ID at execution start, measure elapsed milliseconds, and pass only the final outcome metadata. Use the existing console logger; do not log prompt text, arguments, messages, returned data, raw exceptions, or authentication material.
 
-- [ ] **Step 7: Run focused tests and type checking**
+- [x] **Step 7: Run focused tests and type checking**
 
 Run:
 
@@ -283,7 +283,7 @@ pnpm --filter web check:types
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/web/core/components/copilot/root.tsx apps/web/core/components/copilot/tool-contracts.test.ts apps/web/tests/complete-work-item-agent-schema.test.mjs
@@ -304,21 +304,21 @@ git commit -m "feat: verify copilot mutations"
 - Produces: `AgentScenario`, `AgentTrace`, `AGENT_SCENARIOS`, and `evaluateScenario(scenario, trace)`.
 - Consumers: live evaluator in Task 5.
 
-- [ ] **Step 1: Write failing runtime-policy tests**
+- [x] **Step 1: Write failing runtime-policy tests**
 
 Require the prompt to state that `partial_success`, `failure`, and `uncertain` are not success; uncertain mutations must not be automatically repeated; and tool result IDs or outcomes must never be invented. Keep existing terminology, lookup, schema, date, batch, and filtered-empty requirements.
 
-- [ ] **Step 2: Run the runtime test and verify RED**
+- [x] **Step 2: Run the runtime test and verify RED**
 
 Run: `pnpm --filter @plane/copilot test -- src/runtime.test.ts`
 
 Expected: FAIL because the prompt lacks the explicit outcome rules.
 
-- [ ] **Step 3: Reformat and strengthen the runtime policy**
+- [x] **Step 3: Reformat and strengthen the runtime policy**
 
 Replace the single dense string with joined short policy lines while preserving all existing requirements. Add the three outcome rules from Step 1. Do not change model or step limit.
 
-- [ ] **Step 4: Write failing scenario-evaluator tests**
+- [x] **Step 4: Write failing scenario-evaluator tests**
 
 Define trace assertions for ordered tool calls, critical deep-partial arguments, prohibited tools, maximum call counts, and terminal status. Include scenarios for:
 
@@ -333,13 +333,13 @@ Define trace assertions for ordered tool calls, critical deep-partial arguments,
 
 For each scenario, test one passing trace and one focused failing trace.
 
-- [ ] **Step 5: Run scenario tests and verify RED**
+- [x] **Step 5: Run scenario tests and verify RED**
 
 Run: `pnpm --filter @plane/copilot test -- src/evals/scenarios.test.ts`
 
 Expected: FAIL because the catalog and evaluator do not exist.
 
-- [ ] **Step 6: Implement the catalog and pure evaluator**
+- [x] **Step 6: Implement the catalog and pure evaluator**
 
 Use these types:
 
@@ -364,7 +364,7 @@ export interface AgentScenario {
 
 Return `{ pass: boolean, reasons: string[] }`. Implement recursive partial matching locally with no dependency.
 
-- [ ] **Step 7: Run focused tests and commit**
+- [x] **Step 7: Run focused tests and commit**
 
 Run:
 
@@ -396,7 +396,7 @@ git commit -m "test: add copilot reliability scenarios"
 - Consumes: `DEFAULT_AGENT_PROMPT`, `AGENT_SCENARIOS`, and `evaluateScenario()`.
 - Produces: `runLiveEvaluations(fetchImpl, environment)` and the `pnpm --filter @plane/copilot eval:live` command.
 
-- [ ] **Step 1: Write failing live-runner tests**
+- [x] **Step 1: Write failing live-runner tests**
 
 Use a stub `fetch` implementation to assert that the runner:
 
@@ -406,19 +406,19 @@ Use a stub `fetch` implementation to assert that the runner:
 - Redacts argument values in its report.
 - Returns a nonzero result when `evaluateScenario()` fails.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run: `pnpm --filter @plane/copilot test -- src/evals/live.test.ts`
 
 Expected: FAIL because the live runner does not exist.
 
-- [ ] **Step 3: Implement the dependency-free live runner**
+- [x] **Step 3: Implement the dependency-free live runner**
 
 Use native `fetch` against `https://api.openai.com/v1/responses`, the same model identifier as `runtime.ts`, and a bounded loop of `DEFAULT_AGENT_MAX_STEPS`. Expose only fake tools named by the scenario catalog. Fake outputs use static fixture IDs and records; no imports from Plane services are allowed. Record tool names, parsed arguments, and terminal fixture status, then call `evaluateScenario()`.
 
 When executed as the main module, print one line per scenario containing only scenario ID, tool names, pass/fail, and reasons. Exit `1` if any scenario fails and `0` otherwise.
 
-- [ ] **Step 4: Add the opt-in command and documentation**
+- [x] **Step 4: Add the opt-in command and documentation**
 
 Add:
 
@@ -428,7 +428,7 @@ Add:
 
 Document that it is developer-facing, paid, nondeterministic, requires `OPENAI_API_KEY`, uses fake tools, cannot mutate Plane, and is intentionally excluded from normal CI.
 
-- [ ] **Step 5: Run focused tests and type checking**
+- [x] **Step 5: Run focused tests and type checking**
 
 Run:
 
@@ -439,7 +439,7 @@ pnpm --filter @plane/copilot check:types
 
 Expected: PASS without making a network request.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/copilot/src/evals/live.ts apps/copilot/src/evals/live.test.ts apps/copilot/package.json apps/copilot/README.md
@@ -457,7 +457,7 @@ git commit -m "feat: add opt-in copilot live evals"
 - Consumes: all previous tasks.
 - Produces: checked plan state and fresh verification evidence.
 
-- [ ] **Step 1: Run the complete focused verification**
+- [x] **Step 1: Run the complete focused verification**
 
 ```bash
 pnpm --filter @plane/copilot test
@@ -472,11 +472,11 @@ git diff --check
 
 Expected: every command exits `0` with no test failures or type errors.
 
-- [ ] **Step 2: Audit the acceptance criteria against the diff**
+- [x] **Step 2: Audit the acceptance criteria against the diff**
 
 Confirm from code and tests that duplicate calls invoke a service once, outcomes are classified, create/update/delete success is verified, batches preserve item-level results, date ranges are complete and ordered, scenarios cover prohibited behavior, live tools are fake, and no prohibited dependency or subsystem was added.
 
-- [ ] **Step 3: Mark completed plan checkboxes and commit the plan**
+- [x] **Step 3: Mark completed plan checkboxes and commit the plan**
 
 ```bash
 git add docs/superpowers/plans/2026-09-17-copilot-agent-reliability.md
