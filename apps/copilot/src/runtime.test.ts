@@ -25,6 +25,13 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain("Never invent IDs, tool results, or mutation results");
   });
 
+  it("resolves an omitted Workspace and a yearless month from backend data", () => {
+    expect(DEFAULT_AGENT_PROMPT).toContain("do not infer a Workspace from the open page");
+    expect(DEFAULT_AGENT_PROMPT).toContain("Call list_projects and ask the user to choose");
+    expect(DEFAULT_AGENT_PROMPT).toContain("yearless named month");
+    expect(DEFAULT_AGENT_PROMPT).toContain("Only say a requested date period is empty");
+  });
+
   it("creates the default gpt-4o-mini agent without exposing credentials", () => {
     expect(() =>
       createRuntime({

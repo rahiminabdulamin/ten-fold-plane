@@ -20,6 +20,17 @@ const passingTraces: Record<string, AgentTrace> = {
     ],
     terminalStatus: "success",
   },
+  "yearless-month-selected-workspace": {
+    calls: [
+      { name: "find_project", arguments: { query: "Programmes" } },
+      { name: "get_current_datetime", arguments: {} },
+      {
+        name: "list_work_items",
+        arguments: { projectId: "project-1", dateFrom: "2026-10-01", dateTo: "2026-10-31" },
+      },
+    ],
+    terminalStatus: "success",
+  },
   "schema-backed-assignment": {
     calls: [
       { name: "get_work_item_schema", arguments: { projectId: "project-1" } },
@@ -72,6 +83,19 @@ describe("agent reliability scenarios", () => {
     [
       "relative-date-range",
       { calls: [{ name: "list_work_items", arguments: { projectId: "project-1" } }], terminalStatus: "success" },
+    ],
+    [
+      "yearless-month-selected-workspace",
+      {
+        calls: [
+          { name: "find_project", arguments: { query: "Programmes" } },
+          {
+            name: "list_work_items",
+            arguments: { projectId: "project-1", dateFrom: "2025-10-01", dateTo: "2025-10-31" },
+          },
+        ],
+        terminalStatus: "success",
+      },
     ],
     [
       "schema-backed-assignment",

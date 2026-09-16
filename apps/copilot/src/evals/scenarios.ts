@@ -40,6 +40,20 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
     terminalStatus: "success",
   },
   {
+    id: "yearless-month-selected-workspace",
+    prompt:
+      "The user selected the Programmes Workspace after being asked to choose. What events are coming up for October?",
+    expectedCalls: [
+      { name: "find_project", arguments: { query: "Programmes" } },
+      { name: "get_current_datetime" },
+      {
+        name: "list_work_items",
+        arguments: { projectId: "project-1", dateFrom: "2026-10-01", dateTo: "2026-10-31" },
+      },
+    ],
+    terminalStatus: "success",
+  },
+  {
     id: "schema-backed-assignment",
     prompt: "Assign the launch task to Alex.",
     expectedCalls: [
