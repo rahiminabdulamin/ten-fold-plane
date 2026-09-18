@@ -10,8 +10,6 @@ import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
 import { renderToPipeableStream } from "react-dom/server";
 
-const streamTimeout = 1_000;
-
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -27,14 +25,12 @@ export default function handleRequest(
     let shellRendered = false;
     // Admin is deployed as a static SPA. Its fallback only needs the document
     // shell. Build-time requests must not wait for every route boundary.
-    const timeoutId = setTimeout(() => abort(), streamTimeout);
 
-    const { pipe, abort } = renderToPipeableStream(<ServerRouter context={routerContext} url={request.url} />, {
+    const { pipe } = renderToPipeableStream(<ServerRouter context={routerContext} url={request.url} />, {
       onShellReady() {
         shellRendered = true;
         const body = new PassThrough({
           final(callback) {
-            clearTimeout(timeoutId);
             callback();
           },
         });
