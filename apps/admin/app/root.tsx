@@ -44,6 +44,8 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
+  const isBuildRequest = typeof window === "undefined" && process.env.IS_RR_BUILD_REQUEST === "yes";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -53,7 +55,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Links />
       </head>
       <body className="antialiased" suppressHydrationWarning>
-        <AppProviders>{children}</AppProviders>
+        {isBuildRequest ? children : <AppProviders>{children}</AppProviders>}
         <Scripts />
       </body>
     </html>
