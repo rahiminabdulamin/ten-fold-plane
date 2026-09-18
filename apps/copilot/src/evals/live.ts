@@ -10,7 +10,13 @@ type ResponseFunctionCall = {
   arguments: string;
 };
 
-type ResponsesPayload = { id: string; output: Array<ResponseFunctionCall | { type: string }> };
+type ResponseMessage = { type: "message"; content: Array<{ type: string; text?: string }> };
+
+type ResponsesPayload = {
+  id: string;
+  output: Array<ResponseFunctionCall | ResponseMessage | { type: string }>;
+  output_text?: string;
+};
 
 const objectParameters = {
   type: "object",
@@ -78,6 +84,16 @@ const fakeOutput = (scenario: AgentScenario, call: AgentTraceCall): string => {
   }
 };
 
+const getResponseText = (payload: ResponsesPayload) => {
+  if (payload.output_text?.trim()) return payload.output_text;
+  return payload.output
+    .filter((item): item is ResponseMessage => item.type === "message")
+    .flatMap(({ content }) => content)
+    .filter((content) => content.type === "output_text" && typeof content.text === "string")
+    .map(({ text }) => text)
+    .join("\n");
+};
+
 export async function runLiveEvaluations(
   fetchImpl: typeof fetch = fetch,
   environment: Record<string, string | undefined> = process.env,
@@ -95,8 +111,9 @@ export async function runLiveEvaluations(
     let terminalStatus: "success" | "partial_success" | "failure" | "uncertain" = "failure";
     let previousResponseId: string | undefined;
     let input: string | Array<{ type: "function_call_output"; call_id: string; output: string }> =
-      `${scenario.prompt}\nAfter completing the request, call report_outcome exactly once with the truthful final status.`;
+      `${scenario.prompt}\nAfter completing the request, call report_outcome exactly once with the truthful final status and provide a concise final user-facing answer in the same response.`;
 
+    let finalResponse: string | undefined;
     for (let step = 0; step < DEFAULT_AGENT_MAX_STEPS; step++) {
       // oxlint-disable-next-line eslint(no-await-in-loop) -- each response consumes the previous tool outputs.
       const response = await fetchImpl("https://api.openai.com/v1/responses", {
@@ -115,6 +132,8 @@ export async function runLiveEvaluations(
       if (!response.ok) throw new Error(`OpenAI evaluation request failed with status ${response.status}.`);
       // oxlint-disable-next-line eslint(no-await-in-loop) -- parse the sequential response before continuing.
       const payload = (await response.json()) as ResponsesPayload;
+      const responseText = getResponseText(payload);
+      if (responseText.trim()) finalResponse = responseText;
       const functionCalls = payload.output.filter(
         (item): item is ResponseFunctionCall => item.type === "function_call"
       );
@@ -144,7 +163,11 @@ export async function runLiveEvaluations(
       input = outputs;
     }
 
-    const evaluation = evaluateScenario(scenario, { calls, terminalStatus });
+    const evaluation = evaluateScenario(scenario, {
+      calls,
+      terminalStatus,
+      ...(finalResponse ? { finalResponse } : {}),
+    });
     results.push({
       id: scenario.id,
       pass: evaluation.pass,

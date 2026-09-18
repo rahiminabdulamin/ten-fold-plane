@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { AgentScenario } from "./scenarios";
+import { AGENT_SCENARIOS, type AgentScenario } from "./scenarios";
 import { runLiveEvaluations } from "./live";
 import { DEFAULT_AGENT_PROMPT } from "../runtime";
 
@@ -96,5 +96,62 @@ describe("live agent evaluations", () => {
       exitCode: 1,
       results: [{ id: "safe-lookup", pass: false, tools: [], reasons: ["Missing ordered call find_project."] }],
     });
+  });
+
+  it("rejects a contradictory final answer after successful October event lookups", async () => {
+    const octoberScenario = AGENT_SCENARIOS.find((candidate) => candidate.id === "yearless-month-selected-workspace");
+    expect(octoberScenario).toBeDefined();
+    const responses = [
+      {
+        id: "response-1",
+        output: [
+          {
+            type: "function_call",
+            call_id: "call-1",
+            name: "find_project",
+            arguments: JSON.stringify({ query: "Programmes" }),
+          },
+        ],
+      },
+      {
+        id: "response-2",
+        output: [
+          {
+            type: "function_call",
+            call_id: "call-2",
+            name: "list_month_events",
+            arguments: JSON.stringify({ projectId: "project-1", month: "October" }),
+          },
+        ],
+      },
+      {
+        id: "response-3",
+        output: [
+          {
+            type: "function_call",
+            call_id: "call-3",
+            name: "report_outcome",
+            arguments: JSON.stringify({ status: "success" }),
+          },
+          {
+            type: "message",
+            content: [{ type: "output_text", text: "There are no events scheduled for October 2026." }],
+          },
+        ],
+      },
+    ];
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify(responses.shift()), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        })
+    );
+
+    const report = await runLiveEvaluations(fetchImpl, { OPENAI_API_KEY: "test-key" }, [octoberScenario!]);
+
+    expect(report.exitCode).toBe(1);
+    expect(report.results[0]).toMatchObject({ id: "yearless-month-selected-workspace" });
+    expect(report.results[0]?.reasons).toContainEqual(expect.stringContaining("empty"));
   });
 });

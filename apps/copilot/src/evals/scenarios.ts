@@ -6,6 +6,13 @@ export interface AgentTraceCall {
 export interface AgentTrace {
   calls: AgentTraceCall[];
   terminalStatus: "success" | "partial_success" | "failure" | "uncertain";
+  finalResponse?: string;
+}
+
+export interface AgentResponseFacts {
+  toolName: string;
+  count: number;
+  recordNames: string[];
 }
 
 export interface AgentScenario {
@@ -16,6 +23,7 @@ export interface AgentScenario {
   prohibitedArgumentKeys?: Array<{ name: string; keys: string[] }>;
   maxCalls?: Record<string, number>;
   terminalStatus: AgentTrace["terminalStatus"];
+  responseFacts?: AgentResponseFacts;
 }
 
 export const AGENT_SCENARIOS: AgentScenario[] = [
@@ -50,6 +58,15 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
     ],
     prohibitedCalls: ["list_work_items"],
     terminalStatus: "success",
+    responseFacts: {
+      toolName: "list_month_events",
+      count: 3,
+      recordNames: [
+        "JobCentre - Career360 Session",
+        "IBTE Working Session - AI for Humanity",
+        "(DYAP) Sekolah Arab Perempuan – Safe & Responsible Digital Citizenship Assembly",
+      ],
+    },
   },
   {
     id: "schema-backed-assignment",
@@ -125,6 +142,36 @@ const partiallyMatches = (actual: unknown, expected: unknown): boolean => {
   return Object.is(actual, expected);
 };
 
+const normalizeResponse = (response: string) =>
+  response
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[–—]/g, "-")
+    .toLocaleLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+
+const evaluateResponseFacts = (facts: AgentResponseFacts, finalResponse: string | undefined) => {
+  if (!finalResponse?.trim()) return [`Missing final response for ${facts.toolName}.`];
+  const response = normalizeResponse(finalResponse);
+  const reasons: string[] = [];
+  const emptyClaim = /\b(?:no|zero|0)\s+(?:scheduled\s+)?(?:events?|items?|work items?)\b/.test(response);
+  if (facts.count > 0 && emptyClaim)
+    reasons.push(`${facts.toolName} returned a non-empty list but the response says it is empty.`);
+  if (facts.count === 0 && /\b(?:[1-9]\d*)\s+(?:events?|items?|work items?)\b/.test(response))
+    reasons.push(`${facts.toolName} returned an empty list but the response claims records.`);
+  for (const match of response.matchAll(/\b(\d+)\s+(?:events?|items?|work items?)\b/g)) {
+    if (Number(match[1]) !== facts.count)
+      reasons.push(`${facts.toolName} returned ${facts.count} records but the response claims ${match[1]}.`);
+  }
+  if (facts.count > 0) {
+    for (const name of facts.recordNames) {
+      if (!response.includes(normalizeResponse(name))) reasons.push(`Response omits ${facts.toolName} record ${name}.`);
+    }
+  }
+  return reasons;
+};
+
 export function evaluateScenario(
   scenario: AgentScenario,
   trace: AgentTrace | undefined
@@ -158,5 +205,6 @@ export function evaluateScenario(
   }
   if (trace.terminalStatus !== scenario.terminalStatus)
     reasons.push(`Expected terminal status ${scenario.terminalStatus}, received ${trace.terminalStatus}.`);
+  if (scenario.responseFacts) reasons.push(...evaluateResponseFacts(scenario.responseFacts, trace.finalResponse));
   return { pass: reasons.length === 0, reasons };
 }

@@ -23,6 +23,7 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain("partial_success, failure, or uncertain");
     expect(DEFAULT_AGENT_PROMPT).toContain("Never automatically repeat a mutation after an uncertain result");
     expect(DEFAULT_AGENT_PROMPT).toContain("Never invent IDs, tool results, or mutation results");
+    expect(DEFAULT_AGENT_PROMPT).toContain("including list_month_events");
   });
 
   it("resolves an omitted Workspace and a yearless month from backend data", () => {

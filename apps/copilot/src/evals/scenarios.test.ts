@@ -1,6 +1,25 @@
 import { describe, expect, it } from "vitest";
 
-import { AGENT_SCENARIOS, evaluateScenario, type AgentTrace } from "./scenarios";
+import { AGENT_SCENARIOS, evaluateScenario, type AgentScenario, type AgentTrace } from "./scenarios";
+
+const octoberResponseScenario: AgentScenario = {
+  id: "october-response-grounding",
+  prompt: "What are the events for October 2026?",
+  expectedCalls: [
+    { name: "find_project", arguments: { query: "Programmes" } },
+    { name: "list_month_events", arguments: { projectId: "project-1", month: "October" } },
+  ],
+  terminalStatus: "success",
+  responseFacts: {
+    toolName: "list_month_events",
+    count: 3,
+    recordNames: [
+      "JobCentre - Career360 Session",
+      "IBTE Working Session - AI for Humanity",
+      "(DYAP) Sekolah Arab Perempuan – Safe & Responsible Digital Citizenship Assembly",
+    ],
+  },
+};
 
 const passingTraces: Record<string, AgentTrace> = {
   "named-workspace-backlog": {
@@ -26,6 +45,8 @@ const passingTraces: Record<string, AgentTrace> = {
       { name: "list_month_events", arguments: { projectId: "project-1", month: "October" } },
     ],
     terminalStatus: "success",
+    finalResponse:
+      "There are 3 events: JobCentre - Career360 Session; IBTE Working Session - AI for Humanity; and (DYAP) Sekolah Arab Perempuan – Safe & Responsible Digital Citizenship Assembly.",
   },
   "schema-backed-assignment": {
     calls: [
@@ -65,6 +86,34 @@ const passingTraces: Record<string, AgentTrace> = {
 };
 
 describe("agent reliability scenarios", () => {
+  it("rejects an empty October answer after a successful non-empty event lookup", () => {
+    const result = evaluateScenario(octoberResponseScenario, {
+      calls: [
+        { name: "find_project", arguments: { query: "Programmes" } },
+        { name: "list_month_events", arguments: { projectId: "project-1", month: "October" } },
+      ],
+      terminalStatus: "success",
+      finalResponse: "There are no events scheduled for October 2026.",
+    });
+
+    expect(result.pass).toBe(false);
+    expect(result.reasons).toContainEqual(expect.stringContaining("empty"));
+  });
+
+  it("accepts an October answer grounded in the successful event lookup", () => {
+    const result = evaluateScenario(octoberResponseScenario, {
+      calls: [
+        { name: "find_project", arguments: { query: "Programmes" } },
+        { name: "list_month_events", arguments: { projectId: "project-1", month: "October" } },
+      ],
+      terminalStatus: "success",
+      finalResponse:
+        "There are 3 events: JobCentre - Career360 Session; IBTE Working Session - AI for Humanity; and (DYAP) Sekolah Arab Perempuan – Safe & Responsible Digital Citizenship Assembly.",
+    });
+
+    expect(result).toEqual({ pass: true, reasons: [] });
+  });
+
   it("accepts a conforming trace for every scenario", () => {
     expect(AGENT_SCENARIOS.map((scenario) => evaluateScenario(scenario, passingTraces[scenario.id]))).toEqual(
       AGENT_SCENARIOS.map(() => ({ pass: true, reasons: [] }))
