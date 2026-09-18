@@ -23,10 +23,11 @@ export default function handleRequest(
 
   return new Promise<Response>((resolve, reject) => {
     let shellRendered = false;
+    let shellAborted = false;
     // Admin is deployed as a static SPA. Its fallback only needs the document
     // shell. Build-time requests must not wait for every route boundary.
 
-    const { pipe } = renderToPipeableStream(<ServerRouter context={routerContext} url={request.url} />, {
+    const { pipe, abort } = renderToPipeableStream(<ServerRouter context={routerContext} url={request.url} />, {
       onShellReady() {
         shellRendered = true;
         const body = new PassThrough({
@@ -38,6 +39,12 @@ export default function handleRequest(
 
         responseHeaders.set("Content-Type", "text/html");
         pipe(body);
+        // The static SPA fallback only needs the shell and hydration scripts.
+        // Do not hold the build-time response open for client-only route work.
+        queueMicrotask(() => {
+          shellAborted = true;
+          abort();
+        });
         resolve(new Response(stream, { headers: responseHeaders, status: responseStatusCode }));
       },
       onShellError(error: unknown) {
@@ -45,7 +52,7 @@ export default function handleRequest(
       },
       onError(error: unknown) {
         responseStatusCode = 500;
-        if (shellRendered) console.error(error);
+        if (shellRendered && !shellAborted) console.error(error);
       },
     });
   });
