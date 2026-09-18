@@ -44,11 +44,6 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
-  // Vite replaces `process.env` at compile time with public VITE_* variables.
-  // Read the Node runtime environment through `globalThis` so the React Router
-  // prerender worker can render the static SPA shell without app providers.
-  const isBuildRequest = typeof window === "undefined" && globalThis.process?.env?.IS_RR_BUILD_REQUEST === "yes";
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -58,7 +53,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Links />
       </head>
       <body className="antialiased" suppressHydrationWarning>
-        {isBuildRequest ? children : <AppProviders>{children}</AppProviders>}
+        <AppProviders>{children}</AppProviders>
         <Scripts />
       </body>
     </html>
