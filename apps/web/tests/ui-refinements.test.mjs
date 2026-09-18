@@ -117,6 +117,11 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(styles, /\.cpk\\:max-w-3xl\.cpk\\:mx-auto/);
   assert.match(styles, /margin-inline:\s*0 !important/);
   assert.match(styles, /\[data-testid="copilot-chat-input"\][\s\S]*border-radius:\s*0\.5rem !important/);
+  assert.match(styles, /\[data-testid="copilot-chat-input"\] > div\s*\{\s*display:\s*flex !important/);
+  assert.match(
+    styles,
+    /\[data-testid="copilot-chat-input"\] > div > div:nth-child\(2\)[\s\S]*flex:\s*1 1 0 !important/
+  );
   assert.match(
     styles,
     /\[data-testid="copilot-assistant-message"\]:has\(> div:only-child > div:only-child:empty\)\s*\{\s*display:\s*none !important/

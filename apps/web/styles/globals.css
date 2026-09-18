@@ -151,6 +151,21 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   border-radius: 0.5rem !important;
 }
 
+[data-copilot-sidebar] [data-testid="copilot-chat-input"] > div {
+  display: flex !important;
+  align-items: center !important;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-chat-input"] > div > div:nth-child(2) {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-chat-input"] > div > div:nth-child(1),
+[data-copilot-sidebar] [data-testid="copilot-chat-input"] > div > div:nth-child(3) {
+  flex: 0 0 auto !important;
+}
+
 [data-copilot-sidebar] .copilot-user-toolbar {
   display: none !important;
 }
