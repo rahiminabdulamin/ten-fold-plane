@@ -8,8 +8,6 @@ import { PassThrough } from "node:stream";
 import type { EntryContext, RouterContextProvider } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
-import { isbot } from "isbot";
-import type { RenderToPipeableStreamOptions } from "react-dom/server";
 import { renderToPipeableStream } from "react-dom/server";
 
 const streamTimeout = 1_000;
@@ -27,16 +25,12 @@ export default function handleRequest(
 
   return new Promise<Response>((resolve, reject) => {
     let shellRendered = false;
-    const userAgent = request.headers.get("user-agent");
     // Admin is deployed as a static SPA. Its fallback only needs the document
-    // shell; waiting for every route boundary can exceed the build-time
-    // prerender request limit in constrained Docker builders.
-    const readyOption: keyof RenderToPipeableStreamOptions =
-      userAgent && isbot(userAgent) ? "onAllReady" : "onShellReady";
+    // shell. Build-time requests must not wait for every route boundary.
     const timeoutId = setTimeout(() => abort(), streamTimeout);
 
     const { pipe, abort } = renderToPipeableStream(<ServerRouter context={routerContext} url={request.url} />, {
-      [readyOption]() {
+      onShellReady() {
         shellRendered = true;
         const body = new PassThrough({
           final(callback) {
