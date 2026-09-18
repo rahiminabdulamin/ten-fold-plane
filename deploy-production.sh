@@ -140,7 +140,8 @@ set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"
 deployment_stage="database migrations"
 docker compose run --rm --build migrator
 deployment_stage="application build and replacement"
-if ! docker compose up -d --build --wait grist api worker beat-worker copilot web admin space live proxy; then
+COMPOSE_PARALLEL_LIMIT=1 docker compose build api worker beat-worker copilot web admin space live proxy
+if ! docker compose up -d --no-build --wait grist api worker beat-worker copilot web admin space live proxy; then
   docker compose ps
   grist_container_id="$(docker compose ps -q grist)"
   if [[ -n "$grist_container_id" ]]; then

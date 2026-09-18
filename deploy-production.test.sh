@@ -30,7 +30,8 @@ grep -Fq 'api/orgs/current/workspaces' "$script_path"
 grep -Fq 'workspace.access === "owners"' "$script_path"
 grep -Fq 'body: JSON.stringify({name: "Ten-Fold"})' "$script_path"
 grep -Fq 'set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"' "$script_path"
-grep -Fq 'docker compose up -d --build --wait grist api worker beat-worker copilot web admin space live proxy' "$script_path"
+grep -Fq 'COMPOSE_PARALLEL_LIMIT=1 docker compose build api worker beat-worker copilot web admin space live proxy' "$script_path"
+grep -Fq 'docker compose up -d --no-build --wait grist api worker beat-worker copilot web admin space live proxy' "$script_path"
 grep -Fq "docker inspect --format '{{json .State.Health}}'" "$script_path"
 grep -Fq 'docker compose logs --tail=100 grist api worker beat-worker copilot web admin space live proxy' "$script_path"
 grep -Fq '178.128.104.112' "$script_path"
@@ -143,9 +144,10 @@ run_remote_case() {
 
 run_remote_case "successful deployment verifies matching manifest" 0 current 0
 grep -Fq 'Verified public frontend: manifest-current.js' "$test_root/result"
-grep -Fq 'compose up -d --build --wait grist api worker beat-worker copilot web admin space live proxy' "$test_root/commands"
+grep -Fq 'compose build api worker beat-worker copilot web admin space live proxy' "$test_root/commands"
+grep -Fq 'compose up -d --no-build --wait grist api worker beat-worker copilot web admin space live proxy' "$test_root/commands"
 run_remote_case "migration failure stops before app replacement" 7 current 7
-if grep -Fq 'compose up -d --build' "$test_root/commands"; then
+if grep -Fq 'compose up -d --no-build' "$test_root/commands"; then
   echo "Apps were replaced after migration failure" >&2
   exit 1
 fi
