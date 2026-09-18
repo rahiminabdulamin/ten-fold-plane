@@ -63,10 +63,32 @@ const COPILOT_SIDEBAR_LABELS = { modalHeaderTitle: "Ten-Fold Assistant" };
 
 type LauncherPosition = { x: number; y: number };
 
+type ToolActivityResult = { ok?: boolean; message?: string };
+
+const parseToolActivityResult = (result: unknown) => {
+  const fallback = { label: "Completed", message: "" };
+  if (typeof result !== "string") return fallback;
+  try {
+    const parsed = JSON.parse(result) as ToolActivityResult;
+    if (typeof parsed.message !== "string") return fallback;
+    return { label: parsed.ok ? "Completed" : "Needs attention", message: parsed.message };
+  } catch {
+    return fallback;
+  }
+};
+
 const renderToolActivity =
   (activity: string) =>
-  ({ status }: { status: string }) => {
-    if (status !== "executing" && status !== "inProgress") return null;
+  ({ status, result }: { status: string; result?: unknown }) => {
+    if (status === "complete") {
+      const { label, message } = parseToolActivityResult(result);
+      return (
+        <p data-testid="copilot-tool-activity" data-status="complete" className="my-1 text-13 text-tertiary">
+          <span className="font-medium">{label}</span>
+          {message && ` — ${message}`}
+        </p>
+      );
+    }
     return (
       <p data-testid="copilot-tool-activity" role="status" className="my-1 text-13 text-tertiary">
         {activity}

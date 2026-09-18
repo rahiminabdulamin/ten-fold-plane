@@ -76,6 +76,10 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /const sidebarToggleButton = useMemo/);
   assert.match(copilot, /const renderToolActivity\s*=/);
   assert.match(copilot, /data-testid="copilot-tool-activity"/);
+  assert.match(copilot, /const parseToolActivityResult = \(result: unknown\)/);
+  assert.match(copilot, /status === "complete"/);
+  assert.match(copilot, /JSON\.parse\(result\)/);
+  assert.match(copilot, /message: parsed\.message/);
   assert.match(copilot, /render: renderToolActivity\("Looking up Workspaces…"\)/);
   assert.match(copilot, /onPointerDown={startResize}/);
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);
@@ -139,6 +143,10 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(
     styles,
     /\[data-copilot-sidebar\] \.copilotKitMessage\.copilotKitUserMessage[\s\S]*padding-block:\s*4px !important/
+  );
+  assert.match(
+    styles,
+    /\[data-copilot-sidebar\] \.copilotKitMessage\.copilotKitUserMessage,\s*\[data-copilot-sidebar\] \.copilotKitMessage\.copilotKitUserMessage \*[\s\S]*font-size:\s*13px !important[\s\S]*line-height:\s*1\.15 !important/
   );
   assert.match(styles, /min-height:\s*40px !important/);
   assert.match(styles, /max-height:\s*160px !important/);

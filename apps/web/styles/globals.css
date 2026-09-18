@@ -178,6 +178,12 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   padding-block: 4px !important;
 }
 
+[data-copilot-sidebar] .copilotKitMessage.copilotKitUserMessage,
+[data-copilot-sidebar] .copilotKitMessage.copilotKitUserMessage * {
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+}
+
 [data-copilot-sidebar] .copilot-user-message,
 [data-copilot-sidebar] .copilot-user-message * {
   font-size: 13px !important;
