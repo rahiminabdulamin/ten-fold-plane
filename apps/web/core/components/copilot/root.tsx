@@ -506,7 +506,10 @@ function PlaneTools() {
         <header
           className="relative z-[1201] bg-surface-1 px-4 py-2"
           onClickCapture={(event) => {
-            if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) resetLauncherPosition();
+            if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
+              document.querySelector<HTMLButtonElement>('[data-testid="copilot-chat-toggle"]')?.focus();
+              resetLauncherPosition();
+            }
           }}
         >
           <div className="flex items-center justify-between">

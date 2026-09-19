@@ -4,8 +4,33 @@
  * See the LICENSE file for details.
  */
 
-import sanitizeHtml from "sanitize-html";
 import type { Content, JSONContent } from "@plane/types";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+
+type HTMLNode = {
+  children?: HTMLNode[];
+  tagName?: string;
+  type?: string;
+  value?: string;
+};
+
+const NON_TEXT_HTML_TAGS = new Set(["script", "style", "textarea", "option", "xmp"]);
+
+const parseHTML = (html: string) => unified().use(rehypeParse, { fragment: true }).parse(html) as HTMLNode;
+
+const getHTMLText = (node: HTMLNode): string => {
+  if (node.type === "text") return node.value ?? "";
+  if (node.tagName && NON_TEXT_HTML_TAGS.has(node.tagName)) return "";
+  return node.children?.map(getHTMLText).join("") ?? "";
+};
+
+const hasHTMLContent = (node: HTMLNode, allowedTags: Set<string>): boolean => {
+  if (node.type === "text") return Boolean(node.value?.trim());
+  if (node.tagName && allowedTags.has(node.tagName)) return true;
+  if (node.tagName && NON_TEXT_HTML_TAGS.has(node.tagName)) return false;
+  return node.children?.some((child) => hasHTMLContent(child, allowedTags)) ?? false;
+};
 
 /**
  * @description Adds space between camelCase words
@@ -56,7 +81,7 @@ export const truncateText = (str: string, length: number) => {
 export const createSimilarString = (str: string) => {
   const shuffled = str
     .split("")
-    .sort(() => Math.random() - 0.5)
+    .toSorted(() => Math.random() - 0.5)
     .join("");
 
   return shuffled;
@@ -126,8 +151,7 @@ const text = stripHTML(html);
 console.log(text); // Some text
  */
 export const sanitizeHTML = (htmlString: string) => {
-  const sanitizedText = sanitizeHtml(htmlString, { allowedTags: [] }); // sanitize the string to remove all HTML tags
-  return sanitizedText.trim(); // trim the string to remove leading and trailing whitespaces
+  return getHTMLText(parseHTML(htmlString)).trim();
 };
 
 /**
@@ -153,7 +177,7 @@ export const checkEmailValidity = (email: string): boolean => {
   if (!email) return false;
 
   const isEmailValid =
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
       email
     );
 
@@ -161,10 +185,7 @@ export const checkEmailValidity = (email: string): boolean => {
 };
 
 export const isEmptyHtmlString = (htmlString: string, allowedHTMLTags: string[] = []) => {
-  // Remove HTML tags using sanitize-html
-  const cleanText = sanitizeHtml(htmlString, { allowedTags: allowedHTMLTags });
-  // Trim the string and check if it's empty
-  return cleanText.trim() === "";
+  return !hasHTMLContent(parseHTML(htmlString), new Set(allowedHTMLTags));
 };
 
 /**
@@ -236,7 +257,7 @@ export const isCommentEmpty = (comment: Content | undefined): boolean => {
 
   // Handle JSONContent[] (array)
   if (Array.isArray(comment)) {
-    return comment.length === 0 || comment.every(isJSONContentEmpty);
+    return comment.every(isJSONContentEmpty);
   }
 
   // Handle JSONContent (object)
