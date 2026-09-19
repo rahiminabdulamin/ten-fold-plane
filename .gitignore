@@ -110,6 +110,9 @@ build/
 .react-router/
 temp/
 scripts/
+!scripts/
+!scripts/free-port.sh
+!scripts/free-port.test.sh
 !packages/i18n/scripts/
 
 # i18n auto-generated types (regenerated on every build)
