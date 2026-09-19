@@ -1,0 +1,8 @@
+Deploying checkout: /home/rahimin_amin/ten-fold-plane/ten-fold-plane
+Checkout commit: 0054064b8c
+Source fingerprint: c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8
+Uploading Ten-Fold to root@178.128.104.112:/opt/plane/app/ten-fold-plane...
+Connection closed by 178.128.104.112 port 22
+rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+rsync error: unexplained error (code 255) at io.c(232) [sender=3.2.7]
+Deployment failed during source upload (line 40).

@@ -1,0 +1,2386 @@
+Deploying checkout: /home/rahimin_amin/ten-fold-plane/ten-fold-plane
+Checkout commit: 0054064b8c
+Source fingerprint: c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8
+Uploading Ten-Fold to root@178.128.104.112:/opt/plane/app/ten-fold-plane...
+Uploaded source matches local checkout.
+Rebuilding and migrating Plane on the Droplet...
+ Image gristlabs/grist:1.7.16 Pulling 
+ Image gristlabs/grist:1.7.16 Pulled 
+ Container ten-fold-plane-grist-1 Recreate 
+ Container ten-fold-plane-grist-1 Recreated 
+ Container ten-fold-plane-grist-1 Starting 
+ Container ten-fold-plane-grist-1 Started 
+ Container ten-fold-plane-grist-1 Waiting 
+ Container ten-fold-plane-grist-1 Healthy 
+ Container plane-redis Running 
+ Container plane-db Running 
+ Image ten-fold-plane-migrator Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 610B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.api
+#2 transferring dockerfile: 1.30kB 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/python:3.12.10-alpine
+#3 DONE 1.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [ 1/17] FROM docker.io/library/python:3.12.10-alpine@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c
+#6 resolve docker.io/library/python:3.12.10-alpine@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c 0.0s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 100.40kB 0.2s done
+#5 DONE 0.2s
+
+#7 [ 7/17] RUN apk add --no-cache libffi-dev
+#7 CACHED
+
+#8 [13/17] RUN apk --no-cache add "bash~=5.2"
+#8 CACHED
+
+#9 [ 9/17] COPY manage.py manage.py
+#9 CACHED
+
+#10 [15/17] RUN mkdir -p /code/plane/logs
+#10 CACHED
+
+#11 [11/17] COPY templates templates/
+#11 CACHED
+
+#12 [14/17] COPY ./bin ./bin/
+#12 CACHED
+
+#13 [ 6/17] COPY requirements ./requirements
+#13 CACHED
+
+#14 [ 8/17] RUN apk add --no-cache --virtual .build-deps     "bash~=5.2"     "g++"     "gcc"     "cargo"     "git"     "make"     "postgresql-dev"     "libc-dev"     "linux-headers"     &&     pip install -r requirements.txt --compile --no-cache-dir     &&     apk del .build-deps     &&     rm -rf /var/cache/apk/*
+#14 CACHED
+
+#15 [ 4/17] RUN apk add --no-cache --upgrade     "libpq"     "libxslt"     "xmlsec"     "ca-certificates"     "openssl"
+#15 CACHED
+
+#16 [10/17] COPY plane plane/
+#16 CACHED
+
+#17 [16/17] RUN chmod +x ./bin/*
+#17 CACHED
+
+#18 [ 2/17] RUN apk update && apk upgrade
+#18 CACHED
+
+#19 [ 3/17] WORKDIR /code
+#19 CACHED
+
+#20 [ 5/17] COPY requirements.txt ./
+#20 CACHED
+
+#21 [12/17] COPY package.json package.json
+#21 CACHED
+
+#22 [17/17] RUN chmod -R 777 /code
+#22 CACHED
+
+#23 exporting to image
+#23 exporting layers 0.0s done
+#23 exporting manifest sha256:0d23eba9c0fef8afebb6dca8bc7601190af917087983e656610470a4d8af1858 done
+#23 exporting config sha256:d918b0cc36f0aaf08d914c803382adda8ead710ea189e4fc7623e6e0ae1e6246 done
+#23 exporting attestation manifest sha256:ec7d109169e91c1a0594f892457c9e07f19e9903cbc640c5e1a5430af30b098b 0.0s done
+#23 exporting manifest list sha256:72329620b66ea217b7cbd456d844d9245c665edbffe74d774cfc618f465f2da2 0.0s done
+#23 naming to docker.io/library/ten-fold-plane-migrator:latest
+#23 naming to docker.io/library/ten-fold-plane-migrator:latest done
+#23 unpacking to docker.io/library/ten-fold-plane-migrator:latest 0.0s done
+#23 DONE 0.2s
+
+#24 resolving provenance for metadata file
+#24 DONE 0.0s
+ Image ten-fold-plane-migrator Built 
+ Container ten-fold-plane-migrator-run-77f3e54d0aa7 Creating 
+ Container ten-fold-plane-migrator-run-77f3e54d0aa7 Created 
+Waiting for database...
+Database available!
+Operations to perform:
+  Apply all migrations: auth, contenttypes, db, django_celery_beat, license, sessions
+Running migrations:
+  No migrations to apply.
+  Your models in app(s): 'db' have changes that are not yet reflected in a migration, and so won't be applied.
+  Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.
+ Image ten-fold-plane-copilot Building 
+ Image ten-fold-plane-web Building 
+ Image ten-fold-plane-worker Building 
+ Image ten-fold-plane-proxy Building 
+ Image ten-fold-plane-api Building 
+ Image ten-fold-plane-admin Building 
+ Image ten-fold-plane-beat-worker Building 
+ Image ten-fold-plane-space Building 
+ Image ten-fold-plane-live Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 4.71kB done
+#1 DONE 0.0s
+
+#2 [space internal] load build definition from Dockerfile.space
+#2 transferring dockerfile: 3.43kB 0.0s done
+#2 DONE 0.1s
+
+#3 [web internal] load build definition from Dockerfile.web
+#3 transferring dockerfile: 3.61kB 0.0s done
+#3 DONE 0.1s
+
+#4 [worker internal] load build definition from Dockerfile.api
+#4 transferring dockerfile: 1.30kB done
+#4 DONE 0.1s
+
+#5 [proxy internal] load build definition from Dockerfile.ce
+#5 transferring dockerfile: 1.15kB done
+#5 DONE 0.1s
+
+#6 [api internal] load metadata for docker.io/library/python:3.12.10-alpine
+#6 ...
+
+#7 [admin internal] load build definition from Dockerfile.admin
+#7 transferring dockerfile: 3.20kB done
+#7 DONE 0.4s
+
+#6 [worker internal] load metadata for docker.io/library/python:3.12.10-alpine
+#6 ...
+
+#8 [copilot internal] load build definition from Dockerfile
+#8 transferring dockerfile: 1.07kB 0.0s done
+#8 DONE 0.4s
+
+#9 [live internal] load build definition from Dockerfile.live
+#9 transferring dockerfile: 3.05kB 0.0s done
+#9 DONE 0.4s
+
+#6 [beat-worker internal] load metadata for docker.io/library/python:3.12.10-alpine
+#6 DONE 0.4s
+
+#10 [api internal] load .dockerignore
+#10 transferring context: 2B done
+#10 DONE 0.1s
+
+#11 [api internal] load build context
+#11 DONE 0.0s
+
+#12 [api  1/17] FROM docker.io/library/python:3.12.10-alpine@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c
+#12 resolve docker.io/library/python:3.12.10-alpine@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c 0.0s done
+#12 resolve docker.io/library/python:3.12.10-alpine@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c 0.0s done
+#12 DONE 0.0s
+
+#11 [beat-worker internal] load build context
+#11 transferring context: 100.40kB 0.1s done
+#11 transferring context: 100.40kB 0.1s done
+#11 DONE 0.1s
+
+#13 [beat-worker  4/17] RUN apk add --no-cache --upgrade     "libpq"     "libxslt"     "xmlsec"     "ca-certificates"     "openssl"
+#13 CACHED
+
+#14 [beat-worker  9/17] COPY manage.py manage.py
+#14 CACHED
+
+#15 [beat-worker 15/17] RUN mkdir -p /code/plane/logs
+#15 CACHED
+
+#16 [beat-worker 11/17] COPY templates templates/
+#16 CACHED
+
+#17 [beat-worker  6/17] COPY requirements ./requirements
+#17 CACHED
+
+#18 [beat-worker 14/17] COPY ./bin ./bin/
+#18 CACHED
+
+#19 [beat-worker 13/17] RUN apk --no-cache add "bash~=5.2"
+#19 CACHED
+
+#20 [beat-worker  8/17] RUN apk add --no-cache --virtual .build-deps     "bash~=5.2"     "g++"     "gcc"     "cargo"     "git"     "make"     "postgresql-dev"     "libc-dev"     "linux-headers"     &&     pip install -r requirements.txt --compile --no-cache-dir     &&     apk del .build-deps     &&     rm -rf /var/cache/apk/*
+#20 CACHED
+
+#21 [beat-worker 12/17] COPY package.json package.json
+#21 CACHED
+
+#22 [beat-worker  5/17] COPY requirements.txt ./
+#22 CACHED
+
+#23 [beat-worker  2/17] RUN apk update && apk upgrade
+#23 CACHED
+
+#24 [beat-worker  7/17] RUN apk add --no-cache libffi-dev
+#24 CACHED
+
+#25 [beat-worker  3/17] WORKDIR /code
+#25 CACHED
+
+#26 [beat-worker 10/17] COPY plane plane/
+#26 CACHED
+
+#27 [beat-worker 16/17] RUN chmod +x ./bin/*
+#27 CACHED
+
+#28 [beat-worker 17/17] RUN chmod -R 777 /code
+#28 CACHED
+
+#29 [beat-worker] exporting to image
+#29 exporting layers 0.0s done
+#29 exporting manifest sha256:ef51f63000f6ccf76cb6b47942343ca22e0fc7962555b10cb01ddd0b8edf7f6e done
+#29 exporting config sha256:d4332c5f67b1b0b349d96342f6c1f6d07829d4197af8183e7b64046359ab68c6 done
+#29 exporting attestation manifest sha256:a312e36163c83579c3d2494759adeef261e2b077b7453333d67b881f9582357c
+#29 exporting attestation manifest sha256:a312e36163c83579c3d2494759adeef261e2b077b7453333d67b881f9582357c 0.0s done
+#29 exporting manifest list sha256:7847bcfd9bd741b72700415107b721e9c2cab05b6aa6887fddc1627931e3dabd 0.0s done
+#29 naming to docker.io/library/ten-fold-plane-beat-worker:latest 0.0s done
+#29 unpacking to docker.io/library/ten-fold-plane-beat-worker:latest 0.0s done
+#29 DONE 0.3s
+
+#30 [api] exporting to image
+#30 exporting layers 0.0s done
+#30 exporting manifest sha256:cb128adba9de7e869ef4527b68baeb23dfd4b4d39c3f62d4f01ae17edfdfc338 done
+#30 exporting config sha256:07087b3d881abe8428dcd75e91e3654a983910cf58bb9ecf7f53b1556efebb36 0.0s done
+#30 exporting attestation manifest sha256:47a011ee5234950174c88898ed995e235bd5110dfabcd4a68a69784596e57eab 0.0s done
+#30 exporting manifest list sha256:f31f72bc57e3101fa9938fb2b5b67a9e9456510af45b183bd4ce50ba7f6ad64b 0.0s done
+#30 naming to docker.io/library/ten-fold-plane-api:latest done
+#30 unpacking to docker.io/library/ten-fold-plane-api:latest 0.0s done
+#30 DONE 0.3s
+
+#31 [worker] exporting to image
+#31 exporting layers 0.0s done
+#31 exporting manifest sha256:8596be5b7a771d3370401f702b12e12a071e40e79d5ccf1d994476397d63027e done
+#31 exporting config sha256:4816479f5025af10848aa69a85086eac57e69714cd51c8ebdc32149fa1e5559f done
+#31 exporting attestation manifest sha256:78f1568bbce71adcef84c2b978f04fa5bdc3ae4979f06f50bbc48dc4570cb464 0.0s done
+#31 exporting manifest list sha256:eb28f7940243a95cc13766a7e428f8b921fb083d46336c2ee62bcd68164cd8d6 0.0s done
+#31 naming to docker.io/library/ten-fold-plane-worker:latest done
+#31 unpacking to docker.io/library/ten-fold-plane-worker:latest 0.0s done
+#31 DONE 0.3s
+
+#32 [live] resolve image config for docker-image://docker.io/docker/dockerfile:1.7
+#32 DONE 1.4s
+
+#33 [space internal] load metadata for docker.io/library/node:22-alpine
+#33 DONE 1.4s
+
+#34 [space internal] load .dockerignore
+#34 transferring context: 882B 0.0s done
+#34 DONE 0.1s
+
+#35 [live] docker-image://docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#35 resolve docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#35 ...
+
+#36 [space internal] load build context
+#36 DONE 0.0s
+
+#35 [copilot] docker-image://docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#35 resolve docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e 0.2s done
+#35 CACHED
+
+#37 [space base 1/3] FROM docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85
+#37 resolve docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85 0.1s done
+#37 DONE 0.1s
+
+#38 [space base 3/3] RUN corepack enable pnpm
+#38 CACHED
+
+#39 [space runner 1/8] RUN apk del go 2>/dev/null || true
+#39 CACHED
+
+#40 [space base 2/3] WORKDIR /app
+#40 CACHED
+
+#41 [space runner 2/8] RUN rm -rf /usr/local/lib/node_modules/npm/node_modules/picomatch
+#41 CACHED
+
+#42 [admin internal] load metadata for docker.io/library/caddy:2.11-alpine
+#42 DONE 1.4s
+
+#36 [space internal] load build context
+#36 ...
+
+#43 [admin internal] load metadata for docker.io/library/caddy:2.11-builder-alpine
+#43 DONE 2.0s
+
+#36 [space internal] load build context
+#36 ...
+
+#34 [admin internal] load .dockerignore
+#34 transferring context: 882B 0.0s done
+#34 DONE 0.1s
+
+#44 [proxy internal] load metadata for docker.io/library/caddy:2.11.3-alpine
+#44 DONE 2.0s
+
+#36 [space internal] load build context
+#36 ...
+
+#37 [admin base 1/3] FROM docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85
+#37 resolve docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85 0.1s done
+#37 DONE 0.1s
+
+#36 [admin internal] load build context
+#36 ...
+
+#45 [admin production 1/5] FROM docker.io/library/caddy:2.11-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e
+#45 resolve docker.io/library/caddy:2.11-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e 0.3s done
+#45 DONE 0.4s
+
+#36 [admin internal] load build context
+#36 ...
+
+#46 [admin production 2/5] RUN apk update && apk upgrade --no-cache && apk add --no-cache curl && rm -rf /var/cache/apk/*
+#46 CACHED
+
+#47 [admin caddy-builder 1/2] FROM docker.io/library/caddy:2.11-builder-alpine@sha256:2b9f32cbba6045e79212bb253f595588d20be8f7d1edf61582c519e124e0d2d8
+#47 resolve docker.io/library/caddy:2.11-builder-alpine@sha256:2b9f32cbba6045e79212bb253f595588d20be8f7d1edf61582c519e124e0d2d8 0.3s done
+#47 CACHED
+
+#36 [admin internal] load build context
+#36 ...
+
+#33 [live internal] load metadata for docker.io/library/node:22-alpine
+#33 DONE 2.0s
+
+#36 [admin internal] load build context
+#36 ...
+
+#48 [proxy internal] load metadata for docker.io/library/caddy:2.11.3-builder-alpine
+#48 DONE 3.0s
+
+#49 [copilot internal] load .dockerignore
+#49 transferring context: 882B 0.0s done
+#49 DONE 0.1s
+
+#36 [admin internal] load build context
+#36 ...
+
+#50 [live internal] load .dockerignore
+#50 transferring context: 882B 0.0s done
+#50 DONE 0.2s
+
+#42 [web internal] load metadata for docker.io/library/caddy:2.11-alpine
+#42 DONE 2.2s
+
+#51 [web internal] load .dockerignore
+#51 DONE 0.0s
+
+#36 [admin internal] load build context
+#36 ...
+
+#52 [api] resolving provenance for metadata file
+#52 DONE 0.7s
+
+#53 [worker] resolving provenance for metadata file
+#53 DONE 0.8s
+
+#36 [admin internal] load build context
+#36 ...
+
+#54 [beat-worker] resolving provenance for metadata file
+#54 DONE 0.2s
+
+#55 [proxy internal] load .dockerignore
+#55 transferring context: 2B 0.1s done
+#55 DONE 0.3s
+
+#36 [admin internal] load build context
+#36 ...
+
+#37 [live base 1/3] FROM docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85
+#37 resolve docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85 0.1s done
+#37 DONE 0.1s
+
+#56 [proxy internal] load build context
+#56 DONE 0.0s
+
+#57 [live runner 2/9] RUN apk del go 2>/dev/null || true
+#57 CACHED
+
+#58 [live base 2/2] RUN corepack enable
+#58 CACHED
+
+#59 [live runner 1/9] WORKDIR /app
+#59 CACHED
+
+#60 [live runner 3/9] RUN rm -rf /usr/local/lib/node_modules/npm/node_modules/picomatch
+#60 CACHED
+
+#61 [live internal] load build context
+#61 ...
+
+#51 [web internal] load .dockerignore
+#51 transferring context: 882B 0.2s done
+#51 DONE 0.6s
+
+#36 [admin internal] load build context
+#36 ...
+
+#45 [web production 1/5] FROM docker.io/library/caddy:2.11-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e
+#45 resolve docker.io/library/caddy:2.11-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e 0.3s done
+#45 DONE 0.4s
+
+#36 [admin internal] load build context
+#36 ...
+
+#37 [web base 1/3] FROM docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85
+#37 resolve docker.io/library/node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85 0.1s done
+#37 DONE 0.1s
+
+#45 [web production 1/5] FROM docker.io/library/caddy:2.11-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e
+#45 DONE 0.4s
+
+#46 [web production 2/5] RUN apk update && apk upgrade --no-cache && apk add --no-cache curl && rm -rf /var/cache/apk/*
+#46 CACHED
+
+#36 [admin internal] load build context
+#36 ...
+
+#62 [proxy caddy-builder 1/2] FROM docker.io/library/caddy:2.11.3-builder-alpine@sha256:3eae6b351ecdb05da6d16e341261a457692d344a435764c5ece7a60cf03a23f3
+#62 resolve docker.io/library/caddy:2.11.3-builder-alpine@sha256:3eae6b351ecdb05da6d16e341261a457692d344a435764c5ece7a60cf03a23f3 1.2s done
+#62 DONE 1.2s
+
+#63 [proxy stage-1 1/5] FROM docker.io/library/caddy:2.11.3-alpine@sha256:86deaf5e3d3408a6ccec08fbb79989783dd26e206ae10bcf78a801dc8c9ab794
+#63 resolve docker.io/library/caddy:2.11.3-alpine@sha256:86deaf5e3d3408a6ccec08fbb79989783dd26e206ae10bcf78a801dc8c9ab794 1.2s done
+#63 DONE 1.2s
+
+#36 [admin internal] load build context
+#36 ...
+
+#56 [proxy internal] load build context
+#56 transferring context: 34B 0.2s done
+#56 DONE 0.4s
+
+#36 [admin internal] load build context
+#36 ...
+
+#64 [proxy stage-1 3/5] COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
+#64 CACHED
+
+#65 [proxy caddy-builder 2/2] RUN xcaddy build         --with github.com/caddy-dns/cloudflare@v0.2.1         --with github.com/caddy-dns/digitalocean@04bde2867106aa1b44c2f9da41a285fa02e629c5         --with github.com/mholt/caddy-l4@6faae83b167fda94e62b686be5cbeb9b3f8fe002         --with github.com/go-jose/go-jose/v3@v3.0.5         --with github.com/go-jose/go-jose/v4@v4.1.4         --with google.golang.org/grpc@v1.80.0         --with go.opentelemetry.io/otel@v1.43.0         --with go.opentelemetry.io/otel/sdk@v1.43.0
+#65 CACHED
+
+#66 [proxy stage-1 4/5] COPY Caddyfile.ce /etc/caddy/Caddyfile
+#66 CACHED
+
+#67 [proxy stage-1 2/5] RUN apk update && apk upgrade --no-cache && apk add --no-cache nss-tools bash curl
+#67 CACHED
+
+#68 [proxy stage-1 5/5] RUN SITE_ADDRESS=https://localhost FILE_SIZE_LIMIT=5242880 BUCKET_NAME=uploads     CADDY_TLS_CERT_FILE=/etc/caddy/tls/origin.pem CADDY_TLS_KEY_FILE=/etc/caddy/tls/origin.key     caddy adapt --config /etc/caddy/Caddyfile --adapter caddyfile > /dev/null
+#68 CACHED
+
+#36 [admin internal] load build context
+#36 ...
+
+#69 [proxy] exporting to image
+#69 exporting layers 0.4s done
+#69 exporting manifest sha256:14b5d52b9415da9b536ccb253968b6b6834b45a5551841fb6de71e0129b62ff0 0.0s done
+#69 exporting config sha256:bba437ffaa8be25d9563f8821016cb197d30a9863154884dbed092c971c9f307 0.0s done
+#69 exporting attestation manifest sha256:9d01c106d7a021b261f1a993cb5c386d1d95e228cc3709bcb3257f8cefdca102 0.2s done
+#69 exporting manifest list sha256:9203eb90c14a2482e3a32c327e62c96f597248f1cea66d98c313baa9b0e3ac21 0.2s done
+#69 naming to docker.io/library/ten-fold-plane-proxy:latest done
+#69 unpacking to docker.io/library/ten-fold-plane-proxy:latest 0.6s done
+#69 DONE 3.4s
+
+#36 [admin internal] load build context
+#36 transferring context: 1.07MB 8.1s done
+#36 DONE 8.4s
+
+#61 [live internal] load build context
+#61 ...
+
+#70 [space builder 1/3] RUN pnpm add -g turbo@2.9.18
+#70 CACHED
+
+#61 [live internal] load build context
+#61 ...
+
+#71 [copilot internal] load build context
+#71 ...
+
+#40 [admin base 2/3] WORKDIR /app
+#40 CACHED
+
+#38 [admin base 3/3] RUN corepack enable pnpm
+#38 CACHED
+
+#70 [admin builder 1/3] RUN pnpm add -g turbo@2.9.18
+#70 CACHED
+
+#71 [copilot internal] load build context
+#71 ...
+
+#61 [live internal] load build context
+#61 ...
+
+#72 [proxy] resolving provenance for metadata file
+#72 DONE 0.4s
+
+#61 [live internal] load build context
+#61 ...
+
+#71 [copilot internal] load build context
+#71 transferring context: 1.07MB 7.6s done
+#71 DONE 8.7s
+
+#40 [copilot base 2/3] WORKDIR /app
+#40 CACHED
+
+#73 [copilot builder 3/5] RUN corepack enable && pnpm add -g turbo@2.9.18
+#73 CACHED
+
+#74 [web internal] load build context
+#74 ...
+
+#61 [live internal] load build context
+#61 transferring context: 1.07MB 7.4s done
+#61 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 1.533 2026/09/19 00:09:01 [INFO] absolute output file path: /usr/bin/caddy
+#75 1.533 2026/09/19 00:09:01 [INFO] Temporary folder: /tmp/buildenv_2026-09-19-0009.1252487928
+#75 1.533 2026/09/19 00:09:01 [INFO] Writing main module: /tmp/buildenv_2026-09-19-0009.1252487928/main.go
+#75 1.533 package main
+#75 1.533 
+#75 1.533 import (
+#75 1.533 	caddycmd "github.com/caddyserver/caddy/v2/cmd"
+#75 1.533 
+#75 1.533 	// plug in Caddy modules here
+#75 1.533 	_ "github.com/caddyserver/caddy/v2/modules/standard"
+#75 1.533 	_ "github.com/mholt/caddy-ratelimit"
+#75 1.533 )
+#75 1.533 
+#75 1.533 func main() {
+#75 1.533 	caddycmd.Main()
+#75 1.533 }
+#75 1.533 2026/09/19 00:09:01 [INFO] Initializing Go module
+#75 1.533 2026/09/19 00:09:01 [INFO] exec (timeout=0s): /usr/local/go/bin/go mod init caddy 
+#75 1.715 go: creating new go.mod: module caddy
+#75 1.715 go: to add module requirements and sums:
+#75 1.715 	go mod tidy
+#75 1.715 2026/09/19 00:09:01 [INFO] Pinning versions
+#75 1.715 2026/09/19 00:09:01 [INFO] exec (timeout=0s): /usr/local/go/bin/go get -v github.com/caddyserver/caddy/v2@v2.11.4 
+#75 2.295 go: downloading github.com/caddyserver/caddy/v2 v2.11.4
+#75 3.574 go: downloading github.com/caddyserver/certmagic v0.25.3
+#75 3.588 go: downloading github.com/cespare/xxhash/v2 v2.3.0
+#75 3.701 go: downloading github.com/cespare/xxhash v1.1.0
+#75 3.961 go: downloading github.com/google/uuid v1.6.0
+#75 4.025 go: downloading github.com/prometheus/client_golang v1.23.2
+#75 4.445 go: downloading github.com/quic-go/quic-go v0.59.1
+#75 5.153 go: downloading go.uber.org/zap v1.28.0
+#75 5.153 go: downloading go.uber.org/zap/exp v0.3.0
+#75 5.415 go: downloading golang.org/x/sys v0.45.0
+#75 6.412 go: downloading golang.org/x/term v0.43.0
+#75 6.420 go: downloading golang.org/x/time v0.15.0
+#75 8.677 go: downloading github.com/caddyserver/zerossl v0.1.5
+#75 8.700 go: downloading github.com/klauspost/cpuid/v2 v2.3.0
+#75 8.776 go: downloading github.com/libdns/libdns v1.1.1
+#75 8.801 go: downloading github.com/mholt/acmez/v3 v3.1.6
+#75 8.909 go: downloading github.com/miekg/dns v1.1.72
+#75 9.062 go: downloading github.com/zeebo/blake3 v0.2.4
+#75 9.139 go: downloading golang.org/x/crypto v0.52.0
+#75 9.169 go: downloading golang.org/x/net v0.55.0
+#75 9.976 go: downloading github.com/beorn7/perks v1.0.1
+#75 10.05 go: downloading github.com/prometheus/client_model v0.6.2
+#75 10.13 go: downloading github.com/prometheus/common v0.67.5
+#75 ...
+
+#61 [live internal] load build context
+#61 DONE 9.3s
+
+#74 [web internal] load build context
+#74 transferring context: 1.07MB 6.1s done
+#74 DONE 8.3s
+
+#76 [copilot builder 4/5] COPY . .
+#76 ...
+
+#77 [live builder 1/6] RUN apk update
+#77 CACHED
+
+#78 [live builder 2/6] RUN apk add --no-cache libc6-compat
+#78 CACHED
+
+#79 [live builder 3/6] WORKDIR /app
+#79 CACHED
+
+#80 [live builder 4/6] RUN corepack enable pnpm && pnpm add -g turbo@2.9.18
+#80 CACHED
+
+#81 [web builder 2/5] WORKDIR /app
+#81 CACHED
+
+#58 [web base 2/2] RUN corepack enable
+#58 CACHED
+
+#82 [web builder 1/5] RUN apk add --no-cache libc6-compat
+#82 CACHED
+
+#83 [web builder 3/5] RUN corepack enable pnpm && pnpm add -g turbo@2.9.18
+#83 CACHED
+
+#84 [web production 3/4] COPY apps/web/caddy/Caddyfile /etc/caddy/Caddyfile
+#84 CACHED
+
+#85 [live builder 5/6] COPY . .
+#85 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 10.30 go: downloading github.com/prometheus/procfs v0.20.1
+#75 10.30 go: downloading google.golang.org/protobuf v1.36.11
+#75 11.38 go: downloading github.com/quic-go/qpack v0.6.0
+#75 11.41 go: downloading go.uber.org/multierr v1.11.0
+#75 11.84 go: downloading golang.org/x/tools v0.44.0
+#75 11.85 go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+#75 11.92 go: downloading go.yaml.in/yaml/v2 v2.4.4
+#75 12.04 go: downloading golang.org/x/text v0.37.0
+#75 14.36 go: downloading golang.org/x/sync v0.20.0
+#75 14.43 go: downloading golang.org/x/mod v0.35.0
+#75 16.03 go: added github.com/beorn7/perks v1.0.1
+#75 16.03 go: added github.com/caddyserver/caddy/v2 v2.11.4
+#75 16.03 go: added github.com/caddyserver/certmagic v0.25.3
+#75 16.03 go: added github.com/caddyserver/zerossl v0.1.5
+#75 16.03 go: added github.com/cespare/xxhash/v2 v2.3.0
+#75 16.03 go: added github.com/google/uuid v1.6.0
+#75 16.03 go: added github.com/klauspost/cpuid/v2 v2.3.0
+#75 16.03 go: added github.com/libdns/libdns v1.1.1
+#75 16.03 go: added github.com/mholt/acmez/v3 v3.1.6
+#75 16.03 go: added github.com/miekg/dns v1.1.72
+#75 16.03 go: added github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+#75 16.03 go: added github.com/prometheus/client_golang v1.23.2
+#75 16.03 go: added github.com/prometheus/client_model v0.6.2
+#75 16.03 go: added github.com/prometheus/common v0.67.5
+#75 16.03 go: added github.com/prometheus/procfs v0.20.1
+#75 16.03 go: added github.com/quic-go/qpack v0.6.0
+#75 16.03 go: added github.com/quic-go/quic-go v0.59.1
+#75 16.03 go: added github.com/zeebo/blake3 v0.2.4
+#75 16.03 go: added go.uber.org/multierr v1.11.0
+#75 16.03 go: added go.uber.org/zap v1.28.0
+#75 16.03 go: added go.uber.org/zap/exp v0.3.0
+#75 16.03 go: added go.yaml.in/yaml/v2 v2.4.4
+#75 16.03 go: added golang.org/x/crypto v0.52.0
+#75 16.03 go: added golang.org/x/mod v0.35.0
+#75 16.03 go: added golang.org/x/net v0.55.0
+#75 16.03 go: added golang.org/x/sync v0.20.0
+#75 16.03 go: added golang.org/x/sys v0.45.0
+#75 16.03 go: added golang.org/x/term v0.43.0
+#75 16.03 go: added golang.org/x/text v0.37.0
+#75 16.03 go: added golang.org/x/time v0.15.0
+#75 16.03 go: added golang.org/x/tools v0.44.0
+#75 16.03 go: added google.golang.org/protobuf v1.36.11
+#75 16.03 2026/09/19 00:09:16 [INFO] exec (timeout=0s): /usr/local/go/bin/go get -v github.com/mholt/caddy-ratelimit github.com/caddyserver/caddy/v2@v2.11.4 
+#75 16.51 go: downloading github.com/mholt/caddy-ratelimit v0.1.0
+#75 16.67 go: downloading github.com/dustin/go-humanize v1.0.1
+#75 16.68 go: downloading github.com/google/cel-go v0.28.1
+#75 17.02 go: downloading github.com/spf13/cobra v1.10.2
+#75 17.07 go: downloading go.opentelemetry.io/contrib/bridges/prometheus v0.68.0
+#75 17.12 go: downloading go.opentelemetry.io/contrib/exporters/autoexport v0.68.0
+#75 17.17 go: downloading go.opentelemetry.io/otel/sdk/metric v1.43.0
+#75 17.28 go: downloading go.opentelemetry.io/otel/sdk v1.43.0
+#75 17.40 go: downloading go.opentelemetry.io/otel v1.43.0
+#75 ...
+
+#86 [admin builder 2/3] COPY . .
+#86 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 18.25 go: downloading github.com/smallstep/certificates v0.30.2
+#75 18.84 go: downloading go.step.sm/crypto v0.81.0
+#75 18.85 go: downloading github.com/smallstep/truststore v0.13.0
+#75 19.22 go: downloading github.com/cloudflare/circl v1.6.3
+#75 ...
+
+#87 [web builder 4/5] COPY . .
+#87 ...
+
+#86 [space builder 2/3] COPY . .
+#86 DONE 13.4s
+
+#88 [space builder 3/3] RUN turbo prune --scope=space --docker
+#88 ...
+
+#76 [copilot builder 4/5] COPY . .
+#76 DONE 13.5s
+
+#87 [web builder 4/5] COPY . .
+#87 DONE 12.7s
+
+#85 [live builder 5/6] COPY . .
+#85 DONE 12.7s
+
+#89 [live builder 6/6] RUN turbo prune --scope=live --docker
+#89 3.199  WARNING  --scope is deprecated and will be removed in a future major version. Use positional arguments instead (e.g. `turbo prune web`)
+#89 3.202 
+#89 3.202 Attention:
+#89 3.202 Turborepo now collects completely anonymous telemetry regarding usage.
+#89 3.202 This information is used to shape the Turborepo roadmap and prioritize features.
+#89 3.202 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#89 3.202 https://turborepo.dev/docs/telemetry
+#89 3.202 
+#89 3.211 • turbo 2.9.18
+#89 ...
+
+#90 [admin builder 3/3] RUN turbo prune --scope=admin --docker
+#90 4.493  WARNING  --scope is deprecated and will be removed in a future major version. Use positional arguments instead (e.g. `turbo prune web`)
+#90 4.945 Generating pruned monorepo for admin in /app/out
+#90 5.023  - Added @plane/constants
+#90 5.043  - Added @plane/hooks
+#90 5.126  - Added @plane/services
+#90 5.150  - Added @plane/tailwind-config
+#90 5.310  - Added @plane/types
+#90 5.336  - Added @plane/typescript-config
+#90 5.389  - Added @plane/utils
+#90 5.608  - Added admin
+#90 DONE 6.2s
+
+#89 [live builder 6/6] RUN turbo prune --scope=live --docker
+#89 4.025 Generating pruned monorepo for live in /app/out
+#89 4.166  - Added @plane/constants
+#89 4.196  - Added @plane/decorators
+#89 ...
+
+#91 [admin installer 5/8] COPY turbo.json turbo.json
+#91 CACHED
+
+#92 [admin installer 1/8] COPY .gitignore .gitignore
+#92 CACHED
+
+#93 [admin installer 4/8] COPY --from=builder /app/out/full/ .
+#93 CACHED
+
+#94 [admin installer 3/8] COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+#94 CACHED
+
+#95 [admin installer 6/8] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
+#95 CACHED
+
+#96 [admin installer 2/8] COPY --from=builder /app/out/json/ .
+#96 CACHED
+
+#97 [admin installer 7/8] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store --prod=false
+#97 CACHED
+
+#98 [copilot builder 5/5] RUN turbo prune --scope=@plane/copilot --docker
+#98 3.006  WARNING  --scope is deprecated and will be removed in a future major version. Use positional arguments instead (e.g. `turbo prune web`)
+#98 3.014 
+#98 3.014 Attention:
+#98 3.014 Turborepo now collects completely anonymous telemetry regarding usage.
+#98 3.014 This information is used to shape the Turborepo roadmap and prioritize features.
+#98 3.014 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#98 3.014 https://turborepo.dev/docs/telemetry
+#98 3.014 
+#98 3.018 • turbo 2.9.18
+#98 3.928 Generating pruned monorepo for @plane/copilot in /app/out
+#98 4.072  - Added @plane/copilot
+#98 4.103  - Added @plane/typescript-config
+#98 DONE 4.5s
+
+#89 [live builder 6/6] RUN turbo prune --scope=live --docker
+#89 4.479  - Added @plane/editor
+#89 4.496  - Added @plane/hooks
+#89 4.511  - Added @plane/logger
+#89 ...
+
+#99 [copilot stage-1 6/8] COPY --from=builder /app/out/full/ .
+#99 CACHED
+
+#100 [copilot stage-1 7/8] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
+#100 CACHED
+
+#101 [copilot stage-1 5/8] COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+#101 CACHED
+
+#102 [copilot stage-1 3/8] RUN apk add --no-cache libc6-compat && corepack enable
+#102 CACHED
+
+#103 [copilot stage-1 4/8] COPY --from=builder /app/out/json/ .
+#103 CACHED
+
+#104 [copilot stage-1 8/8] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store
+#104 CACHED
+
+#89 [live builder 6/6] RUN turbo prune --scope=live --docker
+#89 4.984  - Added @plane/propel
+#89 4.996  - Added @plane/tailwind-config
+#89 5.128  - Added @plane/types
+#89 5.145  - Added @plane/typescript-config
+#89 5.223  - Added @plane/ui
+#89 ...
+
+#105 [copilot] exporting to image
+#105 exporting layers 0.1s done
+#105 exporting manifest sha256:a5cdb3dd9159b122858c9e44ff81a3455969b76f868a871f5bb79d9c27e570d8 done
+#105 exporting config sha256:5136fea4989c34f9c7fa4426cb7d404be104edf799a288f92f8ef0dbbd35ed34 0.0s done
+#105 exporting attestation manifest sha256:1749965cc9e069e2eb5d9145b5e4242ff3890f4cd40ee2c1f321d2eda928291e 0.0s done
+#105 exporting manifest list sha256:d6ee0f8c86ebc58da138317beecfa5b8f4cdf52e147bdd1ce9b7fa97bb0e84bc 0.0s done
+#105 naming to docker.io/library/ten-fold-plane-copilot:latest done
+#105 unpacking to docker.io/library/ten-fold-plane-copilot:latest 0.0s done
+#105 DONE 0.5s
+
+#89 [live builder 6/6] RUN turbo prune --scope=live --docker
+#89 5.292  - Added @plane/utils
+#89 5.337  - Added live
+#89 ...
+
+#88 [space builder 3/3] RUN turbo prune --scope=space --docker
+#88 4.480  WARNING  --scope is deprecated and will be removed in a future major version. Use positional arguments instead (e.g. `turbo prune web`)
+#88 5.184 Generating pruned monorepo for space in /app/out
+#88 5.239  - Added @plane/constants
+#88 5.450  - Added @plane/editor
+#88 5.479  - Added @plane/hooks
+#88 6.356  - Added @plane/i18n
+#88 6.671  - Added @plane/propel
+#88 6.706  - Added @plane/services
+#88 6.729  - Added @plane/tailwind-config
+#88 6.924  - Added @plane/types
+#88 6.937  - Added @plane/typescript-config
+#88 7.027  - Added @plane/ui
+#88 7.062  - Added @plane/utils
+#88 7.287  - Added space
+#88 DONE 7.8s
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 24.64 go: downloading github.com/tailscale/tscert v0.0.0-20251216020129-aea342f6d747
+#75 24.70 go: downloading github.com/KimMachineGun/automemlimit v0.7.5
+#75 24.70 go: downloading github.com/aryann/difflib v0.0.0-20210328193216-ff5ff6dc229b
+#75 24.73 go: downloading github.com/spf13/pflag v1.0.10
+#75 24.86 go: downloading go.uber.org/automaxprocs v1.6.0
+#75 24.89 go: downloading golang.org/x/crypto/x509roots/fallback v0.0.0-20260213171211-a408498e5541
+#75 24.96 go: downloading cel.dev/expr v0.25.1
+#75 25.06 go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20260406210006-6f92a3bedf2d
+#75 25.32 go: downloading github.com/antlr4-go/antlr/v4 v4.13.1
+#75 25.46 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.19.0
+#75 25.54 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.19.0
+#75 25.73 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.43.0
+#75 25.78 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.43.0
+#75 25.98 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.43.0
+#75 26.01 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.43.0
+#75 26.18 go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.43.0
+#75 26.30 go: downloading go.opentelemetry.io/otel/exporters/prometheus v0.65.0
+#75 26.36 go: downloading go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.19.0
+#75 26.44 go: downloading go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.43.0
+#75 26.59 go: downloading go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.43.0
+#75 26.64 go: downloading go.opentelemetry.io/otel/sdk/log v0.19.0
+#75 26.79 go: downloading github.com/inconshreveable/mousetrap v1.1.0
+#75 26.87 go: downloading go.opentelemetry.io/otel/metric v1.43.0
+#75 27.11 go: downloading github.com/pkg/errors v0.9.1
+#75 27.13 go: downloading github.com/smallstep/cli-utils v0.12.2
+#75 27.38 go: downloading github.com/smallstep/nosql v0.8.0
+#75 27.38 go: downloading github.com/smallstep/linkedca v0.25.0
+#75 27.59 go: downloading google.golang.org/grpc v1.81.0
+#75 ...
+
+#89 [live builder 6/6] RUN turbo prune --scope=live --docker
+#89 DONE 6.0s
+
+#106 [copilot] resolving provenance for metadata file
+#106 DONE 1.0s
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 30.24 go: downloading howett.net/plist v1.0.0
+#75 30.24 go: downloading github.com/slackhq/nebula v1.10.3
+#75 30.55 go: downloading github.com/cpuguy83/go-md2man/v2 v2.0.7
+#75 30.66 go: downloading go.yaml.in/yaml/v3 v3.0.4
+#75 31.15 go: downloading github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
+#75 31.20 go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4
+#75 31.24 go: downloading github.com/go-logr/logr v1.4.3
+#75 31.29 go: downloading go.opentelemetry.io/otel/trace v1.43.0
+#75 31.40 go: downloading golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546
+#75 31.55 go: downloading go.opentelemetry.io/proto/otlp v1.10.0
+#75 31.71 go: downloading github.com/prometheus/otlptranslator v1.0.0
+#75 31.79 go: downloading go.opentelemetry.io/otel/log v0.19.0
+#75 31.89 go: downloading github.com/go-logr/stdr v1.2.2
+#75 32.13 go: downloading go.opentelemetry.io/auto/sdk v1.2.1
+#75 ...
+
+#107 [web builder 5/5] RUN turbo prune --scope=web --docker
+#107 2.886  WARNING  --scope is deprecated and will be removed in a future major version. Use positional arguments instead (e.g. `turbo prune web`)
+#107 2.892 
+#107 2.892 Attention:
+#107 2.892 Turborepo now collects completely anonymous telemetry regarding usage.
+#107 2.892 This information is used to shape the Turborepo roadmap and prioritize features.
+#107 2.892 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#107 2.892 https://turborepo.dev/docs/telemetry
+#107 2.892 
+#107 2.902 • turbo 2.9.18
+#107 3.705 Generating pruned monorepo for web in /app/out
+#107 4.022  - Added @plane/constants
+#107 4.304  - Added @plane/editor
+#107 4.324  - Added @plane/hooks
+#107 4.926  - Added @plane/i18n
+#107 5.281  - Added @plane/propel
+#107 5.341  - Added @plane/services
+#107 5.385  - Added @plane/shared-state
+#107 5.412  - Added @plane/tailwind-config
+#107 5.698  - Added @plane/types
+#107 5.714  - Added @plane/typescript-config
+#107 5.867  - Added @plane/ui
+#107 5.993  - Added @plane/utils
+#107 8.324  - Added web
+#107 DONE 9.1s
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 32.27 go: downloading github.com/ccoveille/go-safecast/v2 v2.0.0
+#75 32.37 go: downloading github.com/smallstep/pkcs7 v0.2.1
+#75 32.38 go: downloading github.com/smallstep/scep v0.0.0-20250318231241-a25cabb69492
+#75 32.46 go: downloading github.com/Masterminds/sprig/v3 v3.3.0
+#75 32.48 go: downloading github.com/urfave/cli v1.22.17
+#75 32.64 go: downloading github.com/chzyer/readline v1.5.1
+#75 32.68 go: downloading github.com/manifoldco/promptui v0.9.0
+#75 32.76 go: downloading github.com/go-jose/go-jose/v3 v3.0.5
+#75 33.00 go: downloading google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1
+#75 33.00 go: downloading filippo.io/edwards25519 v1.2.0
+#75 ...
+
+#108 [live installer  6/12] COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+#108 CACHED
+
+#109 [live installer 10/12] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
+#109 CACHED
+
+#110 [live installer  8/12] COPY --from=builder /app/out/full/ .
+#110 CACHED
+
+#111 [live installer  4/12] COPY .gitignore .gitignore
+#111 CACHED
+
+#112 [live installer  7/12] RUN corepack enable pnpm
+#112 CACHED
+
+#113 [live installer  9/12] COPY turbo.json turbo.json
+#113 CACHED
+
+#114 [live installer  5/12] COPY --from=builder /app/out/json/ .
+#114 CACHED
+
+#115 [live installer 11/12] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store
+#115 CACHED
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 ...
+
+#117 [space installer 6/8] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
+#117 CACHED
+
+#118 [space installer 5/8] COPY turbo.json turbo.json
+#118 CACHED
+
+#119 [space installer 3/8] COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+#119 CACHED
+
+#92 [space installer 1/8] COPY .gitignore .gitignore
+#92 CACHED
+
+#120 [space installer 2/8] COPY --from=builder /app/out/json/ .
+#120 CACHED
+
+#121 [space installer 4/8] COPY --from=builder /app/out/full/ .
+#121 CACHED
+
+#122 [space installer 7/8] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store --prod=false
+#122 CACHED
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 33.51 go: downloading google.golang.org/api v0.277.0
+#75 33.51 go: downloading github.com/coreos/go-oidc/v3 v3.17.0
+#75 33.60 go: downloading github.com/rs/xid v1.6.0
+#75 33.64 go: downloading github.com/mitchellh/go-ps v1.0.0
+#75 33.67 go: downloading github.com/tailscale/go-winio v0.0.0-20231025203758-c4f33415bf55
+#75 33.75 go: downloading github.com/russross/blackfriday/v2 v2.1.0
+#75 33.88 go: downloading github.com/cenkalti/backoff/v5 v5.0.3
+#75 34.02 go: downloading github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0
+#75 34.83 go: downloading dario.cat/mergo v1.0.2
+#75 34.91 go: downloading github.com/Masterminds/goutils v1.1.1
+#75 34.97 go: downloading github.com/Masterminds/semver/v3 v3.4.0
+#75 35.04 go: downloading github.com/huandu/xstrings v1.5.0
+#75 35.11 go: downloading github.com/mitchellh/copystructure v1.2.0
+#75 35.35 go: downloading github.com/shopspring/decimal v1.4.0
+#75 35.45 go: downloading github.com/spf13/cast v1.7.0
+#75 35.68 go: downloading github.com/dgraph-io/badger v1.6.2
+#75 35.92 go: downloading github.com/dgraph-io/badger/v2 v2.2007.4
+#75 36.33 go: downloading go.etcd.io/bbolt v1.4.3
+#75 36.55 go: downloading github.com/go-sql-driver/mysql v1.9.3
+#75 36.68 go: downloading github.com/jackc/pgx/v5 v5.9.2
+#75 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 6.624 
+#123 6.624    • Packages in scope: admin
+#123 6.624    • Running build in 1 packages
+#123 6.624    • Remote caching disabled
+#123 6.624 
+#123 6.975 @plane/types:build: cache miss, executing 388d4d0f142f4549
+#123 6.975 @plane/hooks:build: cache miss, executing d0aef673d47062f7
+#123 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 37.74 go: downloading github.com/go-jose/go-jose/v4 v4.1.4
+#75 38.14 go: downloading golang.org/x/oauth2 v0.36.0
+#75 38.54 go: downloading filippo.io/bigmod v0.1.0
+#75 38.67 go: downloading github.com/mitchellh/reflectwalk v1.0.2
+#75 38.86 go: downloading github.com/dgraph-io/ristretto v0.2.0
+#75 39.53 go: downloading github.com/golang/protobuf v1.5.4
+#75 39.93 go: downloading github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13
+#75 40.15 go: downloading github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
+#75 40.34 go: downloading github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96
+#75 40.47 go: downloading github.com/golang/snappy v0.0.4
+#75 40.61 go: downloading github.com/klauspost/compress v1.18.6
+#75 ...
+
+#125 [web installer  6/12] RUN corepack enable pnpm
+#125 CACHED
+
+#126 [web installer  9/12] COPY turbo.json turbo.json
+#126 CACHED
+
+#127 [web installer  8/12] COPY --from=builder /app/apps/proxy/grist-custom.css ./apps/proxy/grist-custom.css
+#127 CACHED
+
+#128 [web installer 10/12] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
+#128 CACHED
+
+#129 [web installer  3/12] COPY .gitignore .gitignore
+#129 CACHED
+
+#130 [web installer  5/12] COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+#130 CACHED
+
+#131 [web installer  7/12] COPY --from=builder /app/out/full/ .
+#131 CACHED
+
+#132 [web installer  4/12] COPY --from=builder /app/out/json/ .
+#132 CACHED
+
+#133 [web installer 11/12] RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store
+#133 CACHED
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 15.17 @plane/types:build: $ tsdown
+#123 15.49 @plane/hooks:build: $ tsdown
+#123 16.84 @plane/types:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#123 16.96 @plane/hooks:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#123 18.83 @plane/types:build: [34mℹ[39m Using tsdown config: [4m/app/packages/types/tsdown.config.ts[24m
+#123 18.96 @plane/types:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#123 18.96 @plane/types:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#123 18.97 @plane/types:build: [34mℹ[39m Build start
+#123 19.02 @plane/hooks:build: [34mℹ[39m Using tsdown config: [4m/app/packages/hooks/tsdown.config.ts[24m
+#123 19.14 @plane/hooks:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#123 19.16 @plane/hooks:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#123 19.16 @plane/hooks:build: [34mℹ[39m Build start
+#123 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 53.40 go: downloading github.com/jackc/pgpassfile v1.0.0
+#75 53.44 go: downloading github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
+#75 53.49 go: downloading github.com/jackc/puddle/v2 v2.2.2
+#75 53.74 go: downloading github.com/mattn/go-colorable v0.1.14
+#75 54.08 go: downloading github.com/shurcooL/sanitized_anchor_name v1.0.0
+#75 54.14 go: downloading github.com/mattn/go-isatty v0.0.20
+#75 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 7.894 
+#124 7.894    • Packages in scope: space
+#124 7.894    • Running build in 1 packages
+#124 7.894    • Remote caching disabled
+#124 7.894 
+#124 9.422 @plane/hooks:build: cache miss, executing d0aef673d47062f7
+#124 9.435 @plane/i18n:build: cache miss, executing 5dbd7ff96bc08b5a
+#124 9.439 @plane/types:build: cache miss, executing 388d4d0f142f4549
+#124 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 12.25 Scope: all 13 workspace projects
+#116 16.30 ✓ Lockfile passes supply-chain policies (verified 18h ago)
+#116 16.46 Lockfile is up to date, resolution step is skipped
+#116 20.14 Already up to date
+#116 21.06 
+#116 21.06    ╭──────────────────────────────────────────────╮
+#116 21.06    │                                              │
+#116 21.06    │     Update available! 11.10.0 → 12.4.2.      │
+#116 21.06    │     Changelog: https://pnpm.io/v/12.4.2      │
+#116 21.06    │   To update, run: corepack use pnpm@12.4.2   │
+#116 21.06    │                                              │
+#116 21.06    ╰──────────────────────────────────────────────╯
+#116 21.06 
+#116 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 10.23 Scope: all 14 workspace projects
+#134 14.50 ✓ Lockfile passes supply-chain policies (verified 18h ago)
+#134 14.70 Lockfile is up to date, resolution step is skipped
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 23.12 @plane/i18n:build: $ pnpm run generate:types && tsdown
+#124 24.54 @plane/types:build: $ tsdown
+#124 24.63 @plane/hooks:build: $ tsdown
+#124 29.16 @plane/hooks:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 29.25 @plane/types:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 21.88 Already up to date
+#134 23.11 [WARN] Request took 12781ms: https://registry.npmjs.org/pnpm
+#134 23.24 
+#134 23.24    ╭──────────────────────────────────────────────╮
+#134 23.24    │                                              │
+#134 23.24    │     Update available! 11.10.0 → 12.4.2.      │
+#134 23.24    │     Changelog: https://pnpm.io/v/12.4.2      │
+#134 23.24    │   To update, run: corepack use pnpm@12.4.2   │
+#134 23.24    │                                              │
+#134 23.24    ╰──────────────────────────────────────────────╯
+#134 23.24 
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 32.49 @plane/types:build: [34mℹ[39m Using tsdown config: [4m/app/packages/types/tsdown.config.ts[24m
+#124 32.52 @plane/hooks:build: [34mℹ[39m Using tsdown config: [4m/app/packages/hooks/tsdown.config.ts[24m
+#124 32.76 @plane/types:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 32.78 @plane/hooks:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 32.78 @plane/types:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 32.79 @plane/hooks:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 32.80 @plane/hooks:build: [34mℹ[39m Build start
+#124 32.80 @plane/types:build: [34mℹ[39m Build start
+#124 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 39.61 
+#116 39.76 . prepare$ husky
+#116 40.17 . prepare: .git can't be found
+#116 40.18 . prepare: Done
+#116 42.50 Done in 34.8s using pnpm v11.10.0
+#116 43.66 • turbo 2.10.11
+#116 44.06 
+#116 44.06    • Packages in scope: live
+#116 44.06    • Running build in 1 packages
+#116 44.06    • Remote caching disabled
+#116 44.06 
+#116 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 41.35 @plane/i18n:build: $ tsx scripts/generate-types.ts
+#124 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 68.96 go: downloading github.com/googleapis/gax-go/v2 v2.22.0
+#75 68.96 go: downloading cloud.google.com/go/auth v0.20.0
+#75 69.38 go: downloading cloud.google.com/go/auth/oauth2adapt v0.2.8
+#75 69.41 go: downloading cloud.google.com/go/compute/metadata v0.9.0
+#75 69.51 go: downloading github.com/google/s2a-go v0.1.9
+#75 69.59 go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0
+#75 69.85 go: downloading github.com/googleapis/enterprise-certificate-proxy v0.3.15
+#75 70.12 go: downloading github.com/felixge/httpsnoop v1.0.4
+#75 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 45.04 @plane/hooks:build: cache miss, executing 03765f147810d758
+#116 45.04 @plane/types:build: cache miss, executing 500db04b6ca0f300
+#116 45.07 @plane/logger:build: cache miss, executing 09376fcd1266fb8a
+#116 45.07 @plane/decorators:build: cache miss, executing ee0d07a833633b3d
+#116 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 83.90 go: added github.com/mholt/caddy-ratelimit v0.1.0
+#75 83.99 2026/09/19 00:10:24 [INFO] exec (timeout=0s): /usr/local/go/bin/go get -v  
+#75 84.59 go: downloading github.com/go-chi/chi/v5 v5.2.5
+#75 84.76 go: downloading github.com/DeRuina/timberjack v1.4.2
+#75 85.69 go: downloading github.com/pires/go-proxyproto v0.12.0
+#75 85.70 go: downloading github.com/BurntSushi/toml v1.6.0
+#75 86.21 go: downloading github.com/alecthomas/chroma/v2 v2.24.1
+#75 87.29 go: downloading github.com/yuin/goldmark v1.8.2
+#75 87.64 go: downloading github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
+#75 87.78 go: downloading gopkg.in/yaml.v3 v3.0.1
+#75 88.03 go: downloading go.opentelemetry.io/contrib/propagators/autoprop v0.68.0
+#75 88.38 go: downloading github.com/fxamacker/cbor/v2 v2.9.0
+#75 88.62 go: downloading github.com/google/go-tpm v0.9.8
+#75 89.33 go: downloading github.com/smallstep/go-attestation v0.4.4-0.20241119153605-2306d5b464ca
+#75 89.60 go: downloading go.opentelemetry.io/contrib/propagators/aws v1.43.0
+#75 89.64 go: downloading go.opentelemetry.io/contrib/propagators/b3 v1.43.0
+#75 89.96 go: downloading go.opentelemetry.io/contrib/propagators/jaeger v1.43.0
+#75 90.24 go: downloading go.opentelemetry.io/contrib/propagators/ot v1.43.0
+#75 90.46 go: downloading github.com/x448/float16 v0.8.4
+#75 90.52 go: downloading github.com/sirupsen/logrus v1.9.4
+#75 90.67 go: downloading github.com/dlclark/regexp2 v1.12.0
+#75 90.68 go: downloading github.com/google/go-tspi v0.3.0
+#75 91.10 go: downloading github.com/google/certificate-transparency-go v1.1.8-0.20240110162603-74a5dd331745
+#75 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 56.41 @plane/i18n:build: Generated 3838 keys from 28 namespace files
+#124 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 40.33 
+#134 40.41 . prepare$ husky
+#134 40.86 . prepare: .git can't be found
+#134 40.88 . prepare: Done
+#134 43.13 Done in 37.4s using pnpm v11.10.0
+#134 44.33 • turbo 2.10.11
+#134 45.17 
+#134 45.17    • Packages in scope: web
+#134 45.17    • Running build in 1 packages
+#134 45.17    • Remote caching disabled
+#134 45.17 
+#134 51.24 @plane/hooks:build: cache bypass, force executing 7cfc83de1dc854c6
+#134 51.24 @plane/types:build: cache bypass, force executing 73de4b48de61b180
+#134 51.26 @plane/i18n:build: cache bypass, force executing edd8dbbe1c3771c1
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 62.66 @plane/i18n:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 65.55 @plane/i18n:build: [34mℹ[39m Using tsdown config: [4m/app/packages/i18n/tsdown.config.ts[24m
+#124 65.64 @plane/i18n:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 65.65 @plane/i18n:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 65.65 @plane/i18n:build: [34mℹ[39m Build start
+#124 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 101.6 2026/09/19 00:10:41 [INFO] Build environment ready
+#75 101.6 2026/09/19 00:10:41 [INFO] Building Caddy
+#75 101.6 2026/09/19 00:10:41 [INFO] exec (timeout=0s): /usr/local/go/bin/go mod tidy -e 
+#75 102.5 go: downloading github.com/stretchr/testify v1.11.1
+#75 103.2 go: downloading go.uber.org/goleak v1.3.0
+#75 103.7 go: downloading github.com/smallstep/assert v0.0.0-20200723003110-82e2b9b3b262
+#75 103.8 go: downloading github.com/google/go-cmp v0.7.0
+#75 104.2 go: downloading code.pfad.fr/check v1.1.0
+#75 104.6 go: downloading github.com/letsencrypt/pebble/v2 v2.10.0
+#75 105.1 go: downloading github.com/fortytw2/leaktest v1.3.0
+#75 105.2 go: downloading go.uber.org/mock v0.6.0
+#75 105.3 go: downloading github.com/zeebo/assert v1.1.0
+#75 105.8 go: downloading gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+#75 106.0 go: downloading github.com/prashantv/gostub v1.1.0
+#75 106.3 go: downloading github.com/davecgh/go-spew v1.1.1
+#75 106.4 go: downloading github.com/pmezard/go-difflib v1.0.0
+#75 106.5 go: downloading github.com/kylelemons/godebug v1.1.0
+#75 106.6 go: downloading github.com/alecthomas/assert/v2 v2.11.0
+#75 106.7 go: downloading github.com/google/go-tpm-tools v0.4.8
+#75 107.0 go: downloading github.com/peterbourgon/diskv/v3 v3.0.1
+#75 107.6 go: downloading github.com/schollz/jsonstore v1.1.0
+#75 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 63.28 @plane/types:build: $ tsdown
+#134 63.82 @plane/i18n:build: $ pnpm run generate:types && tsdown
+#134 64.40 @plane/hooks:build: $ tsdown
+#134 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 66.11 @plane/types:build: $ tsdown
+#116 66.37 @plane/logger:build: $ tsdown
+#116 66.49 @plane/hooks:build: $ tsdown
+#116 66.91 @plane/decorators:build: $ tsdown
+#116 69.47 @plane/types:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 69.50 @plane/hooks:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 69.51 @plane/decorators:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 69.93 @plane/logger:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 72.54 @plane/types:build: ℹ Using tsdown config: /app/packages/types/tsdown.config.ts
+#116 72.58 @plane/hooks:build: ℹ Using tsdown config: /app/packages/hooks/tsdown.config.ts
+#116 72.61 @plane/decorators:build: ℹ Using tsdown config: /app/packages/decorators/tsdown.config.ts
+#116 72.74 @plane/types:build: ℹ entry: src/index.ts
+#116 72.76 @plane/types:build: ℹ tsconfig: tsconfig.json
+#116 72.76 @plane/types:build: ℹ Build start
+#116 72.87 @plane/decorators:build: ℹ entry: src/index.ts
+#116 72.88 @plane/hooks:build: ℹ entry: src/index.ts
+#116 72.88 @plane/decorators:build: ℹ tsconfig: tsconfig.json
+#116 72.88 @plane/decorators:build: ℹ Build start
+#116 72.89 @plane/hooks:build: ℹ tsconfig: tsconfig.json
+#116 72.90 @plane/hooks:build: ℹ Build start
+#116 72.91 @plane/logger:build: ℹ Using tsdown config: /app/packages/logger/tsdown.config.ts
+#116 73.19 @plane/logger:build: ℹ entry: src/index.ts
+#116 73.22 @plane/logger:build: ℹ tsconfig: tsconfig.json
+#116 73.22 @plane/logger:build: ℹ Build start
+#116 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 108.0 go: downloading github.com/letsencrypt/challtestsrv v1.4.2
+#75 108.3 go: downloading github.com/kr/pretty v0.3.1
+#75 108.4 go: downloading go.opentelemetry.io/otel/sdk/log/logtest v0.19.0
+#75 108.8 go: downloading github.com/frankban/quicktest v1.14.6
+#75 108.9 go: downloading github.com/alecthomas/repr v0.5.2
+#75 109.2 go: downloading github.com/chzyer/test v1.0.0
+#75 109.2 go: downloading github.com/aws/aws-sdk-go-v2/config v1.32.17
+#75 109.3 go: downloading github.com/aws/aws-sdk-go-v2/service/kms v1.51.1
+#75 109.9 go: downloading github.com/aws/aws-sdk-go-v2 v1.41.7
+#75 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 72.96 @plane/hooks:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m 5.82 kB[22m [2m│ gzip: 1.93 kB[22m
+#123 72.96 @plane/hooks:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m11.13 kB[22m [2m│ gzip: 3.57 kB[22m
+#123 72.96 @plane/hooks:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 0.66 kB[22m [2m│ gzip: 0.39 kB[22m
+#123 72.96 @plane/hooks:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m 2.00 kB[22m [2m│ gzip: 0.80 kB[22m
+#123 72.96 @plane/hooks:build: [34mℹ[39m 4 files, total: 19.61 kB
+#123 72.96 @plane/hooks:build: [32m✔[39m Build complete in [32m53764ms[39m
+#123 80.71 @plane/types:build: [34mℹ[39m [2mdist/[22m[1mindex.mjs[22m        [2m 16.83 kB[22m [2m│ gzip:  3.68 kB[22m
+#123 80.71 @plane/types:build: [34mℹ[39m [2mdist/[22mindex.d.mts.map  [2m 89.23 kB[22m [2m│ gzip: 29.36 kB[22m
+#123 80.71 @plane/types:build: [34mℹ[39m [2mdist/[22mindex.mjs.map    [2m 65.52 kB[22m [2m│ gzip: 13.53 kB[22m
+#123 80.71 @plane/types:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.mts[22m[39m      [2m146.98 kB[22m [2m│ gzip: 28.71 kB[22m
+#123 80.72 @plane/types:build: [34mℹ[39m 4 files, total: 318.56 kB
+#123 80.75 @plane/types:build: [32m✔[39m Build complete in [32m61757ms[39m
+#123 81.17 @plane/constants:build: cache miss, executing b2ebb20385299ae6
+#123 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 65.74 @plane/types:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 66.13 @plane/hooks:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 68.20 @plane/types:build: ℹ Using tsdown config: /app/packages/types/tsdown.config.ts
+#134 68.40 @plane/types:build: ℹ entry: src/index.ts
+#134 68.41 @plane/types:build: ℹ tsconfig: tsconfig.json
+#134 68.44 @plane/types:build: ℹ Build start
+#134 68.52 @plane/hooks:build: ℹ Using tsdown config: /app/packages/hooks/tsdown.config.ts
+#134 68.66 @plane/hooks:build: ℹ entry: src/index.ts
+#134 68.67 @plane/hooks:build: ℹ tsconfig: tsconfig.json
+#134 68.68 @plane/hooks:build: ℹ Build start
+#134 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 110.8 go: downloading cloud.google.com/go/kms v1.31.0
+#75 111.1 go: downloading cloud.google.com/go v0.123.0
+#75 111.6 go: downloading github.com/hexops/gotextdiff v1.0.3
+#75 111.8 go: downloading github.com/google/btree v1.1.2
+#75 111.8 go: downloading github.com/kr/text v0.2.0
+#75 111.9 go: downloading github.com/rogpeppe/go-internal v1.14.1
+#75 112.1 go: downloading github.com/chzyer/logex v1.2.1
+#75 112.3 go: downloading github.com/aws/aws-sdk-go-v2/credentials v1.19.16
+#75 112.6 go: downloading github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.23
+#75 112.7 go: downloading github.com/aws/aws-sdk-go-v2/service/signin v1.0.11
+#75 112.9 go: downloading github.com/aws/aws-sdk-go-v2/service/sso v1.30.17
+#75 113.0 go: downloading github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.21
+#75 113.2 go: downloading github.com/aws/aws-sdk-go-v2/service/sts v1.42.1
+#75 113.2 go: downloading github.com/aws/smithy-go v1.25.1
+#75 114.0 go: downloading github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.23
+#75 114.0 go: downloading cloud.google.com/go/iam v1.7.0
+#75 114.4 go: downloading cloud.google.com/go/longrunning v0.9.0
+#75 114.8 go: downloading google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7
+#75 114.9 go: downloading github.com/zeebo/pcg v1.0.1
+#75 115.5 go: downloading github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.24
+#75 115.7 go: downloading github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.9
+#75 115.8 go: downloading github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.23
+#75 116.1 go: downloading github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.23
+#75 120.6 go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.67.0
+#75 120.6 go: downloading gonum.org/v1/gonum v0.17.0
+#75 120.9 go: downloading github.com/OneOfOne/xxhash v1.2.2
+#75 120.9 go: downloading github.com/spaolacci/murmur3 v1.1.0
+#75 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 86.65 @plane/constants:build: $ tsdown
+#123 87.39 @plane/constants:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#123 88.67 @plane/constants:build: [34mℹ[39m Using tsdown config: [4m/app/packages/constants/tsdown.config.ts[24m
+#123 88.75 @plane/constants:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#123 88.75 @plane/constants:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#123 88.76 @plane/constants:build: [34mℹ[39m Build start
+#123 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 124.8 2026/09/19 00:11:04 [INFO] exec (timeout=0s): /usr/local/go/bin/go build -o /usr/bin/caddy -ldflags -w -s -trimpath -tags nobadger,nomysql,nopgx 
+#75 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 80.60 @plane/i18n:build: $ tsx scripts/generate-types.ts
+#134 96.51 @plane/i18n:build: Generated 3838 keys from 28 namespace files
+#134 100.5 @plane/i18n:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 110.8 @plane/hooks:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m 5.82 kB[22m [2m│ gzip: 1.93 kB[22m
+#124 110.8 @plane/hooks:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m11.13 kB[22m [2m│ gzip: 3.57 kB[22m
+#124 110.8 @plane/hooks:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 0.66 kB[22m [2m│ gzip: 0.39 kB[22m
+#124 110.8 @plane/hooks:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m 2.00 kB[22m [2m│ gzip: 0.80 kB[22m
+#124 110.8 @plane/hooks:build: [34mℹ[39m 4 files, total: 19.61 kB
+#124 110.8 @plane/hooks:build: [32m✔[39m Build complete in [32m77992ms[39m
+#124 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 122.9 @plane/constants:build: [34mℹ[39m [2mdist/[22m[1mindex.mjs[22m        [2m108.95 kB[22m [2m│ gzip: 21.94 kB[22m
+#123 122.9 @plane/constants:build: [34mℹ[39m [2mdist/[22mindex.mjs.map    [2m176.20 kB[22m [2m│ gzip: 30.67 kB[22m
+#123 122.9 @plane/constants:build: [34mℹ[39m [2mdist/[22mindex.d.mts.map  [2m 24.27 kB[22m [2m│ gzip:  8.83 kB[22m
+#123 122.9 @plane/constants:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.mts[22m[39m      [2m 52.02 kB[22m [2m│ gzip: 11.44 kB[22m
+#123 122.9 @plane/constants:build: [34mℹ[39m 4 files, total: 361.43 kB
+#123 122.9 @plane/constants:build: [32m✔[39m Build complete in [32m34154ms[39m
+#123 123.2 @plane/utils:build: cache miss, executing 48c3c319ab8982dc
+#123 123.2 @plane/services:build: cache miss, executing 0f57649255d0e28a
+#123 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 122.5 @plane/types:build: [34mℹ[39m [2mdist/[22m[1mindex.mjs[22m        [2m 16.83 kB[22m [2m│ gzip:  3.68 kB[22m
+#124 122.5 @plane/types:build: [34mℹ[39m [2mdist/[22mindex.d.mts.map  [2m 89.23 kB[22m [2m│ gzip: 29.36 kB[22m
+#124 122.5 @plane/types:build: [34mℹ[39m [2mdist/[22mindex.mjs.map    [2m 65.52 kB[22m [2m│ gzip: 13.53 kB[22m
+#124 122.5 @plane/types:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.mts[22m[39m      [2m146.98 kB[22m [2m│ gzip: 28.71 kB[22m
+#124 122.5 @plane/types:build: [34mℹ[39m 4 files, total: 318.56 kB
+#124 122.7 @plane/types:build: [32m✔[39m Build complete in [32m89854ms[39m
+#124 124.5 @plane/constants:build: cache miss, executing b2ebb20385299ae6
+#124 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 106.4 @plane/i18n:build: ℹ Using tsdown config: /app/packages/i18n/tsdown.config.ts
+#134 106.9 @plane/i18n:build: ℹ entry: src/index.ts
+#134 106.9 @plane/i18n:build: ℹ tsconfig: tsconfig.json
+#134 107.0 @plane/i18n:build: ℹ Build start
+#134 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 133.2 @plane/services:build: $ tsdown
+#123 133.4 @plane/utils:build: $ tsdown
+#123 134.8 @plane/services:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#123 134.9 @plane/utils:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#123 136.5 @plane/utils:build: [34mℹ[39m Using tsdown config: [4m/app/packages/utils/tsdown.config.ts[24m
+#123 136.6 @plane/services:build: [34mℹ[39m Using tsdown config: [4m/app/packages/services/tsdown.config.ts[24m
+#123 136.6 @plane/utils:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#123 136.6 @plane/utils:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#123 136.6 @plane/utils:build: [34mℹ[39m Build start
+#123 136.7 @plane/services:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#123 136.7 @plane/services:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#123 136.7 @plane/services:build: [34mℹ[39m Build start
+#123 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 142.3 @plane/i18n:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m  5.66 kB[22m [2m│ gzip:  2.15 kB[22m
+#124 142.3 @plane/i18n:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 43.17 kB[22m [2m│ gzip:  5.39 kB[22m
+#124 142.3 @plane/i18n:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m 12.36 kB[22m [2m│ gzip:  4.16 kB[22m
+#124 142.4 @plane/i18n:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m176.39 kB[22m [2m│ gzip: 23.79 kB[22m
+#124 142.4 @plane/i18n:build: [34mℹ[39m 4 files, total: 237.59 kB
+#124 142.6 @plane/i18n:build: [32m✔[39m Build complete in [32m76948ms[39m
+#124 143.2 @plane/constants:build: $ tsdown
+#124 144.8 @plane/constants:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 145.7 @plane/constants:build: [34mℹ[39m Using tsdown config: [4m/app/packages/constants/tsdown.config.ts[24m
+#124 145.8 @plane/constants:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 145.8 @plane/constants:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 145.8 @plane/constants:build: [34mℹ[39m Build start
+#124 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 153.3 @plane/logger:build: ℹ dist/index.mjs        0.73 kB │ gzip: 0.39 kB
+#116 153.3 @plane/logger:build: ℹ dist/index.mjs.map    1.68 kB │ gzip: 0.74 kB
+#116 153.3 @plane/logger:build: ℹ dist/index.d.mts.map  0.22 kB │ gzip: 0.18 kB
+#116 153.3 @plane/logger:build: ℹ dist/index.d.mts      0.42 kB │ gzip: 0.22 kB
+#116 153.3 @plane/logger:build: ℹ 4 files, total: 3.05 kB
+#116 153.3 @plane/logger:build: ✔ Build complete in 79975ms
+#116 155.5 @plane/decorators:build: ℹ dist/index.mjs        49.41 kB │ gzip:  8.71 kB
+#116 155.5 @plane/decorators:build: ℹ dist/index.mjs.map    93.65 kB │ gzip: 16.16 kB
+#116 155.6 @plane/decorators:build: ℹ dist/index.d.mts.map   0.86 kB │ gzip:  0.47 kB
+#116 155.6 @plane/decorators:build: ℹ dist/index.d.mts       1.39 kB │ gzip:  0.51 kB
+#116 155.6 @plane/decorators:build: ℹ 4 files, total: 145.32 kB
+#116 155.7 @plane/decorators:build: ✔ Build complete in 82802ms
+#116 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 149.7 @plane/hooks:build: ℹ dist/index.js         5.82 kB │ gzip: 1.93 kB
+#134 149.7 @plane/hooks:build: ℹ dist/index.js.map    11.13 kB │ gzip: 3.57 kB
+#134 149.7 @plane/hooks:build: ℹ dist/index.d.ts.map   0.66 kB │ gzip: 0.39 kB
+#134 149.7 @plane/hooks:build: ℹ dist/index.d.ts       2.00 kB │ gzip: 0.80 kB
+#134 149.7 @plane/hooks:build: ℹ 4 files, total: 19.61 kB
+#134 149.8 @plane/hooks:build: ✔ Build complete in 81131ms
+#134 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 166.1 @plane/hooks:build: ℹ dist/index.js         5.82 kB │ gzip: 1.93 kB
+#116 166.1 @plane/hooks:build: ℹ dist/index.js.map    11.13 kB │ gzip: 3.57 kB
+#116 166.1 @plane/hooks:build: ℹ dist/index.d.ts.map   0.66 kB │ gzip: 0.39 kB
+#116 166.1 @plane/hooks:build: ℹ dist/index.d.ts       2.00 kB │ gzip: 0.80 kB
+#116 166.1 @plane/hooks:build: ℹ 4 files, total: 19.61 kB
+#116 166.2 @plane/hooks:build: ✔ Build complete in 93270ms
+#116 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 159.3 @plane/types:build: ℹ dist/index.mjs         16.83 kB │ gzip:  3.68 kB
+#134 159.3 @plane/types:build: ℹ dist/index.d.mts.map   89.23 kB │ gzip: 29.36 kB
+#134 159.3 @plane/types:build: ℹ dist/index.mjs.map     65.52 kB │ gzip: 13.53 kB
+#134 159.3 @plane/types:build: ℹ dist/index.d.mts      146.98 kB │ gzip: 28.71 kB
+#134 159.3 @plane/types:build: ℹ 4 files, total: 318.56 kB
+#134 159.4 @plane/types:build: ✔ Build complete in 90882ms
+#134 160.9 @plane/constants:build: cache bypass, force executing ba9052764f123943
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 174.2 @plane/constants:build: [34mℹ[39m [2mdist/[22m[1mindex.mjs[22m        [2m108.95 kB[22m [2m│ gzip: 21.94 kB[22m
+#124 174.2 @plane/constants:build: [34mℹ[39m [2mdist/[22mindex.mjs.map    [2m176.20 kB[22m [2m│ gzip: 30.67 kB[22m
+#124 174.2 @plane/constants:build: [34mℹ[39m [2mdist/[22mindex.d.mts.map  [2m 24.27 kB[22m [2m│ gzip:  8.83 kB[22m
+#124 174.2 @plane/constants:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.mts[22m[39m      [2m 52.02 kB[22m [2m│ gzip: 11.44 kB[22m
+#124 174.2 @plane/constants:build: [34mℹ[39m 4 files, total: 361.43 kB
+#124 174.2 @plane/constants:build: [32m✔[39m Build complete in [32m28420ms[39m
+#124 174.6 @plane/services:build: cache miss, executing 0f57649255d0e28a
+#124 174.6 @plane/utils:build: cache miss, executing 48c3c319ab8982dc
+#124 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 173.2 @plane/types:build: ℹ dist/index.mjs         16.83 kB │ gzip:  3.68 kB
+#116 173.2 @plane/types:build: ℹ dist/index.d.mts.map   89.23 kB │ gzip: 29.36 kB
+#116 173.2 @plane/types:build: ℹ dist/index.mjs.map     65.52 kB │ gzip: 13.53 kB
+#116 173.2 @plane/types:build: ℹ dist/index.d.mts      146.98 kB │ gzip: 28.71 kB
+#116 173.2 @plane/types:build: ℹ 4 files, total: 318.56 kB
+#116 173.3 @plane/types:build: ✔ Build complete in 100463ms
+#116 173.8 @plane/constants:build: cache miss, executing 0c16c4218c9b9276
+#116 179.6 @plane/constants:build: $ tsdown
+#116 180.1 @plane/constants:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 180.7 @plane/constants:build: ℹ Using tsdown config: /app/packages/constants/tsdown.config.ts
+#116 180.8 @plane/constants:build: ℹ entry: src/index.ts
+#116 180.8 @plane/constants:build: ℹ tsconfig: tsconfig.json
+#116 180.8 @plane/constants:build: ℹ Build start
+#116 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 174.8 @plane/constants:build: $ tsdown
+#134 178.5 @plane/constants:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 180.0 @plane/i18n:build: ℹ dist/index.js          5.66 kB │ gzip:  2.15 kB
+#134 180.1 @plane/i18n:build: ℹ dist/index.d.ts.map   43.17 kB │ gzip:  5.39 kB
+#134 180.1 @plane/i18n:build: ℹ dist/index.js.map     12.36 kB │ gzip:  4.16 kB
+#134 180.1 @plane/i18n:build: ℹ dist/index.d.ts      176.39 kB │ gzip: 23.79 kB
+#134 180.1 @plane/i18n:build: ℹ 4 files, total: 237.59 kB
+#134 180.2 @plane/i18n:build: ✔ Build complete in 73118ms
+#134 180.4 @plane/constants:build: ℹ Using tsdown config: /app/packages/constants/tsdown.config.ts
+#134 180.5 @plane/constants:build: ℹ entry: src/index.ts
+#134 180.5 @plane/constants:build: ℹ tsconfig: tsconfig.json
+#134 180.5 @plane/constants:build: ℹ Build start
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 183.8 @plane/utils:build: $ tsdown
+#124 185.8 @plane/services:build: $ tsdown
+#124 185.9 @plane/utils:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 187.3 @plane/utils:build: [34mℹ[39m Using tsdown config: [4m/app/packages/utils/tsdown.config.ts[24m
+#124 187.4 @plane/utils:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 187.4 @plane/utils:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 187.4 @plane/utils:build: [34mℹ[39m Build start
+#124 187.7 @plane/services:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 189.5 @plane/services:build: [34mℹ[39m Using tsdown config: [4m/app/packages/services/tsdown.config.ts[24m
+#124 189.6 @plane/services:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 189.6 @plane/services:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 189.6 @plane/services:build: [34mℹ[39m Build start
+#124 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 193.1 @plane/services:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m 97.92 kB[22m [2m│ gzip: 11.24 kB[22m
+#123 193.1 @plane/services:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m154.04 kB[22m [2m│ gzip: 17.93 kB[22m
+#123 193.1 @plane/services:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 21.01 kB[22m [2m│ gzip:  5.70 kB[22m
+#123 193.1 @plane/services:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m 70.26 kB[22m [2m│ gzip:  9.05 kB[22m
+#123 193.1 @plane/services:build: [34mℹ[39m 4 files, total: 343.23 kB
+#123 193.2 @plane/services:build: [32m✔[39m Build complete in [32m56417ms[39m
+#123 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 210.2 @plane/constants:build: ℹ dist/index.mjs        108.95 kB │ gzip: 21.94 kB
+#116 210.2 @plane/constants:build: ℹ dist/index.mjs.map    176.20 kB │ gzip: 30.67 kB
+#116 210.2 @plane/constants:build: ℹ dist/index.d.mts.map   24.27 kB │ gzip:  8.83 kB
+#116 210.2 @plane/constants:build: ℹ dist/index.d.mts       52.02 kB │ gzip: 11.44 kB
+#116 210.2 @plane/constants:build: ℹ 4 files, total: 361.43 kB
+#116 210.2 @plane/constants:build: ✔ Build complete in 29436ms
+#116 210.5 @plane/utils:build: cache miss, executing 28aeb2e06d35887d
+#116 215.1 @plane/utils:build: $ tsdown
+#116 215.8 @plane/utils:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 216.5 @plane/utils:build: ℹ Using tsdown config: /app/packages/utils/tsdown.config.ts
+#116 216.6 @plane/utils:build: ℹ entry: src/index.ts
+#116 216.6 @plane/utils:build: ℹ tsconfig: tsconfig.json
+#116 216.6 @plane/utils:build: ℹ Build start
+#116 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 207.9 @plane/constants:build: ℹ dist/index.mjs        108.95 kB │ gzip: 21.94 kB
+#134 207.9 @plane/constants:build: ℹ dist/index.mjs.map    176.20 kB │ gzip: 30.67 kB
+#134 207.9 @plane/constants:build: ℹ dist/index.d.mts.map   24.27 kB │ gzip:  8.83 kB
+#134 207.9 @plane/constants:build: ℹ dist/index.d.mts       52.02 kB │ gzip: 11.44 kB
+#134 207.9 @plane/constants:build: ℹ 4 files, total: 361.43 kB
+#134 207.9 @plane/constants:build: ✔ Build complete in 27385ms
+#134 208.3 @plane/utils:build: cache bypass, force executing d4486b48b50498f5
+#134 208.4 @plane/services:build: cache bypass, force executing a860ddc49c6fe574
+#134 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 225.0 @plane/utils:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m219.53 kB[22m [2m│ gzip: 55.06 kB[22m
+#123 225.0 @plane/utils:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m398.93 kB[22m [2m│ gzip: 88.53 kB[22m
+#123 225.0 @plane/utils:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 43.34 kB[22m [2m│ gzip: 14.46 kB[22m
+#123 225.0 @plane/utils:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m117.11 kB[22m [2m│ gzip: 27.19 kB[22m
+#123 225.0 @plane/utils:build: [34mℹ[39m 4 files, total: 778.91 kB
+#123 225.0 @plane/utils:build: [32m✔[39m Build complete in [32m88348ms[39m
+#123 225.5 admin:build: cache miss, executing 560c7f4ecec6e868
+#123 231.0 admin:build: $ react-router build
+#123 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 218.5 @plane/utils:build: $ tsdown
+#134 218.9 @plane/services:build: $ tsdown
+#134 220.2 @plane/services:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 220.2 @plane/utils:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 221.3 @plane/services:build: ℹ Using tsdown config: /app/packages/services/tsdown.config.ts
+#134 221.4 @plane/utils:build: ℹ Using tsdown config: /app/packages/utils/tsdown.config.ts
+#134 221.5 @plane/services:build: ℹ entry: src/index.ts
+#134 221.5 @plane/services:build: ℹ tsconfig: tsconfig.json
+#134 221.5 @plane/services:build: ℹ Build start
+#134 221.5 @plane/utils:build: ℹ entry: src/index.ts
+#134 221.5 @plane/utils:build: ℹ tsconfig: tsconfig.json
+#134 221.5 @plane/utils:build: ℹ Build start
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 233.6 @plane/services:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m 97.92 kB[22m [2m│ gzip: 11.24 kB[22m
+#124 233.6 @plane/services:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m154.04 kB[22m [2m│ gzip: 17.93 kB[22m
+#124 233.6 @plane/services:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 21.01 kB[22m [2m│ gzip:  5.70 kB[22m
+#124 233.6 @plane/services:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m 70.26 kB[22m [2m│ gzip:  9.05 kB[22m
+#124 233.6 @plane/services:build: [34mℹ[39m 4 files, total: 343.23 kB
+#124 233.6 @plane/services:build: [32m✔[39m Build complete in [32m44024ms[39m
+#124 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 261.1 admin:build: [33mThe plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the [1mresolve.tsconfigPaths[22m option. You can remove the plugin and set [1mresolve.tsconfigPaths: true[22m in your Vite config instead.[39m
+#123 262.2 admin:build: (node:398) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///app/packages/tailwind-config/postcss.config.js is not specified and it doesn't parse as CommonJS.
+#123 262.2 admin:build: Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+#123 262.2 admin:build: To eliminate this warning, add "type": "module" to /app/packages/tailwind-config/package.json.
+#123 262.2 admin:build: (Use `node --trace-warnings ...` to show where the warning was created)
+#123 262.3 admin:build: [33mThe plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the [1mresolve.tsconfigPaths[22m option. You can remove the plugin and set [1mresolve.tsconfigPaths: true[22m in your Vite config instead.[39m
+#123 262.5 admin:build: Using Vite Environment API
+#123 262.5 admin:build: [36mvite v8.0.16 [32mbuilding client environment for production...[36m[39m
+#123 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 266.9 @plane/utils:build: [34mℹ[39m [2mdist/[22m[1mindex.js[22m        [2m219.53 kB[22m [2m│ gzip: 55.06 kB[22m
+#124 266.9 @plane/utils:build: [34mℹ[39m [2mdist/[22mindex.js.map    [2m398.93 kB[22m [2m│ gzip: 88.53 kB[22m
+#124 266.9 @plane/utils:build: [34mℹ[39m [2mdist/[22mindex.d.ts.map  [2m 43.34 kB[22m [2m│ gzip: 14.46 kB[22m
+#124 266.9 @plane/utils:build: [34mℹ[39m [2mdist/[22m[32m[1mindex.d.ts[22m[39m      [2m117.11 kB[22m [2m│ gzip: 27.19 kB[22m
+#124 266.9 @plane/utils:build: [34mℹ[39m 4 files, total: 778.91 kB
+#124 266.9 @plane/utils:build: [32m✔[39m Build complete in [32m79518ms[39m
+#124 267.4 @plane/propel:build: cache miss, executing cbbcb1c0cb6ad25c
+#124 272.5 @plane/propel:build: $ tsdown
+#124 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 276.2 @plane/utils:build: ℹ dist/index.js        219.53 kB │ gzip: 55.06 kB
+#116 276.2 @plane/utils:build: ℹ dist/index.js.map    398.93 kB │ gzip: 88.53 kB
+#116 276.2 @plane/utils:build: ℹ dist/index.d.ts.map   43.34 kB │ gzip: 14.46 kB
+#116 276.2 @plane/utils:build: ℹ dist/index.d.ts      117.11 kB │ gzip: 27.19 kB
+#116 276.2 @plane/utils:build: ℹ 4 files, total: 778.91 kB
+#116 276.2 @plane/utils:build: ✔ Build complete in 59593ms
+#116 276.6 @plane/propel:build: cache miss, executing c53ccdc103c8c2a3
+#116 281.2 @plane/propel:build: $ tsdown
+#116 281.9 @plane/propel:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 282.8 @plane/propel:build: ℹ Using tsdown config: /app/packages/propel/tsdown.config.ts
+#116 283.1 @plane/propel:build: ℹ entry: src/accordion/index.ts, src/badge/index.ts, src/banner/index.ts, src/avatar/index.ts, src/calendar/index.ts, src/animated-counter/index.ts, src/card/index.ts, src/button/index.ts, src/command/index.ts, src/context-menu/index.ts, src/combobox/index.ts, src/emoji-reaction/index.ts, src/emoji-icon-picker/index.ts, src/dialog/index.ts, src/empty-state/index.ts, src/icons/index.ts, src/input/index.ts, src/icon-button/index.ts, src/menu/index.ts, src/pill/index.ts, src/popover/index.ts, src/portal/index.ts, src/spinners/index.ts, src/skeleton/index.ts, src/collapsible/index.ts, src/scrollarea/index.ts, src/table/index.ts, src/tab-navigation/index.ts, src/tabs/index.ts, src/switch/index.ts, src/toolbar/index.ts, src/tooltip/index.ts, src/utils/index.ts, src/toast/index.ts, src/charts/line-chart/index.ts, src/charts/bar-chart/index.ts, src/charts/area-chart/index.ts, src/charts/pie-chart/index.ts, src/charts/tree-map/index.ts, src/charts/radar-chart/index.ts, src/charts/scatter-chart/index.ts
+#116 283.1 @plane/propel:build: ℹ tsconfig: tsconfig.json
+#116 283.1 @plane/propel:build: ℹ Build start
+#116 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 264.9 @plane/services:build: ℹ dist/index.js         97.92 kB │ gzip: 11.24 kB
+#134 264.9 @plane/services:build: ℹ dist/index.js.map    154.04 kB │ gzip: 17.93 kB
+#134 264.9 @plane/services:build: ℹ dist/index.d.ts.map   21.01 kB │ gzip:  5.70 kB
+#134 264.9 @plane/services:build: ℹ dist/index.d.ts       70.26 kB │ gzip:  9.05 kB
+#134 264.9 @plane/services:build: ℹ 4 files, total: 343.23 kB
+#134 264.9 @plane/services:build: ✔ Build complete in 43420ms
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 273.3 @plane/propel:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 274.1 @plane/propel:build: [34mℹ[39m Using tsdown config: [4m/app/packages/propel/tsdown.config.ts[24m
+#124 274.3 @plane/propel:build: [34mℹ[39m entry: [34msrc/animated-counter/index.ts, src/avatar/index.ts, src/banner/index.ts, src/accordion/index.ts, src/button/index.ts, src/calendar/index.ts, src/card/index.ts, src/badge/index.ts, src/collapsible/index.ts, src/combobox/index.ts, src/context-menu/index.ts, src/command/index.ts, src/dialog/index.ts, src/emoji-icon-picker/index.ts, src/emoji-reaction/index.ts, src/icon-button/index.ts, src/empty-state/index.ts, src/icons/index.ts, src/input/index.ts, src/pill/index.ts, src/menu/index.ts, src/popover/index.ts, src/portal/index.ts, src/scrollarea/index.ts, src/spinners/index.ts, src/skeleton/index.ts, src/switch/index.ts, src/tab-navigation/index.ts, src/table/index.ts, src/tabs/index.ts, src/toast/index.ts, src/toolbar/index.ts, src/tooltip/index.ts, src/utils/index.ts, src/charts/area-chart/index.ts, src/charts/bar-chart/index.ts, src/charts/line-chart/index.ts, src/charts/radar-chart/index.ts, src/charts/pie-chart/index.ts, src/charts/scatter-chart/index.ts, src/charts/tree-map/index.ts[39m
+#124 274.3 @plane/propel:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 274.3 @plane/propel:build: [34mℹ[39m Build start
+#124 ...
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 298.3 @plane/utils:build: ℹ dist/index.js        219.53 kB │ gzip: 55.06 kB
+#134 298.3 @plane/utils:build: ℹ dist/index.js.map    398.93 kB │ gzip: 88.53 kB
+#134 298.3 @plane/utils:build: ℹ dist/index.d.ts.map   43.34 kB │ gzip: 14.46 kB
+#134 298.3 @plane/utils:build: ℹ dist/index.d.ts      117.11 kB │ gzip: 27.19 kB
+#134 298.3 @plane/utils:build: ℹ 4 files, total: 778.91 kB
+#134 298.3 @plane/utils:build: ✔ Build complete in 76804ms
+#134 298.8 @plane/propel:build: cache bypass, force executing efc39d1daaa95f11
+#134 298.8 @plane/shared-state:build: cache bypass, force executing 12c632447996797b
+#134 308.3 @plane/shared-state:build: $ tsdown
+#134 308.6 @plane/propel:build: $ tsdown
+#134 309.7 @plane/shared-state:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 310.2 @plane/propel:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#134 311.6 @plane/shared-state:build: ℹ Using tsdown config: /app/packages/shared-state/tsdown.config.ts
+#134 311.7 @plane/shared-state:build: ℹ entry: src/index.ts
+#134 311.8 @plane/shared-state:build: ℹ tsconfig: tsconfig.json
+#134 311.8 @plane/shared-state:build: ℹ Build start
+#134 311.8 @plane/propel:build: ℹ Using tsdown config: /app/packages/propel/tsdown.config.ts
+#134 312.5 @plane/propel:build: ℹ entry: src/accordion/index.ts, src/animated-counter/index.ts, src/avatar/index.ts, src/badge/index.ts, src/banner/index.ts, src/calendar/index.ts, src/card/index.ts, src/button/index.ts, src/collapsible/index.ts, src/command/index.ts, src/combobox/index.ts, src/context-menu/index.ts, src/dialog/index.ts, src/emoji-icon-picker/index.ts, src/emoji-reaction/index.ts, src/empty-state/index.ts, src/icon-button/index.ts, src/icons/index.ts, src/input/index.ts, src/menu/index.ts, src/popover/index.ts, src/portal/index.ts, src/pill/index.ts, src/scrollarea/index.ts, src/skeleton/index.ts, src/switch/index.ts, src/spinners/index.ts, src/table/index.ts, src/tab-navigation/index.ts, src/toast/index.ts, src/tabs/index.ts, src/utils/index.ts, src/tooltip/index.ts, src/toolbar/index.ts, src/charts/area-chart/index.ts, src/charts/bar-chart/index.ts, src/charts/pie-chart/index.ts, src/charts/radar-chart/index.ts, src/charts/tree-map/index.ts, src/charts/scatter-chart/index.ts, src/charts/line-chart/index.ts
+#134 312.5 @plane/propel:build: ℹ tsconfig: tsconfig.json
+#134 312.5 @plane/propel:build: ℹ Build start
+#134 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 358.9 admin:build: [2Kadmin:build: transforming...✓ 7212 modules transformed.
+#123 362.1 admin:build: rendering chunks...
+#123 364.8 admin:build: computing gzip size...
+#123 365.0 admin:build: build/client/assets/favicon-16x16-B_Opgp1K.png                                  0.46 kB
+#123 365.0 admin:build: build/client/assets/google-logo-r0ky5Kfn.svg                                    0.74 kB │ gzip:  0.43 kB
+#123 365.0 admin:build: build/client/assets/favicon-32x32-cfWXc3P9.png                                  0.76 kB
+#123 365.0 admin:build: build/client/assets/gitlab-logo-BL2xQyij.svg                                    1.06 kB │ gzip:  0.47 kB
+#123 365.0 admin:build: build/client/assets/gitea-logo-BAYfzmEl.svg                                     2.13 kB │ gzip:  1.04 kB
+#123 365.0 admin:build: build/client/assets/takeoff-icon-dark-EbV9jX7-.svg                              2.98 kB │ gzip:  0.99 kB
+#123 365.0 admin:build: build/client/assets/takeoff-icon-light-2XLBscmc.svg                             3.15 kB │ gzip:  1.07 kB
+#123 365.0 admin:build: build/client/assets/instance-failure-C1aRKNan.svg                               4.10 kB │ gzip:  1.27 kB
+#123 365.0 admin:build: build/client/assets/instance-failure-dark-DE7I22mw.svg                          4.10 kB │ gzip:  1.27 kB
+#123 365.0 admin:build: build/client/assets/404-DWCFZzXK.svg                                            5.42 kB │ gzip:  1.58 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-vietnamese-400-normal-DDuiU_S-.woff           5.62 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-cyrillic-ext-400-normal-DMdlQ8Kv.woff         5.82 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-vietnamese-400-normal-BulugwFq.woff2          5.86 kB
+#123 365.0 admin:build: build/client/assets/apple-touch-icon-BmADsVmV.png                               6.29 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-cyrillic-ext-400-normal-xuaO2J-f.woff2        6.91 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-cyrillic-400-normal-CEL4l2ZJ.woff             7.20 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-cyrillic-400-normal-BSMlKf0J.woff2            8.35 kB
+#123 365.0 admin:build: build/client/assets/inter-vietnamese-wght-normal-CBcvBZtf.woff2                10.25 kB
+#123 365.0 admin:build: build/client/assets/inter-greek-ext-wght-normal-DlzME5K_.woff2                 11.23 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-latin-ext-400-normal-D3D2R8hC.woff           11.76 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff               13.14 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-latin-ext-400-normal-BmRBH3aV.woff2          13.34 kB
+#123 365.0 admin:build: build/client/assets/github-black-DmZ70PA_.png                                  14.03 kB
+#123 365.0 admin:build: build/client/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2              14.70 kB
+#123 365.0 admin:build: build/client/assets/favicon-DJlV-mcI.ico                                       15.40 kB
+#123 365.0 admin:build: build/client/assets/github-white-BwRnG8jn.png                                  16.55 kB
+#123 365.0 admin:build: build/client/assets/inter-cyrillic-wght-normal-DqGufNeO.woff2                  18.74 kB
+#123 365.0 admin:build: build/client/assets/inter-greek-wght-normal-CkhJZR-_.woff2                     18.99 kB
+#123 365.0 admin:build: build/client/assets/inter-cyrillic-ext-wght-normal-BOeWTOD4.woff2              25.96 kB
+#123 365.0 admin:build: build/client/.vite/manifest.json                                               35.30 kB │ gzip:  3.50 kB
+#123 365.0 admin:build: build/client/assets/inter-latin-wght-normal-Dx4kXJAl.woff2                     48.25 kB
+#123 365.0 admin:build: build/client/assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2                 85.06 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-400-normal-BVRwnNJJ.woff2  348.77 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-100-normal-StOoOijZ.woff2  363.56 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-300-normal-CGYRw1-j.woff2  388.05 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-200-normal-Dy_97ylg.woff2  389.09 kB
+#123 365.0 admin:build: build/client/assets/logo-spinner-light-DmBc4A-4.gif                           427.96 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-400-normal-3TtrvaAx.woff   454.56 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-100-normal-CyR9BGN8.woff   485.69 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-300-normal-CexQLkYr.woff   506.70 kB
+#123 365.0 admin:build: build/client/assets/material-symbols-rounded-latin-200-normal-B9_93z2O.woff   507.90 kB
+#123 365.0 admin:build: build/client/assets/logo-spinner-dark-Cc1AqekO.gif                            976.39 kB
+#123 365.0 admin:build: build/client/assets/root-CUojeknF.css                                           7.43 kB │ gzip:  1.56 kB
+#123 365.0 admin:build: build/client/assets/globals-C3o653-Q.css                                      170.03 kB │ gzip: 24.64 kB
+#123 365.0 admin:build: build/client/assets/gitea-logo-DdPv11Sq.js                                      0.06 kB │ gzip:  0.08 kB
+#123 365.0 admin:build: build/client/assets/gitlab-logo-DnQSTEsU.js                                     0.06 kB │ gzip:  0.08 kB
+#123 365.0 admin:build: build/client/assets/google-logo-DYoMaRvI.js                                     0.06 kB │ gzip:  0.08 kB
+#123 365.0 admin:build: build/client/assets/check-BWNxUAFv.js                                           0.11 kB │ gzip:  0.13 kB
+#123 365.0 admin:build: build/client/assets/github-white-BqeZC1wr.js                                    0.11 kB │ gzip:  0.10 kB
+#123 365.0 admin:build: build/client/assets/useValueChanged-bgNJoRP4.js                                 0.22 kB │ gzip:  0.19 kB
+#123 365.0 admin:build: build/client/assets/link-DbbAcIUU.js                                            0.26 kB │ gzip:  0.20 kB
+#123 365.0 admin:build: build/client/assets/helper-C6C1ZCJ7.js                                          0.35 kB │ gzip:  0.25 kB
+#123 365.0 admin:build: build/client/assets/logo-spinner-CIKdNuJP.js                                    0.41 kB │ gzip:  0.29 kB
+#123 365.0 admin:build: build/client/assets/navigation-BlP5z0dJ.js                                      0.45 kB │ gzip:  0.30 kB
+#123 365.0 admin:build: build/client/assets/close-outline-D63gA3td.js                                   0.46 kB │ gzip:  0.33 kB
+#123 365.0 admin:build: build/client/assets/layout-DHBDDTtj.js                                          0.50 kB │ gzip:  0.37 kB
+#123 365.0 admin:build: build/client/assets/useAriaLabelledBy-BR58rhu8.js                               0.57 kB │ gzip:  0.38 kB
+#123 365.0 admin:build: build/client/assets/skeleton-Q9wMFoLi.js                                        0.58 kB │ gzip:  0.35 kB
+#123 365.0 admin:build: build/client/assets/useTransitionStatus-B1Cn_QXN.js                             0.71 kB │ gzip:  0.37 kB
+#123 365.0 admin:build: build/client/assets/authentication-method-card-gEC72W8Y.js                      0.93 kB │ gzip:  0.46 kB
+#123 365.0 admin:build: build/client/assets/page-wrapper-DGP-TbZH.js                                    1.02 kB │ gzip:  0.49 kB
+#123 365.0 admin:build: build/client/assets/404-bOjVHMs2.js                                             1.17 kB │ gzip:  0.62 kB
+#123 365.0 admin:build: build/client/assets/controller-input-G2xFgPQf.js                                1.24 kB │ gzip:  0.59 kB
+#123 365.0 admin:build: build/client/assets/monitor-outline-mJDbeTdR.js                                 1.43 kB │ gzip:  0.76 kB
+#123 365.0 admin:build: build/client/assets/anchor-button-CSG9v4wL.js                                   1.60 kB │ gzip:  0.72 kB
+#123 365.0 admin:build: build/client/assets/button-Bw3PC6il.js                                          1.76 kB │ gzip:  0.73 kB
+#123 365.0 admin:build: build/client/assets/page-BfOrEq8V.js                                            2.23 kB │ gzip:  1.16 kB
+#123 365.0 admin:build: build/client/assets/useLabelableId-BEGbWIxe.js                                  2.41 kB │ gzip:  1.16 kB
+#123 365.0 admin:build: build/client/assets/show-outline-B3O-iLsw.js                                    2.53 kB │ gzip:  1.13 kB
+#123 365.0 admin:build: build/client/assets/dist-DzF4Vrwp.js                                            3.28 kB │ gzip:  1.45 kB
+#123 365.0 admin:build: build/client/assets/settings-outline-DgXOv6Rt.js                                3.33 kB │ gzip:  1.45 kB
+#123 365.0 admin:build: build/client/assets/react-dom-ql0OLl_X.js                                       3.54 kB │ gzip:  1.34 kB
+#123 365.0 admin:build: build/client/assets/store-D0-qMsfK.js                                           4.18 kB │ gzip:  1.93 kB
+#123 365.0 admin:build: build/client/assets/switch-CBdPBcgs.js                                          4.27 kB │ gzip:  1.98 kB
+#123 365.0 admin:build: build/client/assets/input-DtiFvGOR.js                                           4.31 kB │ gzip:  1.67 kB
+#123 365.0 admin:build: build/client/assets/page-D349iEre.js                                            4.58 kB │ gzip:  1.81 kB
+#123 365.0 admin:build: build/client/assets/page-Dz8dpfyU.js                                            4.94 kB │ gzip:  2.21 kB
+#123 365.0 admin:build: build/client/assets/page-uGsuhRKn.js                                            4.96 kB │ gzip:  1.93 kB
+#123 365.0 admin:build: build/client/assets/page-De0gSjib.js                                            5.96 kB │ gzip:  2.34 kB
+#123 365.0 admin:build: build/client/assets/page-95rJkwTC.js                                            6.07 kB │ gzip:  2.40 kB
+#123 365.0 admin:build: build/client/assets/page-rpV_11U5.js                                            6.85 kB │ gzip:  2.57 kB
+#123 365.0 admin:build: build/client/assets/page-BU-Lt6-Q.js                                            6.98 kB │ gzip:  2.57 kB
+#123 365.0 admin:build: build/client/assets/page-zYxwyE0r.js                                            7.06 kB │ gzip:  2.53 kB
+#123 365.0 admin:build: build/client/assets/copy-field-CZQlAPrR.js                                      8.70 kB │ gzip:  3.71 kB
+#123 365.0 admin:build: build/client/assets/page-91oc3GZx.js                                            8.75 kB │ gzip:  3.10 kB
+#123 365.0 admin:build: build/client/assets/page-s7rHOpIy.js                                           10.18 kB │ gzip:  3.19 kB
+#123 365.0 admin:build: build/client/assets/index-Cy4ddKoR.js                                          10.25 kB │ gzip:  4.72 kB
+#123 365.0 admin:build: build/client/assets/root-DbLc1CaW.js                                           10.63 kB │ gzip:  3.81 kB
+#123 365.0 admin:build: build/client/assets/lib-B_iFmnw_.js                                            11.13 kB │ gzip:  4.51 kB
+#123 365.0 admin:build: build/client/assets/dialog-CUsKueY2.js                                         11.79 kB │ gzip:  4.57 kB
+#123 365.0 admin:build: build/client/assets/Button-jOqFQdgW.js                                         14.89 kB │ gzip:  5.71 kB
+#123 365.0 admin:build: build/client/assets/icon-DmPEbyyh.js                                           16.42 kB │ gzip:  6.39 kB
+#123 365.0 admin:build: build/client/assets/tooltip-BwiuO_2d.js                                        29.62 kB │ gzip: 10.26 kB
+#123 365.0 admin:build: build/client/assets/index.esm-mSD8OV4N.js                                      31.00 kB │ gzip: 11.16 kB
+#123 365.0 admin:build: build/client/assets/page-Bey7Qvyw.js                                           31.48 kB │ gzip:  9.76 kB
+#123 365.0 admin:build: build/client/assets/toast-CzMzvZHp.js                                          33.22 kB │ gzip: 11.10 kB
+#123 365.0 admin:build: build/client/assets/errorBoundaries-C9zRX8P3.js                                33.32 kB │ gzip: 11.64 kB
+#123 365.0 admin:build: build/client/assets/transition-03q8Yi7b.js                                     33.57 kB │ gzip: 12.23 kB
+#123 365.0 admin:build: build/client/assets/positioner-3fIV8OgO.js                                     38.71 kB │ gzip: 14.33 kB
+#123 365.0 admin:build: build/client/assets/select-trigger-CfXecgYp.js                                 53.02 kB │ gzip: 18.91 kB
+#123 365.0 admin:build: build/client/assets/dist-DN-uzIb_2.js                                          70.87 kB │ gzip: 26.17 kB
+#123 365.0 admin:build: build/client/assets/layout-Dp1iOJB-.js                                         77.59 kB │ gzip: 25.79 kB
+#123 365.0 admin:build: build/client/assets/jsx-runtime-BFXHAw-U.js                                    84.18 kB │ gzip: 27.95 kB
+#123 365.0 admin:build: build/client/assets/use-user-DhkcCfeT.js                                      146.84 kB │ gzip: 45.02 kB
+#123 365.0 admin:build: build/client/assets/entry.client-XFJwu2Eq.js                                  182.47 kB │ gzip: 57.79 kB
+#123 365.0 admin:build: 
+#123 365.0 admin:build: [32m✓ built in 1m 42s[39m
+#123 365.0 admin:build: [36mvite v8.0.16 [32mbuilding ssr environment for production...[36m[39m
+#123 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mempty-state/index.js[22m                  [2m749.12 kB[22m [2m│ gzip: 213.69 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/bar-chart/index.js[22m             [2m  9.75 kB[22m [2m│ gzip:   3.19 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/tree-map/index.js[22m              [2m  9.39 kB[22m [2m│ gzip:   2.77 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mtoast/index.js[22m                        [2m  9.08 kB[22m [2m│ gzip:   2.30 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mportal/index.js[22m                       [2m  6.41 kB[22m [2m│ gzip:   2.15 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/pie-chart/index.js[22m             [2m  6.25 kB[22m [2m│ gzip:   2.03 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1micons/index.js[22m                        [2m  6.18 kB[22m [2m│ gzip:   1.86 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mmenu/index.js[22m                         [2m  5.60 kB[22m [2m│ gzip:   1.87 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1memoji-reaction/index.js[22m               [2m  5.57 kB[22m [2m│ gzip:   1.94 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/area-chart/index.js[22m            [2m  5.21 kB[22m [2m│ gzip:   1.92 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcombobox/index.js[22m                     [2m  4.83 kB[22m [2m│ gzip:   1.74 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/line-chart/index.js[22m            [2m  4.50 kB[22m [2m│ gzip:   1.69 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/scatter-chart/index.js[22m         [2m  4.24 kB[22m [2m│ gzip:   1.56 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mtoolbar/index.js[22m                      [2m  4.05 kB[22m [2m│ gzip:   1.43 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcontext-menu/index.js[22m                 [2m  3.68 kB[22m [2m│ gzip:   1.14 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mbanner/index.js[22m                       [2m  3.43 kB[22m [2m│ gzip:   1.34 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mdialog/index.js[22m                       [2m  3.33 kB[22m [2m│ gzip:   1.12 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mscrollarea/index.js[22m                   [2m  2.96 kB[22m [2m│ gzip:   1.08 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mtabs/index.js[22m                         [2m  2.87 kB[22m [2m│ gzip:   1.13 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcharts/radar-chart/index.js[22m           [2m  2.83 kB[22m [2m│ gzip:   1.19 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mtable/index.js[22m                        [2m  2.72 kB[22m [2m│ gzip:   0.84 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mavatar/index.js[22m                       [2m  2.69 kB[22m [2m│ gzip:   1.02 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mpill/index.js[22m                         [2m  2.37 kB[22m [2m│ gzip:   1.02 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcollapsible/index.js[22m                  [2m  2.17 kB[22m [2m│ gzip:   0.91 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mbadge/index.js[22m                        [2m  2.12 kB[22m [2m│ gzip:   0.97 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1maccordion/index.js[22m                    [2m  1.96 kB[22m [2m│ gzip:   0.74 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mtab-navigation/index.js[22m               [2m  1.90 kB[22m [2m│ gzip:   0.80 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mspinners/index.js[22m                     [2m  1.89 kB[22m [2m│ gzip:   1.00 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcommand/index.js[22m                      [2m  1.48 kB[22m [2m│ gzip:   0.58 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mswitch/index.js[22m                       [2m  1.46 kB[22m [2m│ gzip:   0.71 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1minput/index.js[22m                        [2m  1.42 kB[22m [2m│ gzip:   0.77 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcalendar/index.js[22m                     [2m  1.16 kB[22m [2m│ gzip:   0.59 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mskeleton/index.js[22m                     [2m  0.92 kB[22m [2m│ gzip:   0.46 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1memoji-icon-picker/index.js[22m            [2m  0.71 kB[22m [2m│ gzip:   0.35 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mutils/index.js[22m                        [2m  0.25 kB[22m [2m│ gzip:   0.17 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1micon-button/index.js[22m                  [2m  0.23 kB[22m [2m│ gzip:   0.17 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mbutton/index.js[22m                       [2m  0.21 kB[22m [2m│ gzip:   0.16 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mcard/index.js[22m                         [2m  0.20 kB[22m [2m│ gzip:   0.15 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1manimated-counter/index.js[22m             [2m  0.20 kB[22m [2m│ gzip:   0.15 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mtooltip/index.js[22m                      [2m  0.18 kB[22m [2m│ gzip:   0.14 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[1mpopover/index.js[22m                      [2m  0.11 kB[22m [2m│ gzip:   0.10 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mempty-state/index.js.map              [2m859.86 kB[22m [2m│ gzip: 218.29 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22micons-DWzY_Ct4.js.map                 [2m391.68 kB[22m [2m│ gzip: 100.97 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22micons-DWzY_Ct4.js                     [2m309.50 kB[22m [2m│ gzip:  94.69 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22memoji-icon-picker-CbLNblhQ.js.map     [2m 58.16 kB[22m [2m│ gzip:  13.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22memoji-icon-picker-CbLNblhQ.js         [2m 32.67 kB[22m [2m│ gzip:   8.54 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/bar-chart/index.js.map         [2m 18.54 kB[22m [2m│ gzip:   5.83 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mindex-BUyOAoiw.d.ts.map               [2m 17.31 kB[22m [2m│ gzip:   3.08 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/tree-map/index.js.map          [2m 16.84 kB[22m [2m│ gzip:   4.95 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtoast/index.js.map                    [2m 14.78 kB[22m [2m│ gzip:   4.07 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/pie-chart/index.js.map         [2m 10.95 kB[22m [2m│ gzip:   3.47 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcombobox/index.js.map                 [2m  9.95 kB[22m [2m│ gzip:   3.34 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/area-chart/index.js.map        [2m  9.79 kB[22m [2m│ gzip:   3.31 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22memoji-reaction/index.js.map           [2m  9.74 kB[22m [2m│ gzip:   3.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mempty-state/index.d.ts.map            [2m  9.61 kB[22m [2m│ gzip:   2.39 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mportal/index.js.map                   [2m  9.54 kB[22m [2m│ gzip:   3.32 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mmenu/index.js.map                     [2m  9.53 kB[22m [2m│ gzip:   3.20 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/line-chart/index.js.map        [2m  8.10 kB[22m [2m│ gzip:   2.75 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/scatter-chart/index.js.map     [2m  7.53 kB[22m [2m│ gzip:   2.53 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtoolbar/index.js.map                  [2m  7.21 kB[22m [2m│ gzip:   2.34 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcontext-menu/index.js.map             [2m  7.16 kB[22m [2m│ gzip:   1.94 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbanner/index.js.map                   [2m  6.96 kB[22m [2m│ gzip:   2.58 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtabs/index.js.map                     [2m  6.21 kB[22m [2m│ gzip:   1.86 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtooltip-2hD27cLV.js.map               [2m  5.98 kB[22m [2m│ gzip:   2.15 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mdialog/index.js.map                   [2m  5.75 kB[22m [2m│ gzip:   1.97 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbutton-CjcOirFK.js.map                [2m  5.70 kB[22m [2m│ gzip:   1.99 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mavatar/index.js.map                   [2m  5.14 kB[22m [2m│ gzip:   1.78 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/radar-chart/index.js.map       [2m  4.91 kB[22m [2m│ gzip:   1.89 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mscrollarea/index.js.map               [2m  4.86 kB[22m [2m│ gzip:   1.64 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22micon-button-2BUssuti.js.map           [2m  4.86 kB[22m [2m│ gzip:   1.66 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtable/index.js.map                    [2m  4.83 kB[22m [2m│ gzip:   1.32 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mpopover-CrZ8wRJs.js.map               [2m  4.12 kB[22m [2m│ gzip:   1.50 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbadge/index.js.map                    [2m  4.08 kB[22m [2m│ gzip:   1.63 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22manimated-counter-CqtqTlrG.js.map      [2m  3.95 kB[22m [2m│ gzip:   1.52 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcollapsible/index.js.map              [2m  3.95 kB[22m [2m│ gzip:   1.53 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtooltip-CLEkTCyg.js.map               [2m  3.83 kB[22m [2m│ gzip:   1.57 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mlegend-HUzGLN3O.js.map                [2m  3.79 kB[22m [2m│ gzip:   1.65 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtooltip-2hD27cLV.js                   [2m  3.75 kB[22m [2m│ gzip:   1.29 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22maccordion/index.js.map                [2m  3.72 kB[22m [2m│ gzip:   1.34 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mpill/index.js.map                     [2m  3.46 kB[22m [2m│ gzip:   1.38 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcard-BJ9a4xMU.js.map                  [2m  3.43 kB[22m [2m│ gzip:   1.35 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbutton-CjcOirFK.js                    [2m  3.31 kB[22m [2m│ gzip:   1.22 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mclassname-BokbBhj4.js.map             [2m  3.14 kB[22m [2m│ gzip:   1.30 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22micon-button-2BUssuti.js               [2m  2.93 kB[22m [2m│ gzip:   1.08 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcircular-bar-spinner-Cp6QEb9r.js.map  [2m  2.86 kB[22m [2m│ gzip:   0.97 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mplacement-Db9Qu3XD.js.map             [2m  2.73 kB[22m [2m│ gzip:   0.82 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mswitch/index.js.map                   [2m  2.71 kB[22m [2m│ gzip:   1.19 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtab-navigation/index.js.map           [2m  2.65 kB[22m [2m│ gzip:   1.04 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcommand/index.js.map                  [2m  2.48 kB[22m [2m│ gzip:   0.95 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mspinners/index.js.map                 [2m  2.42 kB[22m [2m│ gzip:   1.33 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22minput/index.js.map                    [2m  2.34 kB[22m [2m│ gzip:   1.11 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mpopover-CrZ8wRJs.js                   [2m  2.30 kB[22m [2m│ gzip:   0.85 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22manimated-counter-CqtqTlrG.js          [2m  2.27 kB[22m [2m│ gzip:   0.93 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcard-BJ9a4xMU.js                      [2m  2.13 kB[22m [2m│ gzip:   0.90 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mlegend-HUzGLN3O.js                    [2m  2.08 kB[22m [2m│ gzip:   1.03 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcircular-bar-spinner-Cp6QEb9r.js      [2m  2.08 kB[22m [2m│ gzip:   0.60 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtooltip-CLEkTCyg.js                   [2m  2.05 kB[22m [2m│ gzip:   0.96 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcombobox/index.d.ts.map               [2m  1.95 kB[22m [2m│ gzip:   0.65 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcalendar/index.js.map                 [2m  1.94 kB[22m [2m│ gzip:   0.92 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22memoji-icon-picker/index.d.ts.map      [2m  1.79 kB[22m [2m│ gzip:   0.77 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22memoji-reaction/index.d.ts.map         [2m  1.71 kB[22m [2m│ gzip:   0.62 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mskeleton/index.js.map                 [2m  1.66 kB[22m [2m│ gzip:   0.82 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtable/index.d.ts.map                  [2m  1.61 kB[22m [2m│ gzip:   0.46 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mportal/index.d.ts.map                 [2m  1.57 kB[22m [2m│ gzip:   0.64 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mclassname-BokbBhj4.js                 [2m  1.47 kB[22m [2m│ gzip:   0.74 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtoast/index.d.ts.map                  [2m  1.46 kB[22m [2m│ gzip:   0.68 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtabs/index.d.ts.map                   [2m  1.42 kB[22m [2m│ gzip:   0.47 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22maccordion/index.d.ts.map              [2m  1.28 kB[22m [2m│ gzip:   0.49 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mplacement-Db9Qu3XD.js                 [2m  1.13 kB[22m [2m│ gzip:   0.36 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbadge/index.d.ts.map                  [2m  1.12 kB[22m [2m│ gzip:   0.43 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mdialog/index.d.ts.map                 [2m  1.09 kB[22m [2m│ gzip:   0.50 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mmenu/index.d.ts.map                   [2m  1.09 kB[22m [2m│ gzip:   0.47 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtoolbar/index.d.ts.map                [2m  1.00 kB[22m [2m│ gzip:   0.45 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mpill/index.d.ts.map                   [2m  0.99 kB[22m [2m│ gzip:   0.45 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22micon-button/index.d.ts.map            [2m  0.96 kB[22m [2m│ gzip:   0.44 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcollapsible/index.d.ts.map            [2m  0.95 kB[22m [2m│ gzip:   0.44 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcontext-menu/index.d.ts.map           [2m  0.94 kB[22m [2m│ gzip:   0.40 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcommand/index.d.ts.map                [2m  0.93 kB[22m [2m│ gzip:   0.39 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mhelper-BHfWoJHN.d.ts.map              [2m  0.76 kB[22m [2m│ gzip:   0.38 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcard/index.d.ts.map                   [2m  0.69 kB[22m [2m│ gzip:   0.38 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mskeleton/index.d.ts.map               [2m  0.63 kB[22m [2m│ gzip:   0.31 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mscrollarea/index.d.ts.map             [2m  0.60 kB[22m [2m│ gzip:   0.33 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbanner/index.d.ts.map                 [2m  0.59 kB[22m [2m│ gzip:   0.31 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mpopover/index.d.ts.map                [2m  0.58 kB[22m [2m│ gzip:   0.32 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mspinners/index.d.ts.map               [2m  0.57 kB[22m [2m│ gzip:   0.28 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mbutton/index.d.ts.map                 [2m  0.52 kB[22m [2m│ gzip:   0.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtab-navigation/index.d.ts.map         [2m  0.52 kB[22m [2m│ gzip:   0.28 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mplacement-qJjmdCXt.d.ts.map           [2m  0.49 kB[22m [2m│ gzip:   0.26 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mswitch/index.d.ts.map                 [2m  0.48 kB[22m [2m│ gzip:   0.25 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mtooltip/index.d.ts.map                [2m  0.40 kB[22m [2m│ gzip:   0.26 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22manimated-counter/index.d.ts.map       [2m  0.38 kB[22m [2m│ gzip:   0.22 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22minput/index.d.ts.map                  [2m  0.35 kB[22m [2m│ gzip:   0.21 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mavatar/index.d.ts.map                 [2m  0.34 kB[22m [2m│ gzip:   0.22 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/scatter-chart/index.d.ts.map   [2m  0.32 kB[22m [2m│ gzip:   0.20 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/bar-chart/index.d.ts.map       [2m  0.32 kB[22m [2m│ gzip:   0.20 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/pie-chart/index.d.ts.map       [2m  0.32 kB[22m [2m│ gzip:   0.20 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/area-chart/index.d.ts.map      [2m  0.31 kB[22m [2m│ gzip:   0.20 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/line-chart/index.d.ts.map      [2m  0.31 kB[22m [2m│ gzip:   0.20 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcalendar/index.d.ts.map               [2m  0.29 kB[22m [2m│ gzip:   0.21 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/radar-chart/index.d.ts.map     [2m  0.27 kB[22m [2m│ gzip:   0.18 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mcharts/tree-map/index.d.ts.map        [2m  0.16 kB[22m [2m│ gzip:   0.14 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mutils/index.d.ts.map                  [2m  0.14 kB[22m [2m│ gzip:   0.13 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22mutils-MPqvUdqq.js                     [2m  0.00 kB[22m [2m│ gzip:   0.02 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mempty-state/index.d.ts[22m[39m                [2m 14.64 kB[22m [2m│ gzip:   2.17 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1micons/index.d.ts[22m[39m                      [2m  6.31 kB[22m [2m│ gzip:   1.89 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1memoji-icon-picker/index.d.ts[22m[39m          [2m  4.15 kB[22m [2m│ gzip:   1.41 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mportal/index.d.ts[22m[39m                     [2m  3.97 kB[22m [2m│ gzip:   1.42 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcombobox/index.d.ts[22m[39m                   [2m  2.23 kB[22m [2m│ gzip:   0.74 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1memoji-reaction/index.d.ts[22m[39m             [2m  2.20 kB[22m [2m│ gzip:   0.67 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mtabs/index.d.ts[22m[39m                       [2m  2.03 kB[22m [2m│ gzip:   0.45 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mtable/index.d.ts[22m[39m                      [2m  1.95 kB[22m [2m│ gzip:   0.37 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcontext-menu/index.d.ts[22m[39m               [2m  1.95 kB[22m [2m│ gzip:   0.53 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mmenu/index.d.ts[22m[39m                       [2m  1.83 kB[22m [2m│ gzip:   0.74 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mtoolbar/index.d.ts[22m[39m                    [2m  1.80 kB[22m [2m│ gzip:   0.54 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mtoast/index.d.ts[22m[39m                      [2m  1.79 kB[22m [2m│ gzip:   0.62 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mbadge/index.d.ts[22m[39m                      [2m  1.61 kB[22m [2m│ gzip:   0.55 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1maccordion/index.d.ts[22m[39m                  [2m  1.48 kB[22m [2m│ gzip:   0.45 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mdialog/index.d.ts[22m[39m                     [2m  1.38 kB[22m [2m│ gzip:   0.52 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mtab-navigation/index.d.ts[22m[39m             [2m  1.27 kB[22m [2m│ gzip:   0.47 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1micon-button/index.d.ts[22m[39m                [2m  1.26 kB[22m [2m│ gzip:   0.55 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mbanner/index.d.ts[22m[39m                     [2m  1.22 kB[22m [2m│ gzip:   0.61 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mavatar/index.d.ts[22m[39m                     [2m  1.21 kB[22m [2m│ gzip:   0.53 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcard/index.d.ts[22m[39m                       [2m  1.11 kB[22m [2m│ gzip:   0.56 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mpill/index.d.ts[22m[39m                       [2m  1.05 kB[22m [2m│ gzip:   0.52 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mbutton/index.d.ts[22m[39m                     [2m  1.05 kB[22m [2m│ gzip:   0.49 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcollapsible/index.d.ts[22m[39m                [2m  0.96 kB[22m [2m│ gzip:   0.39 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcommand/index.d.ts[22m[39m                    [2m  0.95 kB[22m [2m│ gzip:   0.31 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mscrollarea/index.d.ts[22m[39m                 [2m  0.90 kB[22m [2m│ gzip:   0.41 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mpopover/index.d.ts[22m[39m                    [2m  0.84 kB[22m [2m│ gzip:   0.44 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mspinners/index.d.ts[22m[39m                   [2m  0.75 kB[22m [2m│ gzip:   0.30 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mskeleton/index.d.ts[22m[39m                   [2m  0.75 kB[22m [2m│ gzip:   0.32 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mtooltip/index.d.ts[22m[39m                    [2m  0.68 kB[22m [2m│ gzip:   0.39 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1manimated-counter/index.d.ts[22m[39m           [2m  0.56 kB[22m [2m│ gzip:   0.36 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mswitch/index.d.ts[22m[39m                     [2m  0.52 kB[22m [2m│ gzip:   0.31 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mutils/index.d.ts[22m[39m                      [2m  0.45 kB[22m [2m│ gzip:   0.28 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1minput/index.d.ts[22m[39m                      [2m  0.45 kB[22m [2m│ gzip:   0.29 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcalendar/index.d.ts[22m[39m                   [2m  0.42 kB[22m [2m│ gzip:   0.28 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/scatter-chart/index.d.ts[22m[39m       [2m  0.35 kB[22m [2m│ gzip:   0.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/area-chart/index.d.ts[22m[39m          [2m  0.33 kB[22m [2m│ gzip:   0.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/line-chart/index.d.ts[22m[39m          [2m  0.33 kB[22m [2m│ gzip:   0.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/bar-chart/index.d.ts[22m[39m           [2m  0.33 kB[22m [2m│ gzip:   0.24 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/pie-chart/index.d.ts[22m[39m           [2m  0.33 kB[22m [2m│ gzip:   0.23 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/radar-chart/index.d.ts[22m[39m         [2m  0.31 kB[22m [2m│ gzip:   0.22 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32m[1mcharts/tree-map/index.d.ts[22m[39m            [2m  0.27 kB[22m [2m│ gzip:   0.19 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32mindex-BUyOAoiw.d.ts[39m                   [2m 35.59 kB[22m [2m│ gzip:   5.29 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32mhelper-BHfWoJHN.d.ts[39m                  [2m  1.03 kB[22m [2m│ gzip:   0.50 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m [2mdist/[22m[32mplacement-qJjmdCXt.d.ts[39m               [2m  0.75 kB[22m [2m│ gzip:   0.40 kB[22m
+#124 351.2 @plane/propel:build: [34mℹ[39m 187 files, total: 2971.60 kB
+#124 353.0 @plane/propel:build: [32m✔[39m Build complete in [32m78682ms[39m
+#124 353.6 @plane/ui:build: cache miss, executing dd707f6971172f2d
+#124 358.6 @plane/ui:build: $ tsdown
+#124 359.3 @plane/ui:build: [34mℹ[39m tsdown [2mv0.16.0[22m powered by rolldown [2mv1.0.0-beta.46[22m
+#124 360.6 @plane/ui:build: [34mℹ[39m Using tsdown config: [4m/app/packages/ui/tsdown.config.ts[24m
+#124 360.7 @plane/ui:build: [34mℹ[39m entry: [34msrc/index.ts[39m
+#124 360.7 @plane/ui:build: [34mℹ[39m tsconfig: [34mtsconfig.json[39m
+#124 360.7 @plane/ui:build: [34mℹ[39m Build start
+#124 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 367.2 @plane/propel:build: ℹ dist/empty-state/index.js                  749.12 kB │ gzip: 213.69 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/bar-chart/index.js               9.75 kB │ gzip:   3.19 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/tree-map/index.js                9.39 kB │ gzip:   2.77 kB
+#116 367.2 @plane/propel:build: ℹ dist/toast/index.js                          9.08 kB │ gzip:   2.30 kB
+#116 367.2 @plane/propel:build: ℹ dist/portal/index.js                         6.41 kB │ gzip:   2.15 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/pie-chart/index.js               6.25 kB │ gzip:   2.03 kB
+#116 367.2 @plane/propel:build: ℹ dist/icons/index.js                          6.18 kB │ gzip:   1.86 kB
+#116 367.2 @plane/propel:build: ℹ dist/menu/index.js                           5.60 kB │ gzip:   1.87 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-reaction/index.js                 5.57 kB │ gzip:   1.93 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/area-chart/index.js              5.21 kB │ gzip:   1.92 kB
+#116 367.2 @plane/propel:build: ℹ dist/combobox/index.js                       4.83 kB │ gzip:   1.74 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/line-chart/index.js              4.50 kB │ gzip:   1.69 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/scatter-chart/index.js           4.24 kB │ gzip:   1.56 kB
+#116 367.2 @plane/propel:build: ℹ dist/toolbar/index.js                        4.05 kB │ gzip:   1.43 kB
+#116 367.2 @plane/propel:build: ℹ dist/context-menu/index.js                   3.68 kB │ gzip:   1.14 kB
+#116 367.2 @plane/propel:build: ℹ dist/banner/index.js                         3.43 kB │ gzip:   1.34 kB
+#116 367.2 @plane/propel:build: ℹ dist/dialog/index.js                         3.33 kB │ gzip:   1.13 kB
+#116 367.2 @plane/propel:build: ℹ dist/scrollarea/index.js                     2.96 kB │ gzip:   1.08 kB
+#116 367.2 @plane/propel:build: ℹ dist/tabs/index.js                           2.87 kB │ gzip:   1.13 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/radar-chart/index.js             2.83 kB │ gzip:   1.19 kB
+#116 367.2 @plane/propel:build: ℹ dist/table/index.js                          2.72 kB │ gzip:   0.84 kB
+#116 367.2 @plane/propel:build: ℹ dist/avatar/index.js                         2.69 kB │ gzip:   1.02 kB
+#116 367.2 @plane/propel:build: ℹ dist/pill/index.js                           2.37 kB │ gzip:   1.02 kB
+#116 367.2 @plane/propel:build: ℹ dist/collapsible/index.js                    2.17 kB │ gzip:   0.91 kB
+#116 367.2 @plane/propel:build: ℹ dist/badge/index.js                          2.12 kB │ gzip:   0.97 kB
+#116 367.2 @plane/propel:build: ℹ dist/accordion/index.js                      1.96 kB │ gzip:   0.74 kB
+#116 367.2 @plane/propel:build: ℹ dist/tab-navigation/index.js                 1.90 kB │ gzip:   0.80 kB
+#116 367.2 @plane/propel:build: ℹ dist/spinners/index.js                       1.89 kB │ gzip:   1.00 kB
+#116 367.2 @plane/propel:build: ℹ dist/command/index.js                        1.48 kB │ gzip:   0.58 kB
+#116 367.2 @plane/propel:build: ℹ dist/switch/index.js                         1.46 kB │ gzip:   0.71 kB
+#116 367.2 @plane/propel:build: ℹ dist/input/index.js                          1.42 kB │ gzip:   0.77 kB
+#116 367.2 @plane/propel:build: ℹ dist/calendar/index.js                       1.16 kB │ gzip:   0.59 kB
+#116 367.2 @plane/propel:build: ℹ dist/skeleton/index.js                       0.92 kB │ gzip:   0.46 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-icon-picker/index.js              0.71 kB │ gzip:   0.35 kB
+#116 367.2 @plane/propel:build: ℹ dist/utils/index.js                          0.25 kB │ gzip:   0.17 kB
+#116 367.2 @plane/propel:build: ℹ dist/icon-button/index.js                    0.23 kB │ gzip:   0.17 kB
+#116 367.2 @plane/propel:build: ℹ dist/button/index.js                         0.21 kB │ gzip:   0.16 kB
+#116 367.2 @plane/propel:build: ℹ dist/card/index.js                           0.20 kB │ gzip:   0.15 kB
+#116 367.2 @plane/propel:build: ℹ dist/animated-counter/index.js               0.20 kB │ gzip:   0.15 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip/index.js                        0.18 kB │ gzip:   0.14 kB
+#116 367.2 @plane/propel:build: ℹ dist/popover/index.js                        0.11 kB │ gzip:   0.10 kB
+#116 367.2 @plane/propel:build: ℹ dist/empty-state/index.js.map              859.86 kB │ gzip: 218.29 kB
+#116 367.2 @plane/propel:build: ℹ dist/icons-DWzY_Ct4.js.map                 391.68 kB │ gzip: 100.97 kB
+#116 367.2 @plane/propel:build: ℹ dist/icons-DWzY_Ct4.js                     309.50 kB │ gzip:  94.69 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-icon-picker-C-QxDRjq.js.map      58.16 kB │ gzip:  13.25 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-icon-picker-C-QxDRjq.js          32.67 kB │ gzip:   8.54 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/bar-chart/index.js.map          18.54 kB │ gzip:   5.83 kB
+#116 367.2 @plane/propel:build: ℹ dist/index-BUyOAoiw.d.ts.map                17.31 kB │ gzip:   3.08 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/tree-map/index.js.map           16.84 kB │ gzip:   4.95 kB
+#116 367.2 @plane/propel:build: ℹ dist/toast/index.js.map                     14.78 kB │ gzip:   4.07 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/pie-chart/index.js.map          10.95 kB │ gzip:   3.47 kB
+#116 367.2 @plane/propel:build: ℹ dist/combobox/index.js.map                   9.95 kB │ gzip:   3.34 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/area-chart/index.js.map          9.79 kB │ gzip:   3.31 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-reaction/index.js.map             9.74 kB │ gzip:   3.24 kB
+#116 367.2 @plane/propel:build: ℹ dist/empty-state/index.d.ts.map              9.61 kB │ gzip:   2.39 kB
+#116 367.2 @plane/propel:build: ℹ dist/portal/index.js.map                     9.54 kB │ gzip:   3.32 kB
+#116 367.2 @plane/propel:build: ℹ dist/menu/index.js.map                       9.53 kB │ gzip:   3.20 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/line-chart/index.js.map          8.10 kB │ gzip:   2.75 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/scatter-chart/index.js.map       7.53 kB │ gzip:   2.53 kB
+#116 367.2 @plane/propel:build: ℹ dist/toolbar/index.js.map                    7.21 kB │ gzip:   2.34 kB
+#116 367.2 @plane/propel:build: ℹ dist/context-menu/index.js.map               7.16 kB │ gzip:   1.94 kB
+#116 367.2 @plane/propel:build: ℹ dist/banner/index.js.map                     6.96 kB │ gzip:   2.58 kB
+#116 367.2 @plane/propel:build: ℹ dist/tabs/index.js.map                       6.21 kB │ gzip:   1.86 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip-Cbs68rEE.js.map                 5.98 kB │ gzip:   2.15 kB
+#116 367.2 @plane/propel:build: ℹ dist/dialog/index.js.map                     5.75 kB │ gzip:   1.97 kB
+#116 367.2 @plane/propel:build: ℹ dist/button-TCxnxvTK.js.map                  5.70 kB │ gzip:   1.99 kB
+#116 367.2 @plane/propel:build: ℹ dist/avatar/index.js.map                     5.14 kB │ gzip:   1.78 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/radar-chart/index.js.map         4.91 kB │ gzip:   1.89 kB
+#116 367.2 @plane/propel:build: ℹ dist/scrollarea/index.js.map                 4.86 kB │ gzip:   1.64 kB
+#116 367.2 @plane/propel:build: ℹ dist/icon-button-2BUssuti.js.map             4.86 kB │ gzip:   1.66 kB
+#116 367.2 @plane/propel:build: ℹ dist/table/index.js.map                      4.83 kB │ gzip:   1.32 kB
+#116 367.2 @plane/propel:build: ℹ dist/popover-CrZ8wRJs.js.map                 4.12 kB │ gzip:   1.50 kB
+#116 367.2 @plane/propel:build: ℹ dist/badge/index.js.map                      4.08 kB │ gzip:   1.63 kB
+#116 367.2 @plane/propel:build: ℹ dist/animated-counter-CqtqTlrG.js.map        3.95 kB │ gzip:   1.52 kB
+#116 367.2 @plane/propel:build: ℹ dist/collapsible/index.js.map                3.95 kB │ gzip:   1.53 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip-CLEkTCyg.js.map                 3.83 kB │ gzip:   1.57 kB
+#116 367.2 @plane/propel:build: ℹ dist/legend-HUzGLN3O.js.map                  3.79 kB │ gzip:   1.65 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip-Cbs68rEE.js                     3.75 kB │ gzip:   1.29 kB
+#116 367.2 @plane/propel:build: ℹ dist/accordion/index.js.map                  3.72 kB │ gzip:   1.34 kB
+#116 367.2 @plane/propel:build: ℹ dist/pill/index.js.map                       3.46 kB │ gzip:   1.38 kB
+#116 367.2 @plane/propel:build: ℹ dist/card-BALMHRPe.js.map                    3.43 kB │ gzip:   1.35 kB
+#116 367.2 @plane/propel:build: ℹ dist/button-TCxnxvTK.js                      3.31 kB │ gzip:   1.22 kB
+#116 367.2 @plane/propel:build: ℹ dist/classname-BokbBhj4.js.map               3.14 kB │ gzip:   1.30 kB
+#116 367.2 @plane/propel:build: ℹ dist/icon-button-2BUssuti.js                 2.93 kB │ gzip:   1.08 kB
+#116 367.2 @plane/propel:build: ℹ dist/circular-bar-spinner-Cp6QEb9r.js.map    2.86 kB │ gzip:   0.97 kB
+#116 367.2 @plane/propel:build: ℹ dist/placement-Db9Qu3XD.js.map               2.73 kB │ gzip:   0.82 kB
+#116 367.2 @plane/propel:build: ℹ dist/switch/index.js.map                     2.71 kB │ gzip:   1.19 kB
+#116 367.2 @plane/propel:build: ℹ dist/tab-navigation/index.js.map             2.65 kB │ gzip:   1.04 kB
+#116 367.2 @plane/propel:build: ℹ dist/command/index.js.map                    2.48 kB │ gzip:   0.95 kB
+#116 367.2 @plane/propel:build: ℹ dist/spinners/index.js.map                   2.42 kB │ gzip:   1.33 kB
+#116 367.2 @plane/propel:build: ℹ dist/input/index.js.map                      2.34 kB │ gzip:   1.11 kB
+#116 367.2 @plane/propel:build: ℹ dist/popover-CrZ8wRJs.js                     2.30 kB │ gzip:   0.85 kB
+#116 367.2 @plane/propel:build: ℹ dist/animated-counter-CqtqTlrG.js            2.27 kB │ gzip:   0.93 kB
+#116 367.2 @plane/propel:build: ℹ dist/card-BALMHRPe.js                        2.13 kB │ gzip:   0.90 kB
+#116 367.2 @plane/propel:build: ℹ dist/legend-HUzGLN3O.js                      2.08 kB │ gzip:   1.03 kB
+#116 367.2 @plane/propel:build: ℹ dist/circular-bar-spinner-Cp6QEb9r.js        2.08 kB │ gzip:   0.60 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip-CLEkTCyg.js                     2.05 kB │ gzip:   0.96 kB
+#116 367.2 @plane/propel:build: ℹ dist/combobox/index.d.ts.map                 1.95 kB │ gzip:   0.65 kB
+#116 367.2 @plane/propel:build: ℹ dist/calendar/index.js.map                   1.94 kB │ gzip:   0.92 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-icon-picker/index.d.ts.map        1.79 kB │ gzip:   0.77 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-reaction/index.d.ts.map           1.71 kB │ gzip:   0.62 kB
+#116 367.2 @plane/propel:build: ℹ dist/skeleton/index.js.map                   1.66 kB │ gzip:   0.82 kB
+#116 367.2 @plane/propel:build: ℹ dist/table/index.d.ts.map                    1.61 kB │ gzip:   0.46 kB
+#116 367.2 @plane/propel:build: ℹ dist/portal/index.d.ts.map                   1.57 kB │ gzip:   0.64 kB
+#116 367.2 @plane/propel:build: ℹ dist/classname-BokbBhj4.js                   1.47 kB │ gzip:   0.74 kB
+#116 367.2 @plane/propel:build: ℹ dist/toast/index.d.ts.map                    1.46 kB │ gzip:   0.68 kB
+#116 367.2 @plane/propel:build: ℹ dist/tabs/index.d.ts.map                     1.42 kB │ gzip:   0.47 kB
+#116 367.2 @plane/propel:build: ℹ dist/accordion/index.d.ts.map                1.28 kB │ gzip:   0.49 kB
+#116 367.2 @plane/propel:build: ℹ dist/placement-Db9Qu3XD.js                   1.13 kB │ gzip:   0.36 kB
+#116 367.2 @plane/propel:build: ℹ dist/badge/index.d.ts.map                    1.12 kB │ gzip:   0.42 kB
+#116 367.2 @plane/propel:build: ℹ dist/dialog/index.d.ts.map                   1.09 kB │ gzip:   0.50 kB
+#116 367.2 @plane/propel:build: ℹ dist/menu/index.d.ts.map                     1.09 kB │ gzip:   0.47 kB
+#116 367.2 @plane/propel:build: ℹ dist/toolbar/index.d.ts.map                  1.00 kB │ gzip:   0.45 kB
+#116 367.2 @plane/propel:build: ℹ dist/pill/index.d.ts.map                     0.99 kB │ gzip:   0.45 kB
+#116 367.2 @plane/propel:build: ℹ dist/icon-button/index.d.ts.map              0.96 kB │ gzip:   0.44 kB
+#116 367.2 @plane/propel:build: ℹ dist/collapsible/index.d.ts.map              0.95 kB │ gzip:   0.44 kB
+#116 367.2 @plane/propel:build: ℹ dist/context-menu/index.d.ts.map             0.94 kB │ gzip:   0.40 kB
+#116 367.2 @plane/propel:build: ℹ dist/command/index.d.ts.map                  0.93 kB │ gzip:   0.39 kB
+#116 367.2 @plane/propel:build: ℹ dist/helper-DD9s6krP.d.ts.map                0.76 kB │ gzip:   0.38 kB
+#116 367.2 @plane/propel:build: ℹ dist/card/index.d.ts.map                     0.69 kB │ gzip:   0.38 kB
+#116 367.2 @plane/propel:build: ℹ dist/skeleton/index.d.ts.map                 0.63 kB │ gzip:   0.31 kB
+#116 367.2 @plane/propel:build: ℹ dist/scrollarea/index.d.ts.map               0.60 kB │ gzip:   0.33 kB
+#116 367.2 @plane/propel:build: ℹ dist/banner/index.d.ts.map                   0.59 kB │ gzip:   0.31 kB
+#116 367.2 @plane/propel:build: ℹ dist/popover/index.d.ts.map                  0.58 kB │ gzip:   0.31 kB
+#116 367.2 @plane/propel:build: ℹ dist/spinners/index.d.ts.map                 0.57 kB │ gzip:   0.28 kB
+#116 367.2 @plane/propel:build: ℹ dist/button/index.d.ts.map                   0.52 kB │ gzip:   0.24 kB
+#116 367.2 @plane/propel:build: ℹ dist/tab-navigation/index.d.ts.map           0.52 kB │ gzip:   0.28 kB
+#116 367.2 @plane/propel:build: ℹ dist/placement-qJjmdCXt.d.ts.map             0.49 kB │ gzip:   0.26 kB
+#116 367.2 @plane/propel:build: ℹ dist/switch/index.d.ts.map                   0.48 kB │ gzip:   0.25 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip/index.d.ts.map                  0.40 kB │ gzip:   0.26 kB
+#116 367.2 @plane/propel:build: ℹ dist/animated-counter/index.d.ts.map         0.38 kB │ gzip:   0.22 kB
+#116 367.2 @plane/propel:build: ℹ dist/input/index.d.ts.map                    0.35 kB │ gzip:   0.21 kB
+#116 367.2 @plane/propel:build: ℹ dist/avatar/index.d.ts.map                   0.34 kB │ gzip:   0.22 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/scatter-chart/index.d.ts.map     0.32 kB │ gzip:   0.20 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/bar-chart/index.d.ts.map         0.32 kB │ gzip:   0.20 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/pie-chart/index.d.ts.map         0.32 kB │ gzip:   0.20 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/area-chart/index.d.ts.map        0.31 kB │ gzip:   0.20 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/line-chart/index.d.ts.map        0.31 kB │ gzip:   0.20 kB
+#116 367.2 @plane/propel:build: ℹ dist/calendar/index.d.ts.map                 0.29 kB │ gzip:   0.21 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/radar-chart/index.d.ts.map       0.27 kB │ gzip:   0.18 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/tree-map/index.d.ts.map          0.16 kB │ gzip:   0.14 kB
+#116 367.2 @plane/propel:build: ℹ dist/utils/index.d.ts.map                    0.14 kB │ gzip:   0.13 kB
+#116 367.2 @plane/propel:build: ℹ dist/utils-MPqvUdqq.js                       0.00 kB │ gzip:   0.02 kB
+#116 367.2 @plane/propel:build: ℹ dist/empty-state/index.d.ts                 14.64 kB │ gzip:   2.17 kB
+#116 367.2 @plane/propel:build: ℹ dist/icons/index.d.ts                        6.31 kB │ gzip:   1.89 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-icon-picker/index.d.ts            4.15 kB │ gzip:   1.41 kB
+#116 367.2 @plane/propel:build: ℹ dist/portal/index.d.ts                       3.97 kB │ gzip:   1.42 kB
+#116 367.2 @plane/propel:build: ℹ dist/combobox/index.d.ts                     2.23 kB │ gzip:   0.74 kB
+#116 367.2 @plane/propel:build: ℹ dist/emoji-reaction/index.d.ts               2.20 kB │ gzip:   0.67 kB
+#116 367.2 @plane/propel:build: ℹ dist/tabs/index.d.ts                         2.03 kB │ gzip:   0.45 kB
+#116 367.2 @plane/propel:build: ℹ dist/table/index.d.ts                        1.95 kB │ gzip:   0.37 kB
+#116 367.2 @plane/propel:build: ℹ dist/context-menu/index.d.ts                 1.95 kB │ gzip:   0.53 kB
+#116 367.2 @plane/propel:build: ℹ dist/menu/index.d.ts                         1.83 kB │ gzip:   0.74 kB
+#116 367.2 @plane/propel:build: ℹ dist/toolbar/index.d.ts                      1.80 kB │ gzip:   0.54 kB
+#116 367.2 @plane/propel:build: ℹ dist/toast/index.d.ts                        1.79 kB │ gzip:   0.62 kB
+#116 367.2 @plane/propel:build: ℹ dist/badge/index.d.ts                        1.61 kB │ gzip:   0.55 kB
+#116 367.2 @plane/propel:build: ℹ dist/accordion/index.d.ts                    1.48 kB │ gzip:   0.45 kB
+#116 367.2 @plane/propel:build: ℹ dist/dialog/index.d.ts                       1.38 kB │ gzip:   0.52 kB
+#116 367.2 @plane/propel:build: ℹ dist/tab-navigation/index.d.ts               1.27 kB │ gzip:   0.47 kB
+#116 367.2 @plane/propel:build: ℹ dist/icon-button/index.d.ts                  1.26 kB │ gzip:   0.55 kB
+#116 367.2 @plane/propel:build: ℹ dist/banner/index.d.ts                       1.22 kB │ gzip:   0.61 kB
+#116 367.2 @plane/propel:build: ℹ dist/avatar/index.d.ts                       1.21 kB │ gzip:   0.53 kB
+#116 367.2 @plane/propel:build: ℹ dist/card/index.d.ts                         1.11 kB │ gzip:   0.56 kB
+#116 367.2 @plane/propel:build: ℹ dist/pill/index.d.ts                         1.05 kB │ gzip:   0.52 kB
+#116 367.2 @plane/propel:build: ℹ dist/button/index.d.ts                       1.05 kB │ gzip:   0.49 kB
+#116 367.2 @plane/propel:build: ℹ dist/collapsible/index.d.ts                  0.96 kB │ gzip:   0.39 kB
+#116 367.2 @plane/propel:build: ℹ dist/command/index.d.ts                      0.95 kB │ gzip:   0.31 kB
+#116 367.2 @plane/propel:build: ℹ dist/scrollarea/index.d.ts                   0.90 kB │ gzip:   0.41 kB
+#116 367.2 @plane/propel:build: ℹ dist/popover/index.d.ts                      0.84 kB │ gzip:   0.44 kB
+#116 367.2 @plane/propel:build: ℹ dist/spinners/index.d.ts                     0.75 kB │ gzip:   0.30 kB
+#116 367.2 @plane/propel:build: ℹ dist/skeleton/index.d.ts                     0.75 kB │ gzip:   0.32 kB
+#116 367.2 @plane/propel:build: ℹ dist/tooltip/index.d.ts                      0.68 kB │ gzip:   0.39 kB
+#116 367.2 @plane/propel:build: ℹ dist/animated-counter/index.d.ts             0.56 kB │ gzip:   0.35 kB
+#116 367.2 @plane/propel:build: ℹ dist/switch/index.d.ts                       0.52 kB │ gzip:   0.31 kB
+#116 367.2 @plane/propel:build: ℹ dist/utils/index.d.ts                        0.45 kB │ gzip:   0.28 kB
+#116 367.2 @plane/propel:build: ℹ dist/input/index.d.ts                        0.45 kB │ gzip:   0.29 kB
+#116 367.2 @plane/propel:build: ℹ dist/calendar/index.d.ts                     0.42 kB │ gzip:   0.28 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/scatter-chart/index.d.ts         0.35 kB │ gzip:   0.24 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/area-chart/index.d.ts            0.33 kB │ gzip:   0.24 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/line-chart/index.d.ts            0.33 kB │ gzip:   0.24 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/bar-chart/index.d.ts             0.33 kB │ gzip:   0.24 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/pie-chart/index.d.ts             0.33 kB │ gzip:   0.23 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/radar-chart/index.d.ts           0.32 kB │ gzip:   0.23 kB
+#116 367.2 @plane/propel:build: ℹ dist/charts/tree-map/index.d.ts              0.27 kB │ gzip:   0.19 kB
+#116 367.2 @plane/propel:build: ℹ dist/index-BUyOAoiw.d.ts                    35.59 kB │ gzip:   5.29 kB
+#116 367.2 @plane/propel:build: ℹ dist/helper-DD9s6krP.d.ts                    1.03 kB │ gzip:   0.50 kB
+#116 367.2 @plane/propel:build: ℹ dist/placement-qJjmdCXt.d.ts                 0.75 kB │ gzip:   0.40 kB
+#116 367.2 @plane/propel:build: ℹ 187 files, total: 2971.61 kB
+#116 369.3 @plane/propel:build: ✔ Build complete in 86155ms
+#116 369.9 @plane/ui:build: cache miss, executing 118192097a23f98f
+#116 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 378.3 admin:build: [2Kadmin:build: transforming...✓ 197 modules transformed.
+#123 378.7 admin:build: rendering chunks...
+#123 379.2 admin:build: 
+#123 379.2 admin:build: [32m✓[39m 33 assets cleaned from React Router server build.
+#123 379.2 admin:build: [2mbuild/client/assets/globals-C3o653-Q.css[22m
+#123 379.2 admin:build: [2mbuild/client/assets/apple-touch-icon-BmADsVmV.png[22m
+#123 379.2 admin:build: [2mbuild/client/assets/favicon-16x16-B_Opgp1K.png[22m
+#123 379.2 admin:build: [2mbuild/client/assets/favicon-32x32-cfWXc3P9.png[22m
+#123 379.2 admin:build: [2mbuild/client/assets/favicon-DJlV-mcI.ico[22m
+#123 379.2 admin:build: [2mbuild/client/assets/logo-spinner-dark-Cc1AqekO.gif[22m
+#123 379.2 admin:build: [2mbuild/client/assets/logo-spinner-light-DmBc4A-4.gif[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-latin-wght-normal-Dx4kXJAl.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-cyrillic-ext-wght-normal-BOeWTOD4.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-cyrillic-wght-normal-DqGufNeO.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-greek-ext-wght-normal-DlzME5K_.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-greek-wght-normal-CkhJZR-_.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-vietnamese-wght-normal-CBcvBZtf.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-100-normal-StOoOijZ.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-100-normal-CyR9BGN8.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-200-normal-Dy_97ylg.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-200-normal-B9_93z2O.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-300-normal-CGYRw1-j.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-300-normal-CexQLkYr.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-400-normal-BVRwnNJJ.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/material-symbols-rounded-latin-400-normal-3TtrvaAx.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-cyrillic-ext-400-normal-xuaO2J-f.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-cyrillic-ext-400-normal-DMdlQ8Kv.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-cyrillic-400-normal-BSMlKf0J.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-cyrillic-400-normal-CEL4l2ZJ.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-vietnamese-400-normal-BulugwFq.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-vietnamese-400-normal-DDuiU_S-.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-latin-ext-400-normal-BmRBH3aV.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-latin-ext-400-normal-D3D2R8hC.woff[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2[22m
+#123 379.2 admin:build: [2mbuild/client/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff[22m
+#123 379.2 admin:build: [2mbuild/server/assets/server-build-CUojeknF.css[22m
+#123 379.2 admin:build: 
+#123 379.2 admin:build: computing gzip size...
+#123 379.3 admin:build: build/server/assets/favicon-16x16-B_Opgp1K.png                                  0.46 kB
+#123 379.3 admin:build: build/server/assets/favicon-32x32-cfWXc3P9.png                                  0.76 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-vietnamese-400-normal-DDuiU_S-.woff           5.62 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-cyrillic-ext-400-normal-DMdlQ8Kv.woff         5.82 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-vietnamese-400-normal-BulugwFq.woff2          5.86 kB
+#123 379.3 admin:build: build/server/assets/apple-touch-icon-BmADsVmV.png                               6.29 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-cyrillic-ext-400-normal-xuaO2J-f.woff2        6.91 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-cyrillic-400-normal-CEL4l2ZJ.woff             7.20 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-cyrillic-400-normal-BSMlKf0J.woff2            8.35 kB
+#123 379.3 admin:build: build/server/assets/inter-vietnamese-wght-normal-CBcvBZtf.woff2                10.25 kB
+#123 379.3 admin:build: build/server/assets/inter-greek-ext-wght-normal-DlzME5K_.woff2                 11.23 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-latin-ext-400-normal-D3D2R8hC.woff           11.76 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-latin-400-normal-CvHOgSBP.woff               13.14 kB
+#123 379.3 admin:build: build/server/.vite/manifest.json                                               13.17 kB │ gzip:   1.17 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-latin-ext-400-normal-BmRBH3aV.woff2          13.34 kB
+#123 379.3 admin:build: build/server/assets/ibm-plex-mono-latin-400-normal-DMJ8VG8y.woff2              14.70 kB
+#123 379.3 admin:build: build/server/assets/favicon-DJlV-mcI.ico                                       15.40 kB
+#123 379.3 admin:build: build/server/assets/inter-cyrillic-wght-normal-DqGufNeO.woff2                  18.74 kB
+#123 379.3 admin:build: build/server/assets/inter-greek-wght-normal-CkhJZR-_.woff2                     18.99 kB
+#123 379.3 admin:build: build/server/assets/inter-cyrillic-ext-wght-normal-BOeWTOD4.woff2              25.96 kB
+#123 379.3 admin:build: build/server/assets/inter-latin-wght-normal-Dx4kXJAl.woff2                     48.25 kB
+#123 379.3 admin:build: build/server/assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2                 85.06 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-400-normal-BVRwnNJJ.woff2  348.77 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-100-normal-StOoOijZ.woff2  363.56 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-300-normal-CGYRw1-j.woff2  388.05 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-200-normal-Dy_97ylg.woff2  389.09 kB
+#123 379.3 admin:build: build/server/assets/logo-spinner-light-DmBc4A-4.gif                           427.96 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-400-normal-3TtrvaAx.woff   454.56 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-100-normal-CyR9BGN8.woff   485.69 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-300-normal-CexQLkYr.woff   506.70 kB
+#123 379.3 admin:build: build/server/assets/material-symbols-rounded-latin-200-normal-B9_93z2O.woff   507.90 kB
+#123 379.3 admin:build: build/server/assets/logo-spinner-dark-Cc1AqekO.gif                            976.39 kB
+#123 379.3 admin:build: build/server/assets/server-build-CUojeknF.css                                   7.43 kB │ gzip:   1.56 kB
+#123 379.3 admin:build: build/server/assets/globals-C3o653-Q.css                                      170.03 kB │ gzip:  24.64 kB
+#123 379.3 admin:build: build/server/index.js                                                         575.26 kB │ gzip: 112.15 kB
+#123 379.3 admin:build: 
+#123 379.3 admin:build: [33m[33m[PLUGIN_TIMINGS] [0mYour build spent significant time in plugins. Here is a breakdown:
+#123 379.3 admin:build:   - react-router:virtual-modules (37%)
+#123 379.3 admin:build:   - react-router:route-chunks-index (10%)
+#123 379.3 admin:build:   - react-router:inject-hmr-runtime (10%)
+#123 379.3 admin:build:   - vite:css (9%)
+#123 379.3 admin:build:   - vite-tsconfig-paths (7%)
+#123 379.3 admin:build: See https://rolldown.rs/options/checks#plugintimings for more details.
+#123 379.3 admin:build: [39m
+#123 379.3 admin:build: [32m✓ built in 14.30s[39m
+#123 ...
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 375.1 @plane/ui:build: $ tsdown
+#116 376.2 @plane/ui:build: ℹ tsdown v0.16.0 powered by rolldown v1.0.0-beta.46
+#116 377.5 @plane/ui:build: ℹ Using tsdown config: /app/packages/ui/tsdown.config.ts
+#116 377.6 @plane/ui:build: ℹ entry: src/index.ts
+#116 377.6 @plane/ui:build: ℹ tsconfig: tsconfig.json
+#116 377.6 @plane/ui:build: ℹ Build start
+#116 ...
+
+#123 [admin installer 8/8] RUN pnpm turbo run build --filter=admin
+#123 400.5 admin:build: Error: Prerender: Request failed for /god-mode/: The operation was aborted due to timeout
+#123 400.5 admin:build:     at defaultHandleError (file:///app/node_modules/.pnpm/@react-router+dev@8.3.0_@react-router+serve@8.3.0_react-router@8.3.0_react-dom@19.2.8_r_9854e2c15c95b8451927322c02cc1058/node_modules/@react-router/dev/dist/vite.js:887:8)
+#123 400.5 admin:build:     at attempt (file:///app/node_modules/.pnpm/@react-router+dev@8.3.0_@react-router+serve@8.3.0_react-router@8.3.0_react-dom@19.2.8_r_9854e2c15c95b8451927322c02cc1058/node_modules/@react-router/dev/dist/vite.js:835:11)
+#123 400.5 admin:build:     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+#123 400.5 admin:build:     at async prerender (file:///app/node_modules/.pnpm/@react-router+dev@8.3.0_@react-router+serve@8.3.0_react-router@8.3.0_react-dom@19.2.8_r_9854e2c15c95b8451927322c02cc1058/node_modules/@react-router/dev/dist/vite.js:842:64)
+#123 400.5 admin:build:     at async default.concurrency.concurrency (file:///app/node_modules/.pnpm/@react-router+dev@8.3.0_@react-router+serve@8.3.0_react-router@8.3.0_react-dom@19.2.8_r_9854e2c15c95b8451927322c02cc1058/node_modules/@react-router/dev/dist/vite.js:859:9)
+#123 400.5 admin:build:     at async file:///app/node_modules/.pnpm/p-map@7.0.6/node_modules/p-map/index.js:122:20
+#123 401.3 admin:build: [ELIFECYCLE] Command failed with exit code 1.
+#123 401.5 admin#build:  ERROR  command (/app/apps/admin) /usr/local/bin/pnpm run build exited (1)
+#123 401.5 
+#123 401.5  Tasks:    5 successful, 6 total
+#123 401.5 Cached:    0 cached, 6 total
+#123 401.5   Time:    6m35.182s 
+#123 401.5 Failed:    admin#build
+#123 401.5 
+#123 401.7  ERROR  run failed: command  exited (1)
+#123 ERROR: process "/bin/sh -c pnpm turbo run build --filter=admin" did not complete successfully: exit code: 1
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 383.9 @plane/shared-state:build: ℹ dist/index.js        39.80 kB │ gzip:  8.31 kB
+#134 383.9 @plane/shared-state:build: ℹ dist/index.js.map    82.77 kB │ gzip: 17.20 kB
+#134 383.9 @plane/shared-state:build: ℹ dist/index.d.ts.map   9.10 kB │ gzip:  3.48 kB
+#134 383.9 @plane/shared-state:build: ℹ dist/index.d.ts      21.30 kB │ gzip:  4.29 kB
+#134 383.9 @plane/shared-state:build: ℹ 4 files, total: 152.97 kB
+#134 384.1 @plane/shared-state:build: ✔ Build complete in 72306ms
+#134 ...
+
+#75 [admin caddy-builder 2/2] RUN xcaddy build     --with github.com/mholt/caddy-ratelimit
+#75 CANCELED
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 ...
+
+#124 [space installer 8/8] RUN pnpm turbo run build --filter=space
+#124 CANCELED
+
+#116 [live installer 12/12] RUN pnpm turbo run build --filter=live
+#116 CANCELED
+
+#134 [web installer 12/12] RUN pnpm turbo run build --filter=web --force     && printf '%s\n' "c361badfcb61702d5d32fcaca1bd979a5cd88118ef32bf3ef6a86cb3b433b7c8" > /app/apps/web/build/client/deployment-source.txt
+#134 CANCELED
+------
+ > [admin installer 8/8] RUN pnpm turbo run build --filter=admin:
+400.5 admin:build:     at async file:///app/node_modules/.pnpm/p-map@7.0.6/node_modules/p-map/index.js:122:20
+401.3 admin:build: [ELIFECYCLE] Command failed with exit code 1.
+401.5 admin#build:  ERROR  command (/app/apps/admin) /usr/local/bin/pnpm run build exited (1)
+401.5 
+401.5  Tasks:    5 successful, 6 total
+401.5 Cached:    0 cached, 6 total
+401.5   Time:    6m35.182s 
+401.5 Failed:    admin#build
+401.5 
+401.7  ERROR  run failed: command  exited (1)
+------
+Dockerfile.admin:74
+
+--------------------
+
+  72 |     
+
+  73 |     # Build only the admin package
+
+  74 | >>> RUN pnpm turbo run build --filter=admin
+
+  75 |     
+
+  76 |     # *****************************************************************************
+
+--------------------
+
+target admin: failed to solve: process "/bin/sh -c pnpm turbo run build --filter=admin" did not complete successfully: exit code: 1
+
+Deployment failed during application build and replacement (line 77).
+Deployment failed during remote build and deployment (line 65).
