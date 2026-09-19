@@ -134,8 +134,14 @@ test("Copilot close controls are marked before focus returns to the launcher", a
 });
 
 test("Copilot workspace selector stays above the chat surface and accepts pointer input", async () => {
-  const copilot = await read("core/components/copilot/root.tsx");
+  const [copilot, select] = await Promise.all([
+    read("core/components/copilot/root.tsx"),
+    readPackage("ui/src/dropdowns/custom-search-select.tsx"),
+  ]);
 
   assert.match(copilot, /<header[\s\S]*className="pointer-events-auto relative z-\[1202\] bg-surface-1 px-4 py-2"/);
   assert.match(copilot, /<CustomSearchSelect[\s\S]*className="pointer-events-auto relative z-\[1203\]"/);
+  assert.match(copilot, /<CustomSearchSelect[\s\S]*portal=\{false\}/);
+  assert.match(select, /strategy:\s*portal \? "fixed" : "absolute"/);
+  assert.match(select, /<Combobox\.Options[\s\S]*modal=\{false\}/);
 });

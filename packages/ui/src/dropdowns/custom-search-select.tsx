@@ -64,7 +64,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement ?? "bottom-start",
-    strategy: "fixed",
+    strategy: portal ? "fixed" : "absolute",
   });
 
   useEffect(() => {
@@ -225,6 +225,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
                 <Combobox.Options
                   as="ul"
                   data-prevent-outside-click
+                  modal={false}
                   ref={setPopperElement}
                   style={styles.popper}
                   {...attributes.popper}
