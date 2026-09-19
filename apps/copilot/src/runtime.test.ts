@@ -12,6 +12,9 @@ describe("createRuntime", () => {
     );
     expect(DEFAULT_AGENT_PROMPT).toContain("create_recurring_work_items exactly once");
     expect(DEFAULT_AGENT_PROMPT).toContain("never use startDate or targetDate as recurrence boundaries");
+    expect(DEFAULT_AGENT_PROMPT).toContain('"event", "task", and "work item" are synonyms');
+    expect(DEFAULT_AGENT_PROMPT).toContain("does not imply a work-item type");
+    expect(DEFAULT_AGENT_PROMPT).toContain("creation request that does not name one of those properties");
   });
 
   it("uses Team and Workspace in user-facing responses without renaming tool contracts", () => {

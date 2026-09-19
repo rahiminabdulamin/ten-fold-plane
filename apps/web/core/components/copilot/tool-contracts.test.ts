@@ -5,9 +5,11 @@ import {
   classifyToolError,
   createWorkItemsSequentially,
   expandWeeklyOccurrenceDates,
+  formatValidationFields,
   filterMonthEventRecords,
   getUserLocalDateTime,
   getMonthDateRange,
+  normalizeRecurringWorkItemInput,
   toolError,
   toolPartialResult,
   toolResult,
@@ -105,6 +107,46 @@ describe("work-item tool contracts", () => {
     expect(() => expandWeeklyOccurrenceDates("2026-02-30", "wednesday", 4)).toThrow("valid calendar date");
     expect(() => expandWeeklyOccurrenceDates("2026-10-11", "wednesday", 0)).toThrow("positive integer");
     expect(() => expandWeeklyOccurrenceDates("2026-10-11", "holiday" as never, 4)).toThrow("supported weekday");
+  });
+
+  it("removes null recurring-series placeholders while preserving explicit empty arrays", () => {
+    expect(
+      normalizeRecurringWorkItemInput({
+        projectId: "project-1",
+        series: [
+          {
+            title: "Mentoring",
+            anchorDate: "2026-10-11",
+            weekday: "wednesday",
+            occurrences: 4,
+            workItemTypeId: null,
+            estimatePointId: null,
+            assigneeIds: [],
+          },
+        ],
+      })
+    ).toEqual({
+      projectId: "project-1",
+      series: [
+        {
+          title: "Mentoring",
+          anchorDate: "2026-10-11",
+          weekday: "wednesday",
+          occurrences: 4,
+          assigneeIds: [],
+        },
+      ],
+    });
+  });
+
+  it("formats unique validation paths without exposing invalid values", () => {
+    expect(
+      formatValidationFields([
+        ["series", 0, "weekday"],
+        ["series", 0, "weekday"],
+        ["series", 2, "anchorDate"],
+      ])
+    ).toEqual(["series[0].weekday", "series[2].anchorDate"]);
   });
 
   it("keeps only valid records inside the requested month and orders them by target date", () => {

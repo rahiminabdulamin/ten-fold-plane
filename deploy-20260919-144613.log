@@ -1,0 +1,8 @@
+Deploying checkout: /home/rahimin_amin/ten-fold-plane/ten-fold-plane
+Checkout commit: dfc08d46d9
+Source fingerprint: 87eb7057bb56d766ca14b3ab9884e763377378d62826b9da533ef401c2d6cbf2
+Uploading Ten-Fold to root@178.128.104.112:/opt/plane/app/ten-fold-plane...
+Uploaded source matches local checkout.
+Rebuilding and migrating Plane on the Droplet...
+Connection closed by 178.128.104.112 port 22
+Deployment failed during remote build and deployment (line 66).

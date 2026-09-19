@@ -74,7 +74,12 @@ const passingTraces: Record<string, AgentTrace> = {
         arguments: {
           projectId: "project-1",
           series: [
-            { title: "Arab mentoring", anchorDate: "2026-10-11", weekday: "wednesday", occurrences: 4 },
+            {
+              title: "Arab mentoring: Digital skills",
+              anchorDate: "2026-10-11",
+              weekday: "wednesday",
+              occurrences: 4,
+            },
             { title: "Mentiri mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
             { title: "Khattab mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
             { title: "Katok mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
@@ -137,6 +142,15 @@ describe("agent reliability scenarios", () => {
     expect(AGENT_SCENARIOS.map((scenario) => evaluateScenario(scenario, passingTraces[scenario.id]))).toEqual(
       AGENT_SCENARIOS.map(() => ({ pass: true, reasons: [] }))
     );
+  });
+
+  it("rejects a schema lookup for an ordinary recurring event request", () => {
+    const scenario = AGENT_SCENARIOS.find((candidate) => candidate.id === "weekly-recurring-events");
+    expect(scenario).toBeDefined();
+    const calls = [...passingTraces["weekly-recurring-events"].calls];
+    calls.splice(2, 0, { name: "get_work_item_schema", arguments: { projectId: "project-1" } });
+
+    expect(evaluateScenario(scenario!, { calls, terminalStatus: "success" }).pass).toBe(false);
   });
 
   it.each([

@@ -103,7 +103,12 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
         arguments: {
           projectId: "project-1",
           series: [
-            { title: "Arab mentoring", anchorDate: "2026-10-11", weekday: "wednesday", occurrences: 4 },
+            {
+              title: "Arab mentoring: Digital skills",
+              anchorDate: "2026-10-11",
+              weekday: "wednesday",
+              occurrences: 4,
+            },
             { title: "Mentiri mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
             { title: "Khattab mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
             { title: "Katok mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
@@ -111,8 +116,8 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
         },
       },
     ],
-    prohibitedCalls: ["create_work_item", "create_work_items"],
-    maxCalls: { create_recurring_work_items: 1 },
+    prohibitedCalls: ["create_work_item", "create_work_items", "get_work_item_schema"],
+    maxCalls: { find_project: 1, create_recurring_work_items: 1 },
     terminalStatus: "success",
   },
   {

@@ -21,10 +21,12 @@ import {
   createWorkItemsSequentially,
   expandWeeklyOccurrenceDates,
   filterMonthEventRecords,
+  formatValidationFields,
   findProjectMatches,
   getMonthDateRange,
   getUserLocalDateTime,
   MONTH_NAMES,
+  normalizeRecurringWorkItemInput,
   RECURRENCE_WEEKDAYS,
   type ToolResult,
   toWorkItemPayload,
@@ -285,7 +287,11 @@ const createRecurringWorkItemsSchema = z
   })
   .superRefine(({ series }, context) => {
     if (series.reduce((total, item) => total + item.occurrences, 0) > 25)
-      context.addIssue({ code: "custom", message: "A recurring batch can create at most 25 work items." });
+      context.addIssue({
+        code: "custom",
+        message: "A recurring batch can create at most 25 work items.",
+        path: ["series"],
+      });
   });
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), maximum);
@@ -857,13 +863,21 @@ function PlaneTools() {
       handler: async (input) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
-        const validated = createRecurringWorkItemsSchema.safeParse(input);
-        if (!validated.success)
+        const validated = createRecurringWorkItemsSchema.safeParse(normalizeRecurringWorkItemInput(input));
+        if (!validated.success) {
+          const invalidFields = formatValidationFields(
+            validated.error.issues.map(({ path }) => path as Array<string | number>)
+          );
+          const invalidMessages = [...new Set(validated.error.issues.map(({ message }) => message))];
           return finishTool(
-            toolValidationError("create_recurring_work_items", "Provide valid recurring work-item series."),
+            toolValidationError(
+              "create_recurring_work_items",
+              `Provide valid recurring work-item series. Invalid fields: ${invalidFields.join(", ") || "unknown"}. ${invalidMessages.join(" ")}`
+            ),
             startedAt,
             correlationId
           );
+        }
         const { projectId: requestedProjectId, series } = validated.data;
         const targetProjectId = requestedProjectId ?? projectId;
         if (!workspace || !targetProjectId)

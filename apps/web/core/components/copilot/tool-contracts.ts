@@ -88,6 +88,33 @@ export type WorkItemMutation = {
   workItemTypeId?: string | null;
 };
 
+export function normalizeRecurringWorkItemInput(input: unknown): unknown {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return input;
+  const value = input as Record<string, unknown>;
+  if (!Array.isArray(value.series)) return input;
+  return {
+    ...value,
+    series: value.series.map((series) => {
+      if (!series || typeof series !== "object" || Array.isArray(series)) return series;
+      return Object.fromEntries(Object.entries(series).filter(([, fieldValue]) => fieldValue !== null));
+    }),
+  };
+}
+
+export function formatValidationFields(paths: Array<Array<string | number>>): string[] {
+  return [
+    ...new Set(
+      paths.map((path) =>
+        path.reduce<string>(
+          (field, segment) =>
+            typeof segment === "number" ? `${field}[${segment}]` : field ? `${field}.${segment}` : String(segment),
+          ""
+        )
+      )
+    ),
+  ];
+}
+
 export async function createWorkItemsSequentially<TItem, TValue>(
   items: TItem[],
   create: (item: TItem) => Promise<TValue>
