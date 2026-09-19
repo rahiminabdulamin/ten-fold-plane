@@ -150,5 +150,8 @@ test("Copilot workspace selector presents its menu as part of the trigger", asyn
   const copilot = await read("core/components/copilot/root.tsx");
 
   assert.match(copilot, /buttonClassName="min-w-0 rounded-md border-subtle bg-surface-1 px-3 py-2 text-13 shadow-sm"/);
-  assert.match(copilot, /optionsClassName="w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"/);
+  assert.match(
+    copilot,
+    /optionsClassName="!left-4 w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"/
+  );
 });

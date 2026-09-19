@@ -537,7 +537,7 @@ function PlaneTools() {
               }
               onChange={setSelectedProjectId}
               options={workspaceSelectorOptions}
-              optionsClassName="w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"
+              optionsClassName="!left-4 w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"
               portal={false}
               value={selectedProjectId ?? undefined}
             />
