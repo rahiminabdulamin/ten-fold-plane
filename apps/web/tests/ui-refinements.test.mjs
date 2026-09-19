@@ -79,7 +79,11 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /const parseToolActivityResult = \(result: unknown\)/);
   assert.match(copilot, /status === "complete"/);
   assert.match(copilot, /JSON\.parse\(result\)/);
-  assert.match(copilot, /message: parsed\.message/);
+  assert.match(copilot, /return parsed;/);
+  assert.match(copilot, /filterMonthEventRecords/);
+  assert.match(copilot, /data-testid="copilot-month-events"/);
+  assert.match(copilot, /<details>/);
+  assert.match(copilot, /events\.slice\(0, MONTH_EVENT_PREVIEW_LIMIT\)/);
   assert.match(copilot, /render: renderToolActivity\("Looking up Workspaces…"\)/);
   assert.match(copilot, /onPointerDown={startResize}/);
   assert.match(copilot, /event\.currentTarget\.setPointerCapture\(event\.pointerId\)/);

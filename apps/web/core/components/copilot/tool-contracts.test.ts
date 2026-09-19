@@ -4,6 +4,7 @@ import {
   buildWorkItemQuery,
   classifyToolError,
   createWorkItemsSequentially,
+  filterMonthEventRecords,
   getUserLocalDateTime,
   getMonthDateRange,
   toolError,
@@ -79,6 +80,23 @@ describe("work-item tool contracts", () => {
       dateFrom: "2026-10-01",
       dateTo: "2026-10-31",
     });
+  });
+
+  it("keeps only valid records inside the requested month and orders them by target date", () => {
+    expect(
+      filterMonthEventRecords(
+        [
+          { id: "september", name: "September event", target_date: "2026-09-30" },
+          { id: "october-last", name: "Last event", target_date: "2026-10-31" },
+          { id: "october-first", name: "First event", target_date: "2026-10-01T09:00:00Z" },
+          { id: "november", name: "November event", target_date: "2026-11-01" },
+          { id: "missing", name: "Missing date", target_date: null },
+          { id: "malformed", name: "Malformed date", target_date: "2026-10-44" },
+        ],
+        "2026-10-01",
+        "2026-10-31"
+      ).map(({ id }) => id)
+    ).toEqual(["october-first", "october-last"]);
   });
 
   it("preserves a returned work item's state bucket", () => {

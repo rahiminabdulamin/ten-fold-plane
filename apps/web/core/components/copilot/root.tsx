@@ -19,6 +19,7 @@ import {
   buildWorkItemQuery,
   classifyToolError,
   createWorkItemsSequentially,
+  filterMonthEventRecords,
   findProjectMatches,
   getMonthDateRange,
   getUserLocalDateTime,
@@ -63,29 +64,106 @@ const COPILOT_SIDEBAR_LABELS = { modalHeaderTitle: "Ten-Fold Assistant" };
 
 type LauncherPosition = { x: number; y: number };
 
-type ToolActivityResult = { ok?: boolean; message?: string };
+type ToolActivityResult = { ok?: boolean; operation?: string; message?: string; data?: unknown };
+type MonthEvent = { id: string; name: string; target_date: string };
+type MonthEventsData = { month: string; year: number; total: number; events: MonthEvent[] };
+const MONTH_EVENT_PREVIEW_LIMIT = 5;
 
 const parseToolActivityResult = (result: unknown) => {
-  const fallback = { label: "Completed", message: "" };
-  if (typeof result !== "string") return fallback;
+  if (typeof result !== "string") return null;
   try {
     const parsed = JSON.parse(result) as ToolActivityResult;
-    if (typeof parsed.message !== "string") return fallback;
-    return { label: parsed.ok ? "Completed" : "Needs attention", message: parsed.message };
+    if (typeof parsed.message !== "string") return null;
+    return parsed;
   } catch {
-    return fallback;
+    return null;
   }
+};
+
+const isMonthEventsData = (data: unknown): data is MonthEventsData => {
+  if (!data || typeof data !== "object") return false;
+  const value = data as Partial<MonthEventsData>;
+  return (
+    typeof value.month === "string" &&
+    typeof value.year === "number" &&
+    typeof value.total === "number" &&
+    Array.isArray(value.events) &&
+    value.total === value.events.length &&
+    value.events.every(
+      (event) =>
+        event &&
+        typeof event === "object" &&
+        typeof (event as MonthEvent).id === "string" &&
+        typeof (event as MonthEvent).name === "string" &&
+        typeof (event as MonthEvent).target_date === "string"
+    )
+  );
+};
+
+const formatEventDate = (value: string) =>
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(
+    new Date(`${value.slice(0, 10)}T00:00:00Z`)
+  );
+
+const MonthEventsActivity = ({ month, year, total, events }: MonthEventsData) => {
+  const preview = events.slice(0, MONTH_EVENT_PREVIEW_LIMIT);
+  const remaining = events.slice(MONTH_EVENT_PREVIEW_LIMIT);
+  return (
+    <section
+      data-testid="copilot-month-events"
+      aria-label={`${month} ${year} events`}
+      className="my-2 text-13 text-primary"
+    >
+      <p className="font-medium">
+        {total} {total === 1 ? "event" : "events"} in {month} {year}
+      </p>
+      {total === 0 ? (
+        <p className="text-tertiary">No events are scheduled.</p>
+      ) : (
+        <>
+          {remaining.length > 0 && (
+            <p className="text-tertiary">
+              Showing {preview.length} of {total}.
+            </p>
+          )}
+          <ol className="my-2 list-decimal space-y-1 pl-5">
+            {events.slice(0, MONTH_EVENT_PREVIEW_LIMIT).map((event) => (
+              <li key={event.id}>
+                <span className="font-medium">{event.name}</span>
+                <span className="text-tertiary"> — {formatEventDate(event.target_date)}</span>
+              </li>
+            ))}
+          </ol>
+          {remaining.length > 0 && (
+            <details>
+              <summary>Show remaining {remaining.length} events</summary>
+              <ol start={MONTH_EVENT_PREVIEW_LIMIT + 1} className="my-2 list-decimal space-y-1 pl-5">
+                {remaining.map((event) => (
+                  <li key={event.id}>
+                    <span className="font-medium">{event.name}</span>
+                    <span className="text-tertiary"> — {formatEventDate(event.target_date)}</span>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          )}
+        </>
+      )}
+    </section>
+  );
 };
 
 const renderToolActivity =
   (activity: string) =>
   ({ status, result }: { status: string; result?: unknown }) => {
     if (status === "complete") {
-      const { label, message } = parseToolActivityResult(result);
+      const parsed = parseToolActivityResult(result);
+      if (parsed?.ok && isMonthEventsData(parsed.data)) return <MonthEventsActivity {...parsed.data} />;
+      if (parsed?.ok && parsed.operation === "find_project") return null;
       return (
         <p data-testid="copilot-tool-activity" data-status="complete" className="my-1 text-13 text-tertiary">
-          <span className="font-medium">{label}</span>
-          {message && ` — ${message}`}
+          <span className="font-medium">{parsed?.ok ? "Completed" : "Needs attention"}</span>
+          {parsed?.message && ` — ${parsed.message}`}
         </p>
       );
     }
@@ -358,15 +436,19 @@ function PlaneTools() {
             buildWorkItemQuery(undefined, dateFrom, dateTo)
           );
           const issues = Array.isArray(response.results) ? response.results : [];
-          const data = toWorkItemRecords(issues);
+          const events = filterMonthEventRecords(toWorkItemRecords(issues), dateFrom, dateTo);
+          const year = Number(dateFrom.slice(0, 4));
           logWorkItemListTrace({
             projectId: targetProjectId,
             dateFrom,
             dateTo,
-            resultCount: data.length,
+            resultCount: events.length,
             status: "success",
           });
-          return { ...toolResult("list_month_events", `Found ${data.length} events.`), data };
+          return {
+            ...toolResult("list_month_events", `Found ${events.length} events for ${month} ${year}.`),
+            data: { month, year, total: events.length, events },
+          };
         } catch (error) {
           const result = toolError("list_month_events", error);
           logWorkItemListTrace({

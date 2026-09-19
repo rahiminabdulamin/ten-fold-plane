@@ -212,6 +212,34 @@ export function getMonthDateRange(month: MonthName, currentDate: string) {
   return { dateFrom: `${year}-${monthNumber}-01`, dateTo: `${year}-${monthNumber}-${lastDay}` };
 }
 
+const validDateOnly = (value: string | null | undefined) => {
+  const date = value?.match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+  if (!date) return null;
+  const parsed = new Date(`${date}T00:00:00Z`);
+  return Number.isNaN(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== date ? null : date;
+};
+
+export function filterMonthEventRecords<T extends { name: string; target_date?: string | null }>(
+  records: T[],
+  dateFrom: string,
+  dateTo: string
+): Array<T & { target_date: string }> {
+  return (
+    records
+      .map((record) => ({ record, targetDate: validDateOnly(record.target_date) }))
+      .filter(
+        (entry): entry is { record: T; targetDate: string } =>
+          entry.targetDate !== null && entry.targetDate >= dateFrom && entry.targetDate <= dateTo
+      )
+      // oxlint-disable-next-line unicorn/no-array-sort -- ES2023 Array#toSorted is outside this app's TypeScript target.
+      .sort(
+        (left, right) =>
+          left.targetDate.localeCompare(right.targetDate) || left.record.name.localeCompare(right.record.name)
+      )
+      .map(({ record }) => record as T & { target_date: string })
+  );
+}
+
 const toDescriptionHtml = (description: string | null) => {
   if (!description) return "<p></p>";
   const escaped = description.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

@@ -14,7 +14,7 @@ The existing Copilot response-grounding evaluator is test-only. It does not cons
 
 `list_month_events` remains the sole month lookup. It will defensively filter API records by their date-only `target_date` against its already-calculated inclusive month bounds. A pure helper will return only valid records, ordered by target date then name. The filtered array is the single source for both the announced count and tool payload.
 
-The completed activity renderer will consume the structured tool result and render an authoritative event card. It displays the requested calendar month, an accurate total, readable dates, and the first five entries. If there are more than five, a native expandable details control reveals the remaining validated events and labels the preview as such. Completed generic lookup rows are suppressed; loading and failure/uncertain rows remain visible.
+The completed activity renderer will consume the structured tool result and render an authoritative event card. It displays the requested calendar month, an accurate total, readable dates, and the first five entries. If there are more than five, a native expandable details control reveals the remaining validated events and labels the preview as such. The preceding successful Workspace lookup is suppressed; loading and failure/uncertain rows remain visible.
 
 The model prompt will direct the model to defer factual month-event lists to the rendered result card and only add a concise summary or follow-up assistance. This improves the conversational text but is not used as the correctness boundary.
 
@@ -38,5 +38,5 @@ The model prompt will direct the model to defer factual month-event lists to the
 - No record outside the requested inclusive month range can be counted or rendered as a month event.
 - The shown total is derived from exactly the rendered/expandable result collection.
 - A result with more than five events says how many are initially shown and exposes every remaining validated event.
-- Successful internal lookup rows no longer appear as separate `Completed` messages.
+- The successful Workspace lookup no longer appears as a separate `Completed` message before the event card.
 - Loading and failure activity remains visible.
