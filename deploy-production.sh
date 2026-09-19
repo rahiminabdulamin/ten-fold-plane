@@ -8,6 +8,7 @@ DEPLOY_USER="${DEPLOY_USER:-root}"
 DEPLOY_PATH="${DEPLOY_PATH:-/opt/plane/app/ten-fold-plane}"
 DEPLOY_SSH_KEY="${DEPLOY_SSH_KEY:-$HOME/.ssh/plane-digitalocean}"
 PRODUCTION_URL="${PRODUCTION_URL:-https://ten-fold.co}"
+deployment_started_at=$SECONDS
 deployment_stage="local preflight"
 trap 'echo "Deployment failed during $deployment_stage (line $LINENO)." >&2' ERR
 
@@ -188,4 +189,5 @@ echo "Verified public form stylesheet: $public_css_hash"
 echo "Verified deployed source: $DEPLOY_SOURCE_SHA"
 REMOTE
 
-echo "Deployment complete: $PRODUCTION_URL"
+deployment_elapsed_seconds=$((SECONDS - deployment_started_at))
+echo "Deployment complete: $PRODUCTION_URL (elapsed: ${deployment_elapsed_seconds}s)"
