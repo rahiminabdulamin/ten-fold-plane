@@ -1,0 +1,39 @@
+$ react-router dev --port 3000
+[restart] Relaunching with NODE_OPTIONS: --conditions=development
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+(node:8037) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/postcss.config.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ➜  Local:   http://127.0.0.1:3000/
+  ➜  press h + enter to show help
+8:58:59 PM [vite] (ssr) connected.
+9:00:59 PM [vite] (client) hmr update /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /core/components/comments/quick-actions.tsx
+9:02:29 PM [vite] (client) hmr update /core/components/comments/quick-actions.tsx, /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /core/components/issues/issue-layouts/quick-action-dropdowns/issue-detail.tsx
+9:02:29 PM [vite] (client) hmr update /core/components/issues/issue-layouts/quick-action-dropdowns/issue-detail.tsx, /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /core/components/modules/quick-actions.tsx
+9:02:29 PM [vite] (client) hmr update /core/components/modules/quick-actions.tsx, /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /styles/globals.css?direct
+9:02:29 PM [vite] (client) hmr update /core/components/workspace/sidebar/projects-list-item.tsx
+9:02:29 PM [vite] (client) hmr update /core/components/workspace/sidebar/projects-list-item.tsx, /styles/globals.css?direct
+9:03:26 PM [vite] (client) hmr update /core/components/workspace/sidebar/projects-list-item.tsx
+9:03:26 PM [vite] (client) hmr update /core/components/workspace/sidebar/projects-list-item.tsx, /styles/globals.css?direct
+9:03:36 PM [vite] (client) hmr update /styles/globals.css?direct
+9:04:24 PM [vite] (client) [optimizer] bundling dependencies...
+9:04:37 PM [vite] (client) ✨ new dependencies optimized: export-to-csv
+9:04:38 PM [vite] (client) [optimizer] bundling dependencies...
+9:04:44 PM [vite] (client) ✨ new dependencies optimized: @tanstack/react-table
+9:06:28 PM [vite] (client) hmr update /core/components/modules/quick-actions.tsx
+9:06:28 PM [vite] (client) hmr update /core/components/modules/quick-actions.tsx, /styles/globals.css?direct
+9:06:28 PM [vite] (client) hmr update /styles/globals.css?direct
+9:06:28 PM [vite] (client) hmr update /styles/globals.css?direct
+9:06:40 PM [vite] (client) hmr update /core/components/modules/quick-actions.tsx
+9:06:40 PM [vite] (client) hmr update /core/components/modules/quick-actions.tsx, /styles/globals.css?direct
+9:06:40 PM [vite] (client) hmr update /styles/globals.css?direct
+9:06:40 PM [vite] (client) hmr update /styles/globals.css?direct

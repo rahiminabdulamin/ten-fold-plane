@@ -28,7 +28,7 @@ import { Disclosure, Transition } from "@headlessui/react";
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useOutsideClickDetector } from "@plane/hooks";
 import { useTranslation } from "@plane/i18n";
-import { IconButton } from "@plane/propel/icon-button";
+import { getIconButtonStyling, IconButton } from "@plane/propel/icon-button";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import { CustomMenu, DropIndicator, DragHandle, ControlLink } from "@plane/ui";
 import { cn } from "@plane/utils";
@@ -92,7 +92,6 @@ export const SidebarProjectsListItem = observer(function SidebarProjectsListItem
   const isProjectListOpen = getIsProjectListOpen(projectId);
   const [instruction, setInstruction] = useState<"DRAG_OVER" | "DRAG_BELOW" | undefined>(undefined);
   // refs
-  const actionSectionRef = useRef<HTMLButtonElement | null>(null);
   const projectRef = useRef<HTMLDivElement | null>(null);
   const dragHandleRef = useRef<HTMLButtonElement | null>(null);
   // router
@@ -233,7 +232,6 @@ export const SidebarProjectsListItem = observer(function SidebarProjectsListItem
     else toggleAnySidebarDropdown(false);
   }, [isMenuActive, toggleAnySidebarDropdown]);
 
-  useOutsideClickDetector(actionSectionRef, () => setIsMenuActive(false));
   useOutsideClickDetector(projectRef, () => projectRef?.current?.classList?.remove(HIGHLIGHT_CLASS));
 
   useEffect(() => {
@@ -355,23 +353,15 @@ export const SidebarProjectsListItem = observer(function SidebarProjectsListItem
               </ControlLink>
               <div className="flex items-center gap-1">
                 <CustomMenu
-                  customButton={
-                    <IconButton
-                      ref={actionSectionRef}
-                      variant="ghost"
-                      size="sm"
-                      icon={MoreHorizontalOutline}
-                      onClick={() => setIsMenuActive(!isMenuActive)}
-                      className="text-placeholder"
-                    />
-                  }
+                  customButton={<MoreHorizontalOutline className="size-3.5" />}
                   className={cn(
                     "pointer-events-none flex-shrink-0 opacity-0 group-hover/project-item:pointer-events-auto group-hover/project-item:opacity-100",
                     {
                       "pointer-events-auto opacity-100": isMenuActive,
                     }
                   )}
-                  customButtonClassName="grid place-items-center"
+                  customButtonClassName={cn(getIconButtonStyling("ghost", "sm"), "text-placeholder")}
+                  menuButtonOnClick={() => setIsMenuActive(!isMenuActive)}
                   placement="bottom-start"
                   ariaLabel={t("aria_labels.projects_sidebar.toggle_quick_actions_menu")}
                   useCaptureForOutsideClick

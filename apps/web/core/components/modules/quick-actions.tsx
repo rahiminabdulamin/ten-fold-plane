@@ -9,7 +9,7 @@ import { observer } from "mobx-react";
 import { MoreHorizontalOutline } from "@makeplane/propel/icons";
 // plane imports
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
-import { IconButton } from "@plane/propel/icon-button";
+import { getIconButtonStyling } from "@plane/propel/icon-button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { TContextMenuItem } from "@plane/ui";
 import { ContextMenu, CustomMenu } from "@plane/ui";
@@ -55,13 +55,13 @@ export const ModuleQuickActions = observer(function ModuleQuickActions(props: Pr
 
   const moduleLink = `${workspaceSlug}/projects/${projectId}/modules/${moduleId}`;
   const handleCopyText = () =>
-    copyUrlToClipboard(moduleLink).then(() => {
+    copyUrlToClipboard(moduleLink).then(() =>
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: "Link Copied!",
         message: "Module link copied to clipboard.",
-      });
-    });
+      })
+    );
   const handleOpenInNewTab = () => window.open(`/${moduleLink}`, "_blank");
 
   const handleRestoreModule = async () => {
@@ -135,10 +135,10 @@ export const ModuleQuickActions = observer(function ModuleQuickActions(props: Pr
       )}
       <ContextMenu parentRef={parentRef} items={CONTEXT_MENU_ITEMS} />
       <CustomMenu
-        customButton={<IconButton variant="tertiary" size="lg" icon={MoreHorizontalOutline} />}
+        customButton={<MoreHorizontalOutline className="size-4" />}
         placement="bottom-end"
         closeOnSelect
-        buttonClassName={customClassName}
+        customButtonClassName={cn(getIconButtonStyling("tertiary", "lg"), customClassName)}
       >
         {MENU_ITEMS.map((item) => {
           if (item.shouldRender === false) return null;

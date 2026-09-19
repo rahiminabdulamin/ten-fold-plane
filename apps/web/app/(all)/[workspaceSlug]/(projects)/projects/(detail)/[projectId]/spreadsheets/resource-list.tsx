@@ -24,7 +24,7 @@ import {
 } from "@makeplane/propel/icons";
 import { Avatar } from "@plane/propel/avatar";
 import { Button } from "@plane/propel/button";
-import { IconButton } from "@plane/propel/icon-button";
+import { getIconButtonStyling } from "@plane/propel/icon-button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@plane/propel/table";
 import type { TContextMenuItem } from "@plane/ui";
 import { AlertModalCore, ContextMenu, CustomMenu, ModalCore } from "@plane/ui";
@@ -328,8 +328,11 @@ const ResourceActions = ({
       <ContextMenu parentRef={ref} items={items} />
       <CustomMenu
         ariaLabel={`Actions for ${document.name}`}
-        customButton={<IconButton variant="tertiary" size="sm" icon={MoreHorizontalOutline} />}
-        buttonClassName="opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 aria-expanded:opacity-100"
+        customButton={<MoreHorizontalOutline className="size-3.5" />}
+        customButtonClassName={cn(
+          getIconButtonStyling("tertiary", "sm"),
+          "opacity-100 focus-within:opacity-100 aria-expanded:opacity-100 md:opacity-0 md:group-hover:opacity-100"
+        )}
         placement="bottom-end"
         closeOnSelect
       >

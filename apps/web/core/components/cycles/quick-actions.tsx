@@ -10,7 +10,7 @@ import { MoreHorizontalOutline } from "@makeplane/propel/icons";
 // ui
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
-import { IconButton } from "@plane/propel/icon-button";
+import { getIconButtonStyling } from "@plane/propel/icon-button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { TContextMenuItem } from "@plane/ui";
 import { ContextMenu, CustomMenu } from "@plane/ui";
@@ -57,13 +57,13 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
 
   const cycleLink = `${workspaceSlug}/projects/${projectId}/cycles/${cycleId}`;
   const handleCopyText = () =>
-    copyUrlToClipboard(cycleLink).then(() => {
+    copyUrlToClipboard(cycleLink).then(() =>
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: t("common.link_copied"),
         message: t("common.link_copied_to_clipboard"),
-      });
-    });
+      })
+    );
   const handleOpenInNewTab = () => window.open(`/${cycleLink}`, "_blank");
 
   const handleRestoreCycle = async () =>
@@ -74,7 +74,7 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
           title: t("project_cycles.action.restore.success.title"),
           message: t("project_cycles.action.restore.success.description"),
         });
-        router.push(`/${workspaceSlug}/projects/${projectId}/archives/cycles`);
+        return router.push(`/${workspaceSlug}/projects/${projectId}/archives/cycles`);
       })
       .catch(() => {
         setToast({
@@ -140,11 +140,11 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
       )}
       <ContextMenu parentRef={parentRef} items={CONTEXT_MENU_ITEMS} />
       <CustomMenu
-        customButton={<IconButton variant="tertiary" size="lg" icon={MoreHorizontalOutline} />}
+        customButton={<MoreHorizontalOutline className="size-4" />}
         placement="bottom-end"
         closeOnSelect
         maxHeight="lg"
-        buttonClassName={customClassName}
+        customButtonClassName={cn(getIconButtonStyling("tertiary", "lg"), customClassName)}
       >
         {MENU_ITEMS.map((item) => {
           if (item.shouldRender === false) return null;

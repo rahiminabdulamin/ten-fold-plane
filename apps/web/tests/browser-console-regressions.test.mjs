@@ -89,3 +89,22 @@ test("shared drag handles do not render nested buttons inside draggable sidebar 
   assert.doesNotMatch(dragHandle, /<button/);
   assert.match(dragHandle, /<div[\s\S]*<MoreVerticalOutline/);
 });
+
+test("CustomMenu triggers do not wrap IconButton controls", async () => {
+  const customMenuConsumers = [
+    "app/(all)/[workspaceSlug]/(projects)/projects/(detail)/[projectId]/spreadsheets/resource-list.tsx",
+    "core/components/comments/quick-actions.tsx",
+    "core/components/cycles/quick-actions.tsx",
+    "core/components/issues/issue-layouts/quick-action-dropdowns/issue-detail.tsx",
+    "core/components/issues/layout-quick-actions.tsx",
+    "core/components/modules/quick-actions.tsx",
+    "core/components/views/quick-actions.tsx",
+    "core/components/workspace/sidebar/projects-list-item.tsx",
+  ];
+
+  const sources = await Promise.all(customMenuConsumers.map(read));
+
+  for (const source of sources) {
+    assert.doesNotMatch(source, /customButton=\{\s*<IconButton/);
+  }
+});
