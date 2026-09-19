@@ -1,0 +1,27 @@
+$ react-router dev --port 3000
+[restart] Relaunching with NODE_OPTIONS: --conditions=development
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+(node:92458) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/postcss.config.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+8:35:13 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+  ➜  Local:   http://127.0.0.1:3000/
+  ➜  press h + enter to show help
+8:35:14 PM [vite] (ssr) connected.
+8:35:23 PM [vite] (client) [optimizer] bundling dependencies...
+8:35:24 PM [vite] (client) ✨ new dependencies optimized: next-themes
+8:35:25 PM [vite] (client) [optimizer] bundling dependencies...
+8:35:32 PM [vite] (client) [optimizer] bundling dependencies...
+8:35:34 PM [vite] (client) [optimizer] bundling dependencies...
+8:35:37 PM [vite] (client) ✨ new dependencies optimized: @atlaskit/pragmatic-drag-and-drop-hitbox/dist/cjs/closest-edge.js, @atlaskit/pragmatic-drag-and-drop/dist/cjs/entry-point/combine.js, @atlaskit/pragmatic-drag-and-drop/dist/cjs/entry-point/element/adapter.js, @base-ui-components/react/toast, @base-ui-components/react/tooltip, @headlessui/react, @makeplane/propel/components/field, @makeplane/propel/components/input, @makeplane/propel/icons, axios, chroma-js, class-variance-authority, clsx, date-fns, date-fns/differenceInCalendarDays, file-type, i18next-icu, i18next-resources-to-backend, i18next, lodash-es, lucide-react, mobx-react, mobx-utils, mobx, react-color, react-i18next, react-popper, rehype-parse, rehype-remark, remark-gfm, remark-stringify, swr, tailwind-merge, unified, uuid
+8:35:37 PM [vite] (client) ✨ optimized dependencies changed. reloading
+8:35:54 PM [vite] (client) [optimizer] bundling dependencies...
+8:36:14 PM [vite] (client) [optimizer] bundling dependencies...
+8:36:23 PM [vite] (client) [optimizer] bundling dependencies...
+8:36:33 PM [vite] (client) ✨ new dependencies optimized: @atlaskit/pragmatic-drag-and-drop-auto-scroll/element, @atlaskit/pragmatic-drag-and-drop-hitbox/tree-item, @atlaskit/pragmatic-drag-and-drop/combine, @atlaskit/pragmatic-drag-and-drop/element/adapter, @atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview, @atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview, @base-ui-components/react, @base-ui-components/react/context-menu, @base-ui-components/react/menu, @base-ui-components/react/popover, @base-ui-components/react/scroll-area, @base-ui-components/react/tabs, @copilotkit/react-core/v2, @floating-ui/dom, @floating-ui/react, @hocuspocus/provider, @makeplane/propel/components/avatar-group, @makeplane/propel/components/avatar, @makeplane/propel/components/checkbox, @makeplane/propel/components/circular-progress, @makeplane/propel/components/linear-progress, @makeplane/propel/components/pill, @makeplane/propel/components/switch, @makeplane/propel/components/tooltip, @tiptap/core, @tiptap/extension-blockquote, @tiptap/extension-character-count, @tiptap/extension-collaboration, @tiptap/extension-document, @tiptap/extension-emoji, @tiptap/extension-heading, @tiptap/extension-image, @tiptap/extension-mention, @tiptap/extension-placeholder, @tiptap/extension-task-item, @tiptap/extension-task-list, @tiptap/extension-text-align, @tiptap/extension-text-style, @tiptap/extension-text, @tiptap/extension-underline, @tiptap/html, @tiptap/pm/model, @tiptap/pm/state, @tiptap/pm/tables, @tiptap/pm/transform, @tiptap/pm/view, @tiptap/react, @tiptap/starter-kit, @tiptap/suggestion, buffer, cmdk, emoji-regex, framer-motion, frimousse, highlight.js/lib/core, highlight.js/lib/languages/typescript, is-emoji-supported, jsx-dom-cjs, linkifyjs, lodash-es/uniq, lowlight, prosemirror-codemark, react-day-picker, react-dropzone, react-hook-form, react-masonry-component, recharts, smooth-scroll-into-view-if-needed, tippy.js, tiptap-markdown, use-font-face-observer, y-indexeddb, y-prosemirror, yjs, zod
+8:36:33 PM [vite] (client) ✨ optimized dependencies changed. reloading
+8:37:02 PM [vite] (client) [optimizer] bundling dependencies...
+8:37:04 PM [vite] (client) ✨ new dependencies optimized: @bprogress/core
+8:37:04 PM [vite] (client) ✨ optimized dependencies changed. reloading

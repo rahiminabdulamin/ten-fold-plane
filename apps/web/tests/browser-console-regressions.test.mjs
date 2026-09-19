@@ -82,3 +82,10 @@ test("project user-properties failures do not erase the thrown error", async () 
 
   assert.match(projectService, /getProjectUserProperties[\s\S]*throw error\?\.response\?\.data \?\? error/);
 });
+
+test("shared drag handles do not render nested buttons inside draggable sidebar triggers", async () => {
+  const dragHandle = await readPackage("ui/src/drag-handle.tsx");
+
+  assert.doesNotMatch(dragHandle, /<button/);
+  assert.match(dragHandle, /<div[\s\S]*<MoreVerticalOutline/);
+});
