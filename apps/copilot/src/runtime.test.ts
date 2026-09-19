@@ -7,9 +7,7 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_MAX_STEPS).toBeGreaterThanOrEqual(8);
     expect(DEFAULT_AGENT_PROMPT).toContain("create_work_items exactly once");
     expect(DEFAULT_AGENT_PROMPT).toContain("dateFrom and dateTo");
-    expect(DEFAULT_AGENT_PROMPT).toContain(
-      "Do not ask the user to confirm or re-establish the current Workspace context"
-    );
+    expect(DEFAULT_AGENT_PROMPT).toContain("Ask the user to select a Workspace only when neither selected UI context");
     expect(DEFAULT_AGENT_PROMPT).toContain("create_recurring_work_items exactly once");
     expect(DEFAULT_AGENT_PROMPT).toContain("never use startDate or targetDate as recurrence boundaries");
     expect(DEFAULT_AGENT_PROMPT).toContain('"event", "task", and "work item" are synonyms');
@@ -31,9 +29,11 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain("including list_month_events");
   });
 
-  it("resolves an omitted Workspace and a yearless month from backend data", () => {
-    expect(DEFAULT_AGENT_PROMPT).toContain("do not infer a Workspace from the open page");
-    expect(DEFAULT_AGENT_PROMPT).toContain("Call list_projects and ask the user to choose");
+  it("uses selected UI Workspace context before asking the user to choose", () => {
+    expect(DEFAULT_AGENT_PROMPT).toContain("selected UI Workspace");
+    expect(DEFAULT_AGENT_PROMPT).toContain("do not call list_projects or ask the user to choose");
+    expect(DEFAULT_AGENT_PROMPT).toContain("explicitly names a different Workspace");
+    expect(DEFAULT_AGENT_PROMPT).not.toContain("do not infer a Workspace from the open page");
     expect(DEFAULT_AGENT_PROMPT).toContain("yearless named month");
     expect(DEFAULT_AGENT_PROMPT).toContain("Only say a requested date period is empty");
     expect(DEFAULT_AGENT_PROMPT).toContain("Do not infer stateGroup");
