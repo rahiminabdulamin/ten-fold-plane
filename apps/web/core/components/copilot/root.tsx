@@ -525,7 +525,7 @@ function PlaneTools() {
               </svg>
               <div className="text-13 font-medium">{titleContent}</div>
             </div>
-            {closeButton}
+            <span data-testid="copilot-close-button">{closeButton}</span>
           </div>
           <div className="mt-2">
             <CustomSearchSelect

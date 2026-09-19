@@ -108,3 +108,27 @@ test("CustomMenu triggers do not wrap IconButton controls", async () => {
     assert.doesNotMatch(source, /customButton=\{\s*<IconButton/);
   }
 });
+
+test("recents filter trigger is visual content rather than a nested button", async () => {
+  const filters = await read("core/components/home/widgets/recents/filters.tsx");
+
+  assert.doesNotMatch(filters, /customButton=\{\s*<button/);
+  assert.match(filters, /customButton=\{\s*<span/);
+});
+
+test("project cards render settings navigation as a button rather than a nested link", async () => {
+  const projectCard = await read("core/components/project/card.tsx");
+
+  assert.doesNotMatch(projectCard, /href=\{`\/\$\{workspaceSlug\}\/settings\/projects\/\$\{project\.id\}`\}/);
+  assert.match(projectCard, /router\.push\(`\/\$\{workspaceSlug\}\/settings\/projects\/\$\{project\.id\}`\)/);
+});
+
+test("Copilot close controls are marked before focus returns to the launcher", async () => {
+  const copilot = await read("core/components/copilot/root.tsx");
+
+  assert.match(copilot, /data-testid="copilot-close-button">\s*\{closeButton\}/);
+  assert.match(
+    copilot,
+    /document\.querySelector<HTMLButtonElement>\('\[data-testid="copilot-chat-toggle"\]'\)\?\.focus\(\)/
+  );
+});
