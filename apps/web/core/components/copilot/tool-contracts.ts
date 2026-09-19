@@ -41,9 +41,19 @@ export const MONTH_NAMES = [
   "November",
   "December",
 ] as const;
+export const RECURRENCE_WEEKDAYS = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+] as const;
 
 export type WorkItemStateGroup = (typeof WORK_ITEM_STATE_GROUPS)[number];
 export type MonthName = (typeof MONTH_NAMES)[number];
+export type RecurrenceWeekday = (typeof RECURRENCE_WEEKDAYS)[number];
 
 type WorkItemRecordSource = {
   id: string;
@@ -218,6 +228,35 @@ const validDateOnly = (value: string | null | undefined) => {
   const parsed = new Date(`${date}T00:00:00Z`);
   return Number.isNaN(parsed.valueOf()) || parsed.toISOString().slice(0, 10) !== date ? null : date;
 };
+
+export function expandWeeklyOccurrenceDates(
+  anchorDate: string,
+  weekday: RecurrenceWeekday,
+  occurrences: number
+): string[] {
+  const normalizedAnchor = validDateOnly(anchorDate);
+  if (!normalizedAnchor) throw new Error("anchorDate must be a valid calendar date.");
+  if (!RECURRENCE_WEEKDAYS.includes(weekday)) throw new Error("weekday must be a supported weekday.");
+  if (!Number.isInteger(occurrences) || occurrences < 1 || occurrences > 25)
+    throw new Error("occurrences must be a positive integer no greater than 25.");
+
+  const anchor = new Date(`${normalizedAnchor}T00:00:00Z`);
+  const firstOffset = (RECURRENCE_WEEKDAYS.indexOf(weekday) - anchor.getUTCDay() + 7) % 7;
+  const firstOccurrence = new Date(
+    Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), anchor.getUTCDate() + firstOffset)
+  );
+
+  return Array.from({ length: occurrences }, (_, index) => {
+    const occurrence = new Date(
+      Date.UTC(
+        firstOccurrence.getUTCFullYear(),
+        firstOccurrence.getUTCMonth(),
+        firstOccurrence.getUTCDate() + index * 7
+      )
+    );
+    return occurrence.toISOString().slice(0, 10);
+  });
+}
 
 export function filterMonthEventRecords<T extends { name: string; target_date?: string | null }>(
   records: T[],

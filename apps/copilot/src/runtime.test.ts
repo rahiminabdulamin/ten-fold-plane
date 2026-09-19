@@ -10,6 +10,8 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain(
       "Do not ask the user to confirm or re-establish the current Workspace context"
     );
+    expect(DEFAULT_AGENT_PROMPT).toContain("create_recurring_work_items exactly once");
+    expect(DEFAULT_AGENT_PROMPT).toContain("never use startDate or targetDate as recurrence boundaries");
   });
 
   it("uses Team and Workspace in user-facing responses without renaming tool contracts", () => {

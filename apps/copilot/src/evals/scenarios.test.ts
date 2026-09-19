@@ -65,6 +65,25 @@ const passingTraces: Record<string, AgentTrace> = {
     ],
     terminalStatus: "success",
   },
+  "weekly-recurring-events": {
+    calls: [
+      { name: "find_project", arguments: { query: "Programmes" } },
+      { name: "get_current_datetime", arguments: {} },
+      {
+        name: "create_recurring_work_items",
+        arguments: {
+          projectId: "project-1",
+          series: [
+            { title: "Arab mentoring", anchorDate: "2026-10-11", weekday: "wednesday", occurrences: 4 },
+            { title: "Mentiri mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
+            { title: "Khattab mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
+            { title: "Katok mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
+          ],
+        },
+      },
+    ],
+    terminalStatus: "success",
+  },
   "ambiguous-workspace": {
     calls: [{ name: "find_project", arguments: { query: "Mobile" } }],
     terminalStatus: "failure",

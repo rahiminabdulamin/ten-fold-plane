@@ -92,6 +92,30 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
     terminalStatus: "success",
   },
   {
+    id: "weekly-recurring-events",
+    prompt:
+      "In the Programmes Workspace, starting October 11 2026, create the next four weekly upcoming recurring events. Leave them unassigned: Arab mentoring every Wednesday; Mentiri mentoring, Khattab mentoring, and Katok mentoring every Saturday.",
+    expectedCalls: [
+      { name: "find_project", arguments: { query: "Programmes" } },
+      { name: "get_current_datetime" },
+      {
+        name: "create_recurring_work_items",
+        arguments: {
+          projectId: "project-1",
+          series: [
+            { title: "Arab mentoring", anchorDate: "2026-10-11", weekday: "wednesday", occurrences: 4 },
+            { title: "Mentiri mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
+            { title: "Khattab mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
+            { title: "Katok mentoring", anchorDate: "2026-10-11", weekday: "saturday", occurrences: 4 },
+          ],
+        },
+      },
+    ],
+    prohibitedCalls: ["create_work_item", "create_work_items"],
+    maxCalls: { create_recurring_work_items: 1 },
+    terminalStatus: "success",
+  },
+  {
     id: "ambiguous-workspace",
     prompt: "Create a work item in Mobile.",
     expectedCalls: [{ name: "find_project", arguments: { query: "Mobile" } }],

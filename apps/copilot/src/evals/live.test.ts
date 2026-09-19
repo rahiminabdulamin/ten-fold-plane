@@ -58,7 +58,10 @@ describe("live agent evaluations", () => {
     });
     expect(requests[0]).toMatchObject({ instructions: DEFAULT_AGENT_PROMPT, store: false });
     expect(requests[0].tools).toEqual(
-      expect.arrayContaining([expect.objectContaining({ type: "function", name: "find_project" })])
+      expect.arrayContaining([
+        expect.objectContaining({ type: "function", name: "find_project" }),
+        expect.objectContaining({ type: "function", name: "create_recurring_work_items" }),
+      ])
     );
     expect(requests[1]).toMatchObject({
       previous_response_id: "response-1",

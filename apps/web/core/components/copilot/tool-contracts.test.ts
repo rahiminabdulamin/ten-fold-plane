@@ -4,6 +4,7 @@ import {
   buildWorkItemQuery,
   classifyToolError,
   createWorkItemsSequentially,
+  expandWeeklyOccurrenceDates,
   filterMonthEventRecords,
   getUserLocalDateTime,
   getMonthDateRange,
@@ -80,6 +81,30 @@ describe("work-item tool contracts", () => {
       dateFrom: "2026-10-01",
       dateTo: "2026-10-31",
     });
+  });
+
+  it("expands four Wednesday occurrences from a Sunday anchor without creating Sunday dates", () => {
+    expect(expandWeeklyOccurrenceDates("2026-10-11", "wednesday", 4)).toEqual([
+      "2026-10-14",
+      "2026-10-21",
+      "2026-10-28",
+      "2026-11-04",
+    ]);
+  });
+
+  it("keeps an anchor-day Saturday occurrence and crosses the year boundary", () => {
+    expect(expandWeeklyOccurrenceDates("2026-12-26", "saturday", 4)).toEqual([
+      "2026-12-26",
+      "2027-01-02",
+      "2027-01-09",
+      "2027-01-16",
+    ]);
+  });
+
+  it("rejects an invalid recurrence anchor or occurrence count", () => {
+    expect(() => expandWeeklyOccurrenceDates("2026-02-30", "wednesday", 4)).toThrow("valid calendar date");
+    expect(() => expandWeeklyOccurrenceDates("2026-10-11", "wednesday", 0)).toThrow("positive integer");
+    expect(() => expandWeeklyOccurrenceDates("2026-10-11", "holiday" as never, 4)).toThrow("supported weekday");
   });
 
   it("keeps only valid records inside the requested month and orders them by target date", () => {

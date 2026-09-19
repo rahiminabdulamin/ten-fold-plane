@@ -19,11 +19,13 @@ import {
   buildWorkItemQuery,
   classifyToolError,
   createWorkItemsSequentially,
+  expandWeeklyOccurrenceDates,
   filterMonthEventRecords,
   findProjectMatches,
   getMonthDateRange,
   getUserLocalDateTime,
   MONTH_NAMES,
+  RECURRENCE_WEEKDAYS,
   type ToolResult,
   toWorkItemPayload,
   toWorkItemRecords,
@@ -268,6 +270,23 @@ const createWorkItemsSchema = z.object({
     .min(1)
     .max(25),
 });
+
+const recurringWorkItemSchema = workItemMutationSchema.omit({ startDate: true, targetDate: true }).extend({
+  title: z.string().min(1).max(255),
+  anchorDate: z.string().date(),
+  weekday: z.enum(RECURRENCE_WEEKDAYS),
+  occurrences: z.number().int().min(1).max(25),
+});
+
+const createRecurringWorkItemsSchema = z
+  .object({
+    projectId: z.string().uuid().optional(),
+    series: z.array(recurringWorkItemSchema).min(1).max(25),
+  })
+  .superRefine(({ series }, context) => {
+    if (series.reduce((total, item) => total + item.occurrences, 0) > 25)
+      context.addIssue({ code: "custom", message: "A recurring batch can create at most 25 work items." });
+  });
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), maximum);
 
@@ -821,6 +840,80 @@ function PlaneTools() {
             return { ...outcome, data: { created, failed } };
           },
           "create_work_items"
+        );
+        return finishTool(result, startedAt, correlationId);
+      },
+    },
+    [workspace, projectId]
+  );
+
+  useFrontendTool(
+    {
+      name: "create_recurring_work_items",
+      description:
+        "Create weekly recurring work-item instances in one Workspace. Call get_current_datetime first; use the user's earliest requested date as anchorDate, or its local date when none is requested. Each generated instance gets matching start and due dates on the requested weekday; provide all series in one call.",
+      parameters: createRecurringWorkItemsSchema,
+      render: renderToolActivity("Creating recurring work items…"),
+      handler: async (input) => {
+        const startedAt = Date.now();
+        const correlationId = crypto.randomUUID();
+        const validated = createRecurringWorkItemsSchema.safeParse(input);
+        if (!validated.success)
+          return finishTool(
+            toolValidationError("create_recurring_work_items", "Provide valid recurring work-item series."),
+            startedAt,
+            correlationId
+          );
+        const { projectId: requestedProjectId, series } = validated.data;
+        const targetProjectId = requestedProjectId ?? projectId;
+        if (!workspace || !targetProjectId)
+          return finishTool(
+            toolValidationError("create_recurring_work_items", "Find a Workspace first, then provide its ID."),
+            startedAt,
+            correlationId
+          );
+
+        const items = series.flatMap(({ anchorDate, weekday, occurrences, ...item }) =>
+          expandWeeklyOccurrenceDates(anchorDate, weekday, occurrences).map((date) =>
+            Object.assign({}, item, { startDate: date, targetDate: date })
+          )
+        );
+        const result = await mutationGuard.run(
+          mutationFingerprint("create_recurring_work_items", workspace, targetProjectId, series),
+          async () => {
+            const results = await createWorkItemsSequentially(items, async (item) =>
+              issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(item))
+            );
+            const created = results.created
+              .filter(({ value }) => isCanonicalRecord(value))
+              .map(({ item, value }) => ({ id: value.id, name: item.title, date: item.targetDate }));
+            const invalidCount = results.created.length - created.length;
+            const failed = results.failed.map(({ item, message }) => ({
+              name: item.title,
+              date: item.targetDate,
+              message,
+            }));
+            const affectedIds = created.map(({ id }) => id);
+            const message =
+              failed.length || invalidCount
+                ? `Created ${created.length} of ${items.length} recurring work items. ${failed.length + invalidCount} item(s) failed or could not be verified.`
+                : `Created ${created.length} recurring work items.`;
+            const hasAmbiguousFailure =
+              invalidCount > 0 ||
+              results.failed.some(({ error }) => {
+                const category = classifyToolError(error).category;
+                return category === "network" || category === "timeout";
+              });
+            const outcome = hasAmbiguousFailure
+              ? toolUncertainResult("create_recurring_work_items", affectedIds, message)
+              : failed.length && created.length
+                ? toolPartialResult("create_recurring_work_items", message, affectedIds)
+                : failed.length
+                  ? toolError("create_recurring_work_items", results.failed[0].error, { mutation: true })
+                  : toolResult("create_recurring_work_items", message, affectedIds);
+            return { ...outcome, data: { created, failed } };
+          },
+          "create_recurring_work_items"
         );
         return finishTool(result, startedAt, correlationId);
       },

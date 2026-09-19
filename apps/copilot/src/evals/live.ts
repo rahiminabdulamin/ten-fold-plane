@@ -33,6 +33,7 @@ const fakeTools = [
   "update_work_item",
   "create_work_item",
   "create_work_items",
+  "create_recurring_work_items",
   "confirm_delete_work_item",
 ].map((name) => ({
   type: "function",
@@ -67,7 +68,14 @@ const fakeOutput = (scenario: AgentScenario, call: AgentTraceCall): string => {
           : { ok: true, data: [{ id: "project-1", name: "Marketing" }] }
       );
     case "get_current_datetime":
-      return JSON.stringify({ ok: true, data: { date: "2026-09-17", time: "09:00", timeZone: "Asia/Singapore" } });
+      return JSON.stringify({
+        ok: true,
+        data: {
+          date: scenario.id === "weekly-recurring-events" ? "2026-10-11" : "2026-09-17",
+          time: "09:00",
+          timeZone: "Asia/Singapore",
+        },
+      });
     case "get_work_item_schema":
       return JSON.stringify({ ok: true, data: { members: [{ id: "member-1", name: "Alex" }] } });
     case "list_work_items":
@@ -75,6 +83,8 @@ const fakeOutput = (scenario: AgentScenario, call: AgentTraceCall): string => {
       return JSON.stringify({ ok: true, status: "success", data: [{ id: "issue-1", name: "Launch" }] });
     case "create_work_items":
       return JSON.stringify({ ok: scenario.id !== "partial-batch", status: scenario.terminalStatus });
+    case "create_recurring_work_items":
+      return JSON.stringify({ ok: true, status: "success" });
     case "update_work_item":
       return JSON.stringify({ ok: scenario.id !== "uncertain-update", status: scenario.terminalStatus });
     case "confirm_delete_work_item":
