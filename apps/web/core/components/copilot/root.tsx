@@ -55,7 +55,12 @@ import {
   mutationFingerprint,
   requestedFieldsMatch,
 } from "./tool-reliability";
-import { resolveSelectedWorkspaceId, toAgentWorkspaceContext, type WorkspaceOption } from "./workspace-context";
+import {
+  resolveSelectedWorkspaceId,
+  resolveWorkspaceToolTarget,
+  toAgentWorkspaceContext,
+  type WorkspaceOption,
+} from "./workspace-context";
 
 const projectService = new ProjectService();
 const issueService = new IssueService();
@@ -543,9 +548,9 @@ function PlaneTools() {
       parameters: z.object({ projectId: z.string().uuid().optional(), month: z.enum(MONTH_NAMES) }),
       render: renderToolActivity("Checking monthly events…"),
       handler: async ({ projectId: requestedProjectId, month }) => {
-        const targetProjectId = requestedProjectId ?? projectId;
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
         if (!workspace || !targetProjectId)
-          return { ok: false, message: "Find a Workspace first, then provide its ID.", retryable: false };
+          return { ok: false, message: "Select a Workspace first.", retryable: false };
         const timeZone = user?.user_timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
         const { dateFrom, dateTo } = getMonthDateRange(month, getUserLocalDateTime(timeZone).date);
         try {
@@ -581,7 +586,7 @@ function PlaneTools() {
         }
       },
     },
-    [workspace, projectId, user?.user_timezone]
+    [workspace, selectedProjectId, user?.user_timezone]
   );
 
   useFrontendTool(
@@ -608,9 +613,9 @@ function PlaneTools() {
       parameters: z.object({ projectId: z.string().uuid().optional() }),
       render: renderToolActivity("Loading Workspace details…"),
       handler: async ({ projectId: requestedProjectId }) => {
-        const targetProjectId = requestedProjectId ?? projectId;
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
         if (!workspace || !targetProjectId)
-          return { ok: false, message: "Find a Workspace first, then provide its ID.", retryable: false };
+          return { ok: false, message: "Select a Workspace first.", retryable: false };
         try {
           const [states, labels, members, workspaceMembers, estimates, project] = await Promise.all([
             stateService.getStates(workspace, targetProjectId),
@@ -643,7 +648,7 @@ function PlaneTools() {
         }
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -811,9 +816,9 @@ function PlaneTools() {
       }),
       render: renderToolActivity("Checking work items…"),
       handler: async ({ projectId: requestedProjectId, stateGroup, dateFrom, dateTo }) => {
-        const targetProjectId = requestedProjectId ?? projectId;
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
         if (!workspace || !targetProjectId)
-          return { ok: false, message: "Find a Workspace first, then provide its ID.", retryable: false };
+          return { ok: false, message: "Select a Workspace first.", retryable: false };
         try {
           const response = await issueService.getIssues(
             workspace,
@@ -845,7 +850,7 @@ function PlaneTools() {
         }
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -861,10 +866,10 @@ function PlaneTools() {
       handler: async ({ projectId: requestedProjectId, ...input }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
-        const targetProjectId = requestedProjectId ?? projectId;
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
         if (!workspace || !targetProjectId)
           return finishTool(
-            toolValidationError("create_work_item", "Find a Workspace first, then provide its ID."),
+            toolValidationError("create_work_item", "Select a Workspace first."),
             startedAt,
             correlationId
           );
@@ -887,7 +892,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -900,10 +905,10 @@ function PlaneTools() {
       handler: async ({ projectId: requestedProjectId, items }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
-        const targetProjectId = requestedProjectId ?? projectId;
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
         if (!workspace || !targetProjectId)
           return finishTool(
-            toolValidationError("create_work_items", "Find a Workspace first, then provide its ID."),
+            toolValidationError("create_work_items", "Select a Workspace first."),
             startedAt,
             correlationId
           );
@@ -944,7 +949,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -973,10 +978,10 @@ function PlaneTools() {
           );
         }
         const { projectId: requestedProjectId, series } = validated.data;
-        const targetProjectId = requestedProjectId ?? projectId;
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
         if (!workspace || !targetProjectId)
           return finishTool(
-            toolValidationError("create_recurring_work_items", "Find a Workspace first, then provide its ID."),
+            toolValidationError("create_recurring_work_items", "Select a Workspace first."),
             startedAt,
             correlationId
           );
@@ -1026,7 +1031,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -1036,10 +1041,10 @@ function PlaneTools() {
       parameters: z.object({ issueId: z.string().uuid() }),
       render: renderToolActivity("Loading the work item…"),
       handler: async ({ issueId }) => {
-        if (!workspace || !projectId)
-          return { ok: false, message: "A current Workspace is required.", retryable: false };
+        if (!workspace || !selectedProjectId)
+          return { ok: false, message: "Select a Workspace first.", retryable: false };
         try {
-          const issue = await issueService.retrieve(workspace, projectId, issueId);
+          const issue = await issueService.retrieve(workspace, selectedProjectId, issueId);
           const data = toWorkItemRecords([issue])[0];
           return { ...toolResult("get_work_item", `Found ${issue.name}.`, [issue.id]), data };
         } catch (error) {
@@ -1047,7 +1052,7 @@ function PlaneTools() {
         }
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -1057,14 +1062,14 @@ function PlaneTools() {
       parameters: z.object({ issueId: z.string().uuid() }),
       render: renderToolActivity("Opening the work item…"),
       handler: async ({ issueId }) => {
-        if (!workspace || !projectId)
-          return { ok: false, message: "A current Workspace is required.", retryable: false };
-        window.location.assign(`/${workspace}/projects/${projectId}/issues/${issueId}`);
+        if (!workspace || !selectedProjectId)
+          return { ok: false, message: "Select a Workspace first.", retryable: false };
+        window.location.assign(`/${workspace}/projects/${selectedProjectId}/issues/${issueId}`);
         return toolResult("open_work_item", "Opening work item.", [issueId]);
       },
       followUp: false,
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useFrontendTool(
@@ -1080,19 +1085,19 @@ function PlaneTools() {
       handler: async ({ issueId, ...changes }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
-        if (!workspace || !projectId)
+        if (!workspace || !selectedProjectId)
           return finishTool(
-            toolValidationError("update_work_item", "A current Workspace is required."),
+            toolValidationError("update_work_item", "Select a Workspace first."),
             startedAt,
             correlationId
           );
         const payload = toWorkItemPayload(changes);
         const result = await mutationGuard.run(
-          mutationFingerprint("update_work_item", workspace, projectId, issueId, payload),
+          mutationFingerprint("update_work_item", workspace, selectedProjectId, issueId, payload),
           async () => {
             try {
-              await issueService.patchIssue(workspace, projectId, issueId, payload);
-              const issue = await issueService.retrieve(workspace, projectId, issueId);
+              await issueService.patchIssue(workspace, selectedProjectId, issueId, payload);
+              const issue = await issueService.retrieve(workspace, selectedProjectId, issueId);
               if (!isCanonicalRecord(issue) || !requestedFieldsMatch(issue, payload))
                 return toolUncertainResult("update_work_item", [issueId]);
               return {
@@ -1108,7 +1113,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useHumanInTheLoop(
@@ -1118,21 +1123,21 @@ function PlaneTools() {
       parameters: z.object({ issueId: z.string().uuid(), name: z.string().min(1).max(255) }),
       render: ({ args, status, respond }) => {
         const execute = async () => {
-          if (!workspace || !projectId || !respond) return;
+          if (!workspace || !selectedProjectId || !respond) return;
           const startedAt = Date.now();
           const correlationId = crypto.randomUUID();
           const result = await mutationGuard.run(
-            mutationFingerprint("delete_work_item", workspace, projectId, args.issueId),
+            mutationFingerprint("delete_work_item", workspace, selectedProjectId, args.issueId),
             async () => {
               try {
-                await issueService.deleteIssue(workspace, projectId, args.issueId);
+                await issueService.deleteIssue(workspace, selectedProjectId, args.issueId);
               } catch (error) {
                 const category = classifyToolError(error).category;
                 if (category !== "network" && category !== "timeout")
                   return toolError("delete_work_item", error, { mutation: true });
               }
               return confirmDeleted("delete_work_item", args.issueId, () =>
-                issueService.retrieve(workspace, projectId, args.issueId)
+                issueService.retrieve(workspace, selectedProjectId, args.issueId)
               );
             },
             "delete_work_item"
@@ -1156,7 +1161,7 @@ function PlaneTools() {
         );
       },
     },
-    [workspace, projectId]
+    [workspace, selectedProjectId]
   );
 
   useHumanInTheLoop(
