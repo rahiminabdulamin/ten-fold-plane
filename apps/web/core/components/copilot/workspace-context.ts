@@ -25,3 +25,9 @@ export const resolveSelectedWorkspaceId = ({
 
 export const resolveWorkspaceToolTarget = (requestedProjectId: string | undefined, selectedProjectId: string | null) =>
   requestedProjectId ?? selectedProjectId;
+
+export const shouldSyncWorkspaceSelection = (
+  previousRouteProjectId: string | undefined,
+  routeProjectId: string | undefined,
+  selectedProjectId: string | null
+) => previousRouteProjectId !== routeProjectId || selectedProjectId === null;

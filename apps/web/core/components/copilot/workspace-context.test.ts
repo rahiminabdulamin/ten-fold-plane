@@ -4,6 +4,7 @@ import {
   toAgentWorkspaceContext,
   resolveSelectedWorkspaceId,
   resolveWorkspaceToolTarget,
+  shouldSyncWorkspaceSelection,
   type WorkspaceOption,
 } from "./workspace-context";
 
@@ -44,6 +45,12 @@ describe("Copilot Workspace context", () => {
     expect(resolveWorkspaceToolTarget("workspace-b", "workspace-a")).toBe("workspace-b");
     expect(resolveWorkspaceToolTarget(undefined, "workspace-a")).toBe("workspace-a");
     expect(resolveWorkspaceToolTarget(undefined, null)).toBeNull();
+  });
+
+  it("only resynchronizes route context after navigation or an empty selection", () => {
+    expect(shouldSyncWorkspaceSelection("workspace-a", "workspace-a", "workspace-b")).toBe(false);
+    expect(shouldSyncWorkspaceSelection("workspace-a", "workspace-c", "workspace-b")).toBe(true);
+    expect(shouldSyncWorkspaceSelection("workspace-a", "workspace-a", null)).toBe(true);
   });
 
   it("serializes no Workspace fields when none is selected", () => {

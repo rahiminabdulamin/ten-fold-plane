@@ -58,6 +58,7 @@ import {
 import {
   resolveSelectedWorkspaceId,
   resolveWorkspaceToolTarget,
+  shouldSyncWorkspaceSelection,
   toAgentWorkspaceContext,
   type WorkspaceOption,
 } from "./workspace-context";
@@ -327,6 +328,8 @@ function PlaneTools() {
   const [workspaceOptions, setWorkspaceOptions] = useState<WorkspaceOption[]>([]);
   const [isWorkspaceOptionsLoading, setIsWorkspaceOptionsLoading] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const routeProjectIdRef = useRef<string | undefined>(typeof projectId === "string" ? projectId : undefined);
+  const deleteWorkItemTargets = useRef(new Map<string, { workspace: string; projectId: string }>());
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
   const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
   const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
@@ -346,7 +349,11 @@ function PlaneTools() {
       .getProjectsLite(workspace)
       .then((projects) => {
         if (cancelled) return null;
-        setWorkspaceOptions(projects.map(({ id, name, identifier }) => ({ id, name, identifier: identifier ?? null })));
+        setWorkspaceOptions(
+          projects
+            .filter(({ archived_at }) => !archived_at)
+            .map(({ id, name, identifier }) => ({ id, name, identifier: identifier ?? null }))
+        );
         return null;
       })
       .catch(() => {
@@ -361,8 +368,11 @@ function PlaneTools() {
   }, [workspace]);
 
   useEffect(() => {
+    const routeProjectId = typeof projectId === "string" ? projectId : undefined;
+    if (!shouldSyncWorkspaceSelection(routeProjectIdRef.current, routeProjectId, selectedProjectId)) return;
+    routeProjectIdRef.current = routeProjectId;
     const nextSelectedProjectId = resolveSelectedWorkspaceId({
-      routeProjectId: typeof projectId === "string" ? projectId : undefined,
+      routeProjectId,
       selectedProjectId: selectedProjectId ?? undefined,
       availableIds: workspaceOptions.map(({ id }) => id),
     });
@@ -1038,13 +1048,14 @@ function PlaneTools() {
     {
       name: "get_work_item",
       description: "Get one work item in the current Workspace by its canonical work-item ID.",
-      parameters: z.object({ issueId: z.string().uuid() }),
+      parameters: z.object({ issueId: z.string().uuid(), projectId: z.string().uuid().optional() }),
       render: renderToolActivity("Loading the work item…"),
-      handler: async ({ issueId }) => {
-        if (!workspace || !selectedProjectId)
+      handler: async ({ issueId, projectId: requestedProjectId }) => {
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
+        if (!workspace || !targetProjectId)
           return { ok: false, message: "Select a Workspace first.", retryable: false };
         try {
-          const issue = await issueService.retrieve(workspace, selectedProjectId, issueId);
+          const issue = await issueService.retrieve(workspace, targetProjectId, issueId);
           const data = toWorkItemRecords([issue])[0];
           return { ...toolResult("get_work_item", `Found ${issue.name}.`, [issue.id]), data };
         } catch (error) {
@@ -1059,12 +1070,13 @@ function PlaneTools() {
     {
       name: "open_work_item",
       description: "Navigate to a work item in the current Workspace.",
-      parameters: z.object({ issueId: z.string().uuid() }),
+      parameters: z.object({ issueId: z.string().uuid(), projectId: z.string().uuid().optional() }),
       render: renderToolActivity("Opening the work item…"),
-      handler: async ({ issueId }) => {
-        if (!workspace || !selectedProjectId)
+      handler: async ({ issueId, projectId: requestedProjectId }) => {
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
+        if (!workspace || !targetProjectId)
           return { ok: false, message: "Select a Workspace first.", retryable: false };
-        window.location.assign(`/${workspace}/projects/${selectedProjectId}/issues/${issueId}`);
+        window.location.assign(`/${workspace}/projects/${targetProjectId}/issues/${issueId}`);
         return toolResult("open_work_item", "Opening work item.", [issueId]);
       },
       followUp: false,
@@ -1077,15 +1089,20 @@ function PlaneTools() {
       name: "update_work_item",
       description: "Update one work item in the current Workspace with any supported editable fields.",
       parameters: workItemMutationSchema
-        .extend({ issueId: z.string().uuid() })
-        .refine(({ issueId: _issueId, ...changes }) => Object.values(changes).some((value) => value !== undefined), {
-          message: "Provide at least one work-item field to update.",
-        }),
+        .extend({ issueId: z.string().uuid(), projectId: z.string().uuid().optional() })
+        .refine(
+          ({ issueId: _issueId, projectId: _projectId, ...changes }) =>
+            Object.values(changes).some((value) => value !== undefined),
+          {
+            message: "Provide at least one work-item field to update.",
+          }
+        ),
       render: renderToolActivity("Updating the work item…"),
-      handler: async ({ issueId, ...changes }) => {
+      handler: async ({ issueId, projectId: requestedProjectId, ...changes }) => {
         const startedAt = Date.now();
         const correlationId = crypto.randomUUID();
-        if (!workspace || !selectedProjectId)
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
+        if (!workspace || !targetProjectId)
           return finishTool(
             toolValidationError("update_work_item", "Select a Workspace first."),
             startedAt,
@@ -1093,11 +1110,11 @@ function PlaneTools() {
           );
         const payload = toWorkItemPayload(changes);
         const result = await mutationGuard.run(
-          mutationFingerprint("update_work_item", workspace, selectedProjectId, issueId, payload),
+          mutationFingerprint("update_work_item", workspace, targetProjectId, issueId, payload),
           async () => {
             try {
-              await issueService.patchIssue(workspace, selectedProjectId, issueId, payload);
-              const issue = await issueService.retrieve(workspace, selectedProjectId, issueId);
+              await issueService.patchIssue(workspace, targetProjectId, issueId, payload);
+              const issue = await issueService.retrieve(workspace, targetProjectId, issueId);
               if (!isCanonicalRecord(issue) || !requestedFieldsMatch(issue, payload))
                 return toolUncertainResult("update_work_item", [issueId]);
               return {
@@ -1120,31 +1137,50 @@ function PlaneTools() {
     {
       name: "confirm_delete_work_item",
       description: "Use this tool to delete a work item. It always requires explicit user approval.",
-      parameters: z.object({ issueId: z.string().uuid(), name: z.string().min(1).max(255) }),
-      render: ({ args, status, respond }) => {
+      parameters: z.object({
+        issueId: z.string().uuid(),
+        name: z.string().min(1).max(255),
+        projectId: z.string().uuid().optional(),
+      }),
+      render: ({ args, status, respond, toolCallId }) => {
+        const requestedProjectId = args.projectId;
+        const initialTargetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
+        if (
+          status === "executing" &&
+          workspace &&
+          initialTargetProjectId &&
+          !deleteWorkItemTargets.current.has(toolCallId)
+        )
+          deleteWorkItemTargets.current.set(toolCallId, { workspace, projectId: initialTargetProjectId });
+        const target = deleteWorkItemTargets.current.get(toolCallId);
         const execute = async () => {
-          if (!workspace || !selectedProjectId || !respond) return;
+          if (!target || !respond) return;
           const startedAt = Date.now();
           const correlationId = crypto.randomUUID();
           const result = await mutationGuard.run(
-            mutationFingerprint("delete_work_item", workspace, selectedProjectId, args.issueId),
+            mutationFingerprint("delete_work_item", target.workspace, target.projectId, args.issueId),
             async () => {
               try {
-                await issueService.deleteIssue(workspace, selectedProjectId, args.issueId);
+                await issueService.deleteIssue(target.workspace, target.projectId, args.issueId);
               } catch (error) {
                 const category = classifyToolError(error).category;
                 if (category !== "network" && category !== "timeout")
                   return toolError("delete_work_item", error, { mutation: true });
               }
               return confirmDeleted("delete_work_item", args.issueId, () =>
-                issueService.retrieve(workspace, selectedProjectId, args.issueId)
+                issueService.retrieve(target.workspace, target.projectId, args.issueId)
               );
             },
             "delete_work_item"
           );
+          deleteWorkItemTargets.current.delete(toolCallId);
           respond(finishTool(result, startedAt, correlationId));
         };
-        if (status !== "executing" || !respond) return <p>Preparing deletion confirmation…</p>;
+        if (status !== "executing" || !respond) {
+          deleteWorkItemTargets.current.delete(toolCallId);
+          return <p>Preparing deletion confirmation…</p>;
+        }
+        if (!target) return <p>Select a Workspace first.</p>;
         return (
           <section aria-label="Confirm work item deletion" className="border-red-500 rounded border p-3">
             <p>Delete {args.name}? This cannot be undone.</p>
