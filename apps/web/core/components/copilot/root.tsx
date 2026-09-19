@@ -504,7 +504,7 @@ function PlaneTools() {
     () => ({
       children: ({ closeButton, titleContent }: { closeButton: React.ReactNode; titleContent: React.ReactNode }) => (
         <header
-          className="bg-surface-1 px-4 py-2"
+          className="relative z-[1201] bg-surface-1 px-4 py-2"
           onClickCapture={(event) => {
             if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) resetLauncherPosition();
           }}
@@ -524,8 +524,7 @@ function PlaneTools() {
             </div>
             {closeButton}
           </div>
-          <div className="mt-2 flex items-center gap-2">
-            <span className="text-11 text-secondary">Workspace</span>
+          <div className="mt-2">
             <CustomSearchSelect
               buttonClassName="min-w-0 max-w-56"
               disabled={isWorkspaceOptionsLoading || workspaceOptions.length === 0}
@@ -534,6 +533,7 @@ function PlaneTools() {
               }
               onChange={setSelectedProjectId}
               options={workspaceSelectorOptions}
+              portal={false}
               value={selectedProjectId ?? undefined}
             />
           </div>
