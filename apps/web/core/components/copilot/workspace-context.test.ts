@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveSelectedWorkspaceId, resolveWorkspaceToolTarget } from "./workspace-context";
+import {
+  toAgentWorkspaceContext,
+  resolveSelectedWorkspaceId,
+  resolveWorkspaceToolTarget,
+  type WorkspaceOption,
+} from "./workspace-context";
 
 describe("Copilot Workspace context", () => {
   const availableIds = ["workspace-a", "workspace-b"];
@@ -39,5 +44,24 @@ describe("Copilot Workspace context", () => {
     expect(resolveWorkspaceToolTarget("workspace-b", "workspace-a")).toBe("workspace-b");
     expect(resolveWorkspaceToolTarget(undefined, "workspace-a")).toBe("workspace-a");
     expect(resolveWorkspaceToolTarget(undefined, null)).toBeNull();
+  });
+
+  it("serializes no Workspace fields when none is selected", () => {
+    expect(toAgentWorkspaceContext("tenfold", undefined)).toEqual({
+      teamSlug: "tenfold",
+      workspaceId: null,
+      workspaceName: null,
+      workspaceIdentifier: null,
+    });
+  });
+
+  it("serializes the selected Workspace for the agent", () => {
+    const selected: WorkspaceOption = { id: "workspace-a", name: "Programmes", identifier: "PROG" };
+    expect(toAgentWorkspaceContext("tenfold", selected)).toEqual({
+      teamSlug: "tenfold",
+      workspaceId: "workspace-a",
+      workspaceName: "Programmes",
+      workspaceIdentifier: "PROG",
+    });
   });
 });

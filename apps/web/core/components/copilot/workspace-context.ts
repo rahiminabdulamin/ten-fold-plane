@@ -1,5 +1,12 @@
 export type WorkspaceOption = { id: string; name: string; identifier: string | null };
 
+export const toAgentWorkspaceContext = (teamSlug: string, selectedWorkspace: WorkspaceOption | undefined) => ({
+  teamSlug,
+  workspaceId: selectedWorkspace?.id ?? null,
+  workspaceName: selectedWorkspace?.name ?? null,
+  workspaceIdentifier: selectedWorkspace?.identifier ?? null,
+});
+
 type SelectedWorkspaceInput = {
   routeProjectId: string | undefined;
   selectedProjectId: string | undefined;

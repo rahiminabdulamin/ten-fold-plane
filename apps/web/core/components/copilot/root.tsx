@@ -1,5 +1,13 @@
-import { CopilotKit, CopilotSidebar, useFrontendTool, useHumanInTheLoop } from "@copilotkit/react-core/v2";
+import {
+  CopilotKit,
+  CopilotSidebar,
+  useAgentContext,
+  useFrontendTool,
+  useHumanInTheLoop,
+} from "@copilotkit/react-core/v2";
 import { API_BASE_URL } from "@plane/constants";
+import type { ICustomSearchSelectOption } from "@plane/types";
+import { CustomSearchSelect } from "@plane/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useParams } from "react-router";
@@ -47,6 +55,7 @@ import {
   mutationFingerprint,
   requestedFieldsMatch,
 } from "./tool-reliability";
+import { resolveSelectedWorkspaceId, toAgentWorkspaceContext, type WorkspaceOption } from "./workspace-context";
 
 const projectService = new ProjectService();
 const issueService = new IssueService();
@@ -310,11 +319,74 @@ function PlaneTools() {
   const { workspaceSlug, projectId, spreadsheetId } = useParams();
   const { data: user } = useUser();
   const workspace = typeof workspaceSlug === "string" ? workspaceSlug : "";
+  const [workspaceOptions, setWorkspaceOptions] = useState<WorkspaceOption[]>([]);
+  const [isWorkspaceOptionsLoading, setIsWorkspaceOptionsLoading] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
   const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
   const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
   const launcherPositionRef = useRef<LauncherPosition | null>(null);
   const dragStart = useRef<{ x: number; y: number; pointerX: number; pointerY: number; moved: boolean } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setWorkspaceOptions([]);
+    setSelectedProjectId(null);
+    if (!workspace) {
+      setIsWorkspaceOptionsLoading(false);
+      return;
+    }
+    setIsWorkspaceOptionsLoading(true);
+    projectService
+      .getProjectsLite(workspace)
+      .then((projects) => {
+        if (cancelled) return null;
+        setWorkspaceOptions(projects.map(({ id, name, identifier }) => ({ id, name, identifier: identifier ?? null })));
+        return null;
+      })
+      .catch(() => {
+        if (!cancelled) setWorkspaceOptions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsWorkspaceOptionsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [workspace]);
+
+  useEffect(() => {
+    const nextSelectedProjectId = resolveSelectedWorkspaceId({
+      routeProjectId: typeof projectId === "string" ? projectId : undefined,
+      selectedProjectId: selectedProjectId ?? undefined,
+      availableIds: workspaceOptions.map(({ id }) => id),
+    });
+    if (nextSelectedProjectId !== selectedProjectId) setSelectedProjectId(nextSelectedProjectId);
+  }, [projectId, selectedProjectId, workspaceOptions]);
+
+  const selectedWorkspace = useMemo(
+    () => workspaceOptions.find(({ id }) => id === selectedProjectId),
+    [selectedProjectId, workspaceOptions]
+  );
+  const workspaceSelectorOptions = useMemo<ICustomSearchSelectOption[]>(
+    () =>
+      workspaceOptions.map(({ id, name, identifier }) => ({
+        value: id,
+        query: `${name} ${identifier ?? ""}`,
+        content: (
+          <span className="flex max-w-64 items-center gap-2">
+            <span className="truncate">{name}</span>
+            {identifier && <span className="text-tertiary">{identifier}</span>}
+          </span>
+        ),
+      })),
+    [workspaceOptions]
+  );
+
+  useAgentContext({
+    description: "The selected UI Workspace is the authoritative default for unqualified work-item requests.",
+    value: toAgentWorkspaceContext(workspace, selectedWorkspace),
+  });
 
   useEffect(() => {
     const storedWidth = Number(window.localStorage.getItem(COPILOT_PANEL_WIDTH_STORAGE_KEY));
@@ -417,28 +489,50 @@ function PlaneTools() {
     () => ({
       children: ({ closeButton, titleContent }: { closeButton: React.ReactNode; titleContent: React.ReactNode }) => (
         <header
-          className="flex h-[51px] items-center justify-between bg-surface-1 px-4"
+          className="bg-surface-1 px-4 py-2"
           onClickCapture={(event) => {
             if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) resetLauncherPosition();
           }}
         >
-          <div className="flex items-center gap-2 text-primary">
-            <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
-              <path
-                d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="1.75"
-              />
-              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
-            </svg>
-            <div className="text-13 font-medium">{titleContent}</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-primary">
+              <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="1.75"
+                />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+              </svg>
+              <div className="text-13 font-medium">{titleContent}</div>
+            </div>
+            {closeButton}
           </div>
-          {closeButton}
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-11 text-secondary">Workspace</span>
+            <CustomSearchSelect
+              buttonClassName="min-w-0 max-w-56"
+              disabled={isWorkspaceOptionsLoading || workspaceOptions.length === 0}
+              label={
+                isWorkspaceOptionsLoading ? "Loading Workspaces…" : (selectedWorkspace?.name ?? "Choose Workspace")
+              }
+              onChange={setSelectedProjectId}
+              options={workspaceSelectorOptions}
+              value={selectedProjectId ?? undefined}
+            />
+          </div>
         </header>
       ),
     }),
-    [resetLauncherPosition]
+    [
+      isWorkspaceOptionsLoading,
+      resetLauncherPosition,
+      selectedProjectId,
+      selectedWorkspace?.name,
+      workspaceOptions.length,
+      workspaceSelectorOptions,
+    ]
   );
 
   useFrontendTool(
