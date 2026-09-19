@@ -28,6 +28,11 @@ copy_env_file() {
         return 1
     fi
 
+    if [ -f "$destination" ]; then
+        echo -e "${BLUE}•${NC} Preserved existing $destination"
+        return 0
+    fi
+
     cp "$source" "$destination"
 
     if [ $? -eq 0 ]; then
@@ -35,6 +40,40 @@ copy_env_file() {
     else
         echo -e "${RED}✗${NC} Failed to copy $destination"
         return 1
+    fi
+}
+
+env_value() {
+    local file=$1
+    local key=$2
+    local line value
+    line=$(grep "^${key}=" "$file" | tail -1) || true
+    value=${line#*=}
+    value=$(printf '%s' "$value" | sed 's/^[[:space:]]*//')
+
+    case "$value" in
+        \"*) value=${value#\"}; printf '%s\n' "${value%%\"*}" ;;
+        \'*) value=${value#\'}; printf '%s\n' "${value%%\'*}" ;;
+        *) printf '%s' "${value%%#*}" | sed 's/[[:space:]]*$//' ;;
+    esac
+}
+
+set_env_value() {
+    local file=$1
+    local key=$2
+    local value=$3
+    local escaped_value
+
+    if [ "$(env_value "$file" "$key")" = "$value" ]; then
+        return 0
+    fi
+
+    escaped_value=$(printf '%s' "$value" | sed 's/[\\&|]/\\&/g') || return 1
+
+    if grep -q "^${key}=" "$file"; then
+        sed -i.bak "s|^${key}=.*|${key}=\"${escaped_value}\"|" "$file" && rm -f "${file}.bak"
+    else
+        echo "${key}=\"${value}\"" >> "$file"
     fi
 }
 
@@ -61,19 +100,61 @@ done
 
 # Generate SECRET_KEY for Django
 if [ -f "./apps/api/.env" ]; then
-    echo -e "\n${YELLOW}Generating Django SECRET_KEY...${NC}"
-    SECRET_KEY=$(tr -dc 'a-z0-9' < /dev/urandom | head -c50)
-
-    if [ -z "$SECRET_KEY" ]; then
-        echo -e "${RED}Error: Failed to generate SECRET_KEY.${NC}"
-        echo -e "${RED}Ensure 'tr' and 'head' commands are available on your system.${NC}"
-        success=false
+    existing_secret_key=$(env_value "./apps/api/.env" "SECRET_KEY")
+    if [ -n "$existing_secret_key" ]; then
+        echo -e "\n${BLUE}•${NC} Preserved existing Django SECRET_KEY"
     else
-        echo -e "SECRET_KEY=\"$SECRET_KEY\"" >> ./apps/api/.env
-        echo -e "${GREEN}✓${NC} Added SECRET_KEY to apps/api/.env"
+        echo -e "\n${YELLOW}Generating Django SECRET_KEY...${NC}"
+        SECRET_KEY=$(tr -dc 'a-z0-9' < /dev/urandom | head -c50)
+
+        if [ -z "$SECRET_KEY" ]; then
+            echo -e "${RED}Error: Failed to generate SECRET_KEY.${NC}"
+            echo -e "${RED}Ensure 'tr' and 'head' commands are available on your system.${NC}"
+            success=false
+        else
+            if set_env_value "./apps/api/.env" "SECRET_KEY" "$SECRET_KEY"; then
+                echo -e "${GREEN}✓${NC} Added SECRET_KEY to apps/api/.env"
+            else
+                echo -e "${RED}Error: Failed to write SECRET_KEY to apps/api/.env.${NC}"
+                success=false
+            fi
+        fi
     fi
 else
     echo -e "${RED}✗${NC} apps/api/.env not found. SECRET_KEY not added."
+    success=false
+fi
+
+# Copilot identity tokens must be signed and verified with the same secret.
+if [ -f "./.env" ] && [ -f "./apps/api/.env" ]; then
+    echo -e "\n${YELLOW}Configuring Copilot identity token secret...${NC}"
+    root_copilot_secret=$(env_value "./.env" "COPILOT_IDENTITY_TOKEN_SECRET")
+    api_copilot_secret=$(env_value "./apps/api/.env" "COPILOT_IDENTITY_TOKEN_SECRET")
+
+    if [ -n "$root_copilot_secret" ] && [ -n "$api_copilot_secret" ] && [ "$root_copilot_secret" != "$api_copilot_secret" ]; then
+        echo -e "${RED}Error: COPILOT_IDENTITY_TOKEN_SECRET differs between .env and apps/api/.env.${NC}"
+        success=false
+    else
+        copilot_secret=${root_copilot_secret:-$api_copilot_secret}
+        if [ -z "$copilot_secret" ]; then
+            copilot_secret=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c64)
+        fi
+
+        if [ -z "$copilot_secret" ]; then
+            echo -e "${RED}Error: Failed to generate COPILOT_IDENTITY_TOKEN_SECRET.${NC}"
+            success=false
+        else
+            if set_env_value "./.env" "COPILOT_IDENTITY_TOKEN_SECRET" "$copilot_secret" &&
+                set_env_value "./apps/api/.env" "COPILOT_IDENTITY_TOKEN_SECRET" "$copilot_secret"; then
+                echo -e "${GREEN}✓${NC} Configured the shared Copilot identity token secret"
+            else
+                echo -e "${RED}Error: Failed to write COPILOT_IDENTITY_TOKEN_SECRET.${NC}"
+                success=false
+            fi
+        fi
+    fi
+else
+    echo -e "${RED}✗${NC} .env or apps/api/.env not found. Copilot identity token secret not configured."
     success=false
 fi
 

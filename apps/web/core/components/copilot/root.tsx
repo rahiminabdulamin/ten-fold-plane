@@ -1369,7 +1369,12 @@ export function PlaneCopilot() {
 
   if (!token) return null;
   return (
-    <CopilotKit runtimeUrl={runtimeUrl} credentials="omit" headers={() => ({ Authorization: `Bearer ${token}` })}>
+    <CopilotKit
+      runtimeUrl={runtimeUrl}
+      credentials="omit"
+      headers={() => ({ Authorization: `Bearer ${token}` })}
+      showDevConsole={false}
+    >
       <PlaneTools />
     </CopilotKit>
   );

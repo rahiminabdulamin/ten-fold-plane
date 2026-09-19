@@ -125,6 +125,7 @@ test("CopilotKit is a compact resizable Ten-Fold panel below the viewport-wide n
   assert.match(copilot, /Ten-Fold Assistant/);
   assert.match(copilot, /const sidebarHeader = useMemo/);
   assert.match(copilot, /header=\{sidebarHeader\}/);
+  assert.match(copilot, /<CopilotKit[\s\S]*showDevConsole=\{false\}/);
   assert.match(copilot, /<svg/);
   assert.match(contentWrapper, /copilot-panel-layout/);
   assert.match(styles, /\.copilot-panel-layout/);
