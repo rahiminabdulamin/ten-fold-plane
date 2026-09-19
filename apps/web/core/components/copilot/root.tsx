@@ -529,7 +529,7 @@ function PlaneTools() {
           </div>
           <div className="mt-2">
             <CustomSearchSelect
-              buttonClassName="min-w-0"
+              buttonClassName="min-w-0 rounded-md border-subtle bg-surface-1 px-3 py-2 text-13 shadow-sm"
               className="pointer-events-auto relative z-[1203] w-full"
               disabled={isWorkspaceOptionsLoading || workspaceOptions.length === 0}
               label={
@@ -537,6 +537,7 @@ function PlaneTools() {
               }
               onChange={setSelectedProjectId}
               options={workspaceSelectorOptions}
+              optionsClassName="w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"
               portal={false}
               value={selectedProjectId ?? undefined}
             />

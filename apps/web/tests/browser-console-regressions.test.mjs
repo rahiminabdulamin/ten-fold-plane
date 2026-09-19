@@ -140,8 +140,15 @@ test("Copilot workspace selector stays above the chat surface and accepts pointe
   ]);
 
   assert.match(copilot, /<header[\s\S]*className="pointer-events-auto relative z-\[1202\] bg-surface-1 px-4 py-2"/);
-  assert.match(copilot, /<CustomSearchSelect[\s\S]*className="pointer-events-auto relative z-\[1203\]"/);
+  assert.match(copilot, /className="pointer-events-auto relative z-\[1203\] w-full"/);
   assert.match(copilot, /<CustomSearchSelect[\s\S]*portal=\{false\}/);
   assert.match(select, /strategy:\s*portal \? "fixed" : "absolute"/);
   assert.match(select, /<Combobox\.Options[\s\S]*modal=\{false\}/);
+});
+
+test("Copilot workspace selector presents its menu as part of the trigger", async () => {
+  const copilot = await read("core/components/copilot/root.tsx");
+
+  assert.match(copilot, /buttonClassName="min-w-0 rounded-md border-subtle bg-surface-1 px-3 py-2 text-13 shadow-sm"/);
+  assert.match(copilot, /optionsClassName="w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"/);
 });
