@@ -1,0 +1,20 @@
+$ react-router dev --port 3000
+[restart] Relaunching with NODE_OPTIONS: --conditions=development
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+(node:87274) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/postcss.config.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+12:18:07 AM [vite] (client) Re-optimizing dependencies because vite config has changed
+  ➜  Local:   http://127.0.0.1:3000/
+  ➜  press h + enter to show help
+12:18:19 AM [vite] (ssr) connected.
+12:25:28 AM [vite] (client) [optimizer] bundling dependencies...
+12:25:29 AM [vite] (client) [optimizer] bundling dependencies...
+12:25:31 AM [vite] (client) [optimizer] bundling dependencies...
+12:25:32 AM [vite] (client) ✨ new dependencies optimized: @atlaskit/pragmatic-drag-and-drop-hitbox/dist/cjs/closest-edge.js, @atlaskit/pragmatic-drag-and-drop/dist/cjs/entry-point/combine.js, @atlaskit/pragmatic-drag-and-drop/dist/cjs/entry-point/element/adapter.js, @base-ui-components/react/toast, @base-ui-components/react/tooltip, @headlessui/react, @makeplane/propel/components/field, @makeplane/propel/components/input, @makeplane/propel/icons, axios, chroma-js, class-variance-authority, clsx, date-fns, date-fns/differenceInCalendarDays, file-type, i18next-icu, i18next-resources-to-backend, i18next, lodash-es, lucide-react, mobx-react, mobx-utils, mobx, next-themes, react-color, react-i18next, react-popper, rehype-parse, rehype-remark, remark-gfm, remark-stringify, swr, tailwind-merge, unified, uuid
+12:25:32 AM [vite] (client) ✨ optimized dependencies changed. reloading
+/home/rahimin_amin/ten-fold-plane/ten-fold-plane/apps/web:
+[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] web@1.4.2 dev: `react-router dev --port 3000`
+Exit status 143

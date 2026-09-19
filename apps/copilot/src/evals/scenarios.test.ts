@@ -29,6 +29,10 @@ const passingTraces: Record<string, AgentTrace> = {
     ],
     terminalStatus: "success",
   },
+  "unqualified-work-item-list": {
+    calls: [{ name: "list_work_items", arguments: { projectId: "project-1" } }],
+    terminalStatus: "success",
+  },
   "relative-date-range": {
     calls: [
       { name: "get_current_datetime", arguments: {} },
@@ -161,6 +165,13 @@ describe("agent reliability scenarios", () => {
     [
       "relative-date-range",
       { calls: [{ name: "list_work_items", arguments: { projectId: "project-1" } }], terminalStatus: "success" },
+    ],
+    [
+      "unqualified-work-item-list",
+      {
+        calls: [{ name: "list_work_items", arguments: { projectId: "project-1", stateGroup: "backlog" } }],
+        terminalStatus: "success",
+      },
     ],
     [
       "yearless-month-selected-workspace",

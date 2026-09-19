@@ -39,6 +39,12 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain("Do not infer stateGroup");
   });
 
+  it("requires unqualified work-item requests to omit stateGroup", () => {
+    expect(DEFAULT_AGENT_PROMPT).toContain(
+      "For an unqualified request to list work items, tasks, or events, omit stateGroup"
+    );
+  });
+
   it("creates the default gpt-4o-mini agent without exposing credentials", () => {
     expect(() =>
       createRuntime({

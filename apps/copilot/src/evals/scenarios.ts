@@ -37,6 +37,13 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
     terminalStatus: "success",
   },
   {
+    id: "unqualified-work-item-list",
+    prompt: "What work items are in this Workspace?",
+    expectedCalls: [{ name: "list_work_items" }],
+    prohibitedArgumentKeys: [{ name: "list_work_items", keys: ["stateGroup"] }],
+    terminalStatus: "success",
+  },
+  {
     id: "relative-date-range",
     prompt: "List work items due in the next week.",
     expectedCalls: [

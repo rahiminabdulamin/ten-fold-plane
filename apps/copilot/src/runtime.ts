@@ -22,6 +22,7 @@ export const DEFAULT_AGENT_PROMPT = [
   "When creating a work item, only send fields the user specified. Leave unspecified work-item fields unset without follow-up questions.",
   "Put task details that do not fit a supported field, including a time of day, in the description; append them to an existing description.",
   "When the request names a state bucket, call list_work_items with the matching stateGroup.",
+  "For an unqualified request to list work items, tasks, or events, omit stateGroup so the tool returns every state bucket. Never default stateGroup to backlog.",
   "Do not infer stateGroup from words such as upcoming or events, or from a date period. Omit stateGroup unless the user explicitly requests a state or status.",
   "If an explicitly named Workspace has zero or multiple matches, report the tool result and ask a concise clarifying question.",
   "Only say a requested bucket is empty after a successful list_work_items result for that stateGroup contains no items. Only say a requested date period is empty after a successful list_work_items result for its exact inclusive date range contains no items.",

@@ -815,7 +815,7 @@ function PlaneTools() {
     {
       name: "list_work_items",
       description:
-        "List up to 20 work items, optionally limited to one state bucket and an inclusive target-date range. For upcoming work in a requested period, call get_current_datetime when needed, then pass dateFrom and dateTo. Use the current Workspace by default, or pass a canonical ID returned by find_project.",
+        "List up to 20 work items from every state bucket by default. Set stateGroup only when the user explicitly names a state or status; never default it to backlog. Optionally limit results to an inclusive target-date range. For upcoming work in a requested period, call get_current_datetime when needed, then pass dateFrom and dateTo. Use the current Workspace by default, or pass a canonical ID returned by find_project.",
       parameters: z.object({
         projectId: z.string().uuid().optional(),
         stateGroup: z.enum(WORK_ITEM_STATE_GROUPS).optional(),
