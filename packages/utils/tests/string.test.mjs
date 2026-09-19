@@ -10,6 +10,7 @@ test("sanitizeHTML returns decoded text without executable markup", () => {
     ),
     "Hello world & friends"
   );
+  assert.equal(sanitizeHTML("<script>alert(1)</script><style>body {}</style><xmp>hidden</xmp>"), "");
 });
 
 test("isEmptyHtmlString preserves explicitly allowed meaningful elements", () => {

@@ -1376,6 +1376,7 @@ export function PlaneCopilot() {
       runtimeUrl={runtimeUrl}
       credentials="omit"
       headers={() => ({ Authorization: `Bearer ${token}` })}
+      enableInspector={false}
       showDevConsole={false}
     >
       <PlaneTools />

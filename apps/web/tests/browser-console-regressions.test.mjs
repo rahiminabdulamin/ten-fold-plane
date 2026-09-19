@@ -33,3 +33,52 @@ test("closing the Copilot sidebar restores focus to its launcher", async () => {
     /document\.querySelector<HTMLButtonElement>\('\[data-testid="copilot-chat-toggle"\]'\)\?\.focus\(\)/
   );
 });
+
+test("the Copilot Web Inspector is disabled without hiding the chat toggle", async () => {
+  const copilot = await read("core/components/copilot/root.tsx");
+
+  assert.match(copilot, /enableInspector=\{false\}/);
+  assert.match(copilot, /data-testid="copilot-chat-toggle"/);
+});
+
+test("issue root route synchronization happens inside a MobX action", async () => {
+  const store = await read("core/store/issue/root.store.ts");
+
+  assert.match(store, /import \{ autorun, makeObservable, observable, runInAction \} from "mobx"/);
+  assert.match(store, /const hasStateMap = !isEmpty\(stateMap\);[\s\S]*runInAction\(\(\) => \{/);
+  assert.match(store, /autorun\(\(\) => \{[\s\S]*runInAction\(\(\) => \{/);
+});
+
+test("workspace loading resets inside a MobX action after async work", async () => {
+  const store = await read("core/store/workspace/index.ts");
+
+  assert.match(store, /finally \{\s*runInAction\(\(\) => \{\s*this\.loader = false;/);
+});
+
+test("user menu custom trigger does not render a nested button", async () => {
+  const userMenu = await read("core/components/workspace/sidebar/user-menu-root.tsx");
+
+  assert.doesNotMatch(userMenu, /customButton=\{\s*<AppSidebarItem\s+variant="button"/);
+  assert.match(userMenu, /customButton=\{\s*<AppSidebarItem\.Icon/);
+});
+
+test("work item filters create MobX filter instances after render", async () => {
+  const filters = await read("core/components/work-item-filters/filters-hoc/base.tsx");
+
+  assert.doesNotMatch(filters, /const workItemLayoutFilter = useMemo\(\s*\(\) =>\s*getOrCreateFilter/);
+  assert.match(filters, /useEffect\(\(\) => \{\s*getOrCreateFilter\(/);
+  assert.match(filters, /useEffect\(\s*\(\) => \(\) => \{\s*deleteFilter\(entityType, workItemEntityID\);/);
+  assert.match(filters, /const workItemLayoutFilter = getFilter\(entityType, workItemEntityID\)/);
+});
+
+test("project sidebar autoscroll targets the scroll area viewport", async () => {
+  const projectsList = await read("core/components/workspace/sidebar/projects-list.tsx");
+
+  assert.match(projectsList, /closest<HTMLElement>\('\[data-slot="scroll-area-viewport"\]'\)/);
+});
+
+test("project user-properties failures do not erase the thrown error", async () => {
+  const projectService = await read("core/services/project/project.service.ts");
+
+  assert.match(projectService, /getProjectUserProperties[\s\S]*throw error\?\.response\?\.data \?\? error/);
+});

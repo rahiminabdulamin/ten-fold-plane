@@ -110,25 +110,26 @@ export const SidebarProjectsList = observer(function SidebarProjectsList() {
    * Implementing scroll animation styles based on the scroll length of the container
    */
   useEffect(() => {
+    const currentContainerRef = containerRef.current;
+    const scrollContainer = currentContainerRef?.closest<HTMLElement>('[data-slot="scroll-area-viewport"]');
     const handleScroll = () => {
-      if (containerRef.current) {
-        const scrollTop = containerRef.current.scrollTop;
+      if (scrollContainer) {
+        const scrollTop = scrollContainer.scrollTop;
         setIsScrolled(scrollTop > 0);
       }
     };
-    const currentContainerRef = containerRef.current;
-    if (currentContainerRef) {
-      currentContainerRef.addEventListener("scroll", handleScroll);
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
     }
     return () => {
-      if (currentContainerRef) {
-        currentContainerRef.removeEventListener("scroll", handleScroll);
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll);
       }
     };
   }, [containerRef]);
 
   useEffect(() => {
-    const element = containerRef.current;
+    const element = containerRef.current?.closest<HTMLElement>('[data-slot="scroll-area-viewport"]');
 
     if (!element) return;
 

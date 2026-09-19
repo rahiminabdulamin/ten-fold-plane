@@ -58,19 +58,16 @@ export const UserMenuRoot = observer(function UserMenuRoot() {
     <CustomMenu
       className="flex items-center"
       customButton={
-        <AppSidebarItem
-          variant="button"
-          item={{
-            icon: (
-              <Avatar
-                alt={currentUser?.display_name}
-                fallback={currentUser?.display_name?.[0]?.toUpperCase()}
-                src={getFileURL(currentUser?.avatar_url ?? "")}
-                size="xs"
-              />
-            ),
-            isActive: isUserMenuOpen,
-          }}
+        <AppSidebarItem.Icon
+          highlight={isUserMenuOpen}
+          icon={
+            <Avatar
+              alt={currentUser?.display_name}
+              fallback={currentUser?.display_name?.[0]?.toUpperCase()}
+              src={getFileURL(currentUser?.avatar_url ?? "")}
+              size="xs"
+            />
+          }
         />
       }
       menuButtonOnClick={() => !isUserMenuOpen && setIsUserMenuOpen(true)}

@@ -1,0 +1,12 @@
+$ react-router dev --port 3000
+[restart] Relaunching with NODE_OPTIONS: --conditions=development
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+(node:49206) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/postcss.config.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/rahimin_amin/ten-fold-plane/ten-fold-plane/packages/tailwind-config/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Port 3000 is in use, trying another one...
+7:40:22 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+  ➜  Local:   http://127.0.0.1:3001/
+  ➜  press h + enter to show help
