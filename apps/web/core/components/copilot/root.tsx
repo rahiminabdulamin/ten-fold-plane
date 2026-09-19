@@ -815,10 +815,65 @@ function PlaneTools() {
     {
       name: "list_work_items",
       description:
-        "List up to 20 work items from every state bucket by default. Set stateGroup only when the user explicitly names a state or status; never default it to backlog. Optionally limit results to an inclusive target-date range. For upcoming work in a requested period, call get_current_datetime when needed, then pass dateFrom and dateTo. Use the current Workspace by default, or pass a canonical ID returned by find_project.",
+        "List up to 20 work items from every state bucket. This tool cannot filter by state. Optionally limit results to an inclusive target-date range. For upcoming work in a requested period, call get_current_datetime when needed, then pass dateFrom and dateTo. Use the current Workspace by default, or pass a canonical ID returned by find_project.",
       parameters: z.object({
         projectId: z.string().uuid().optional(),
-        stateGroup: z.enum(WORK_ITEM_STATE_GROUPS).optional(),
+        dateFrom: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
+        dateTo: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
+      }),
+      render: renderToolActivity("Checking work items…"),
+      handler: async ({ projectId: requestedProjectId, dateFrom, dateTo }) => {
+        const targetProjectId = resolveWorkspaceToolTarget(requestedProjectId, selectedProjectId);
+        if (!workspace || !targetProjectId)
+          return { ok: false, message: "Select a Workspace first.", retryable: false };
+        try {
+          const response = await issueService.getIssues(
+            workspace,
+            targetProjectId,
+            buildWorkItemQuery(undefined, dateFrom, dateTo)
+          );
+          const issues = Array.isArray(response.results) ? response.results : [];
+          const data = toWorkItemRecords(issues);
+          logWorkItemListTrace({
+            projectId: targetProjectId,
+            dateFrom,
+            dateTo,
+            stateGroup: undefined,
+            resultCount: data.length,
+            status: "success",
+          });
+          return { ...toolResult("list_work_items", `Found ${data.length} work items.`), data };
+        } catch (error) {
+          const result = toolError("list_work_items", error);
+          logWorkItemListTrace({
+            projectId: targetProjectId,
+            dateFrom,
+            dateTo,
+            stateGroup: undefined,
+            resultCount: null,
+            status: result.status,
+          });
+          return result;
+        }
+      },
+    },
+    [workspace, selectedProjectId]
+  );
+
+  useFrontendTool(
+    {
+      name: "list_work_items_by_state",
+      description:
+        "List up to 20 work items in one explicitly requested state bucket. Use list_work_items instead unless the user named a state or status.",
+      parameters: z.object({
+        projectId: z.string().uuid().optional(),
+        stateGroup: z.enum(WORK_ITEM_STATE_GROUPS),
         dateFrom: z
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -837,7 +892,7 @@ function PlaneTools() {
           const response = await issueService.getIssues(
             workspace,
             targetProjectId,
-            buildWorkItemQuery(stateGroup ?? undefined, dateFrom, dateTo)
+            buildWorkItemQuery(stateGroup, dateFrom, dateTo)
           );
           const issues = Array.isArray(response.results) ? response.results : [];
           const data = toWorkItemRecords(issues);
@@ -849,9 +904,9 @@ function PlaneTools() {
             resultCount: data.length,
             status: "success",
           });
-          return { ...toolResult("list_work_items", `Found ${data.length} work items.`), data };
+          return { ...toolResult("list_work_items_by_state", `Found ${data.length} work items.`), data };
         } catch (error) {
-          const result = toolError("list_work_items", error);
+          const result = toolError("list_work_items_by_state", error);
           logWorkItemListTrace({
             projectId: targetProjectId,
             dateFrom,

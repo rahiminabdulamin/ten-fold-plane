@@ -36,13 +36,14 @@ describe("createRuntime", () => {
     expect(DEFAULT_AGENT_PROMPT).not.toContain("do not infer a Workspace from the open page");
     expect(DEFAULT_AGENT_PROMPT).toContain("yearless named month");
     expect(DEFAULT_AGENT_PROMPT).toContain("Only say a requested date period is empty");
-    expect(DEFAULT_AGENT_PROMPT).toContain("Do not infer stateGroup");
+    expect(DEFAULT_AGENT_PROMPT).toContain("list_work_items; it returns every state bucket");
   });
 
-  it("requires unqualified work-item requests to omit stateGroup", () => {
+  it("separates unqualified and state-filtered work-item requests", () => {
     expect(DEFAULT_AGENT_PROMPT).toContain(
-      "For an unqualified request to list work items, tasks, or events, omit stateGroup"
+      "For an unqualified request to list work items, tasks, or events, call list_work_items"
     );
+    expect(DEFAULT_AGENT_PROMPT).toContain("list_work_items_by_state with the matching stateGroup");
   });
 
   it("creates the default gpt-4o-mini agent without exposing credentials", () => {

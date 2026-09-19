@@ -32,7 +32,7 @@ export const AGENT_SCENARIOS: AgentScenario[] = [
     prompt: "List the Backlog work items in the Marketing Workspace.",
     expectedCalls: [
       { name: "find_project", arguments: { query: "Marketing" } },
-      { name: "list_work_items", arguments: { projectId: "project-1", stateGroup: "backlog" } },
+      { name: "list_work_items_by_state", arguments: { projectId: "project-1", stateGroup: "backlog" } },
     ],
     terminalStatus: "success",
   },
