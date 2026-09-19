@@ -529,8 +529,8 @@ function PlaneTools() {
           </div>
           <div className="mt-2">
             <CustomSearchSelect
-              buttonClassName="min-w-0 max-w-56"
-              className="pointer-events-auto relative z-[1203]"
+              buttonClassName="min-w-0"
+              className="pointer-events-auto relative z-[1203] w-full"
               disabled={isWorkspaceOptionsLoading || workspaceOptions.length === 0}
               label={
                 isWorkspaceOptionsLoading ? "Loading Workspaces…" : (selectedWorkspace?.name ?? "Choose Workspace")
