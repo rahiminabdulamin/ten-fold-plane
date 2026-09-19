@@ -504,7 +504,7 @@ function PlaneTools() {
     () => ({
       children: ({ closeButton, titleContent }: { closeButton: React.ReactNode; titleContent: React.ReactNode }) => (
         <header
-          className="relative z-[1201] bg-surface-1 px-4 py-2"
+          className="pointer-events-auto relative z-[1202] bg-surface-1 px-4 py-2"
           onClickCapture={(event) => {
             if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
               document.querySelector<HTMLButtonElement>('[data-testid="copilot-chat-toggle"]')?.focus();
@@ -530,6 +530,7 @@ function PlaneTools() {
           <div className="mt-2">
             <CustomSearchSelect
               buttonClassName="min-w-0 max-w-56"
+              className="pointer-events-auto relative z-[1203]"
               disabled={isWorkspaceOptionsLoading || workspaceOptions.length === 0}
               label={
                 isWorkspaceOptionsLoading ? "Loading Workspaces…" : (selectedWorkspace?.name ?? "Choose Workspace")

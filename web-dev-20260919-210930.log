@@ -21,3 +21,10 @@ To eliminate this warning, add "type": "module" to /home/rahimin_amin/ten-fold-p
 10:14:27 PM [vite] (client) hmr update /core/components/project/card.tsx
 10:14:27 PM [vite] (client) hmr update /core/components/project/card.tsx, /styles/globals.css?direct
 10:14:27 PM [vite] (client) hmr update /styles/globals.css?direct
+10:46:49 PM [vite] (client) hmr update /styles/globals.css?direct
+10:46:58 PM [vite] (client) hmr update /core/components/copilot/root.tsx
+10:46:58 PM [vite] (client) hmr update /core/components/copilot/root.tsx, /styles/globals.css?direct
+10:47:14 PM [vite] (client) hmr update /styles/globals.css?direct
+10:47:15 PM [vite] (client) hmr update /core/components/copilot/root.tsx
+10:47:15 PM [vite] (client) hmr update /core/components/copilot/root.tsx, /styles/globals.css?direct
+10:48:05 PM [vite] (client) hmr update /styles/globals.css?direct
