@@ -397,6 +397,20 @@ function PlaneTools() {
       })),
     [workspaceOptions]
   );
+  const workspaceSelectorStateRef = useRef({
+    isWorkspaceOptionsLoading,
+    selectedProjectId,
+    selectedWorkspace,
+    workspaceOptions,
+    workspaceSelectorOptions,
+  });
+  workspaceSelectorStateRef.current = {
+    isWorkspaceOptionsLoading,
+    selectedProjectId,
+    selectedWorkspace,
+    workspaceOptions,
+    workspaceSelectorOptions,
+  };
 
   useAgentContext({
     description: "The selected UI Workspace is the authoritative default for unqualified work-item requests.",
@@ -502,57 +516,61 @@ function PlaneTools() {
 
   const sidebarHeader = useMemo(
     () => ({
-      children: ({ closeButton, titleContent }: { closeButton: React.ReactNode; titleContent: React.ReactNode }) => (
-        <header
-          className="pointer-events-auto relative z-[1202] bg-surface-1 px-4 py-2"
-          onClickCapture={(event) => {
-            if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
-              document.querySelector<HTMLButtonElement>('[data-testid="copilot-chat-toggle"]')?.focus();
-              resetLauncherPosition();
-            }
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-primary">
-              <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeWidth="1.75"
-                />
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
-              </svg>
-              <div className="text-13 font-medium">{titleContent}</div>
-            </div>
-            <span data-testid="copilot-close-button">{closeButton}</span>
-          </div>
-          <div className="mt-2">
-            <CustomSearchSelect
-              buttonClassName="min-w-0 rounded-md border-subtle bg-surface-1 px-3 py-2 text-13 shadow-sm"
-              className="pointer-events-auto relative z-[1203] w-full"
-              disabled={isWorkspaceOptionsLoading || workspaceOptions.length === 0}
-              label={
-                isWorkspaceOptionsLoading ? "Loading Workspaces…" : (selectedWorkspace?.name ?? "Choose Workspace")
+      children: ({ closeButton, titleContent }: { closeButton: React.ReactNode; titleContent: React.ReactNode }) => {
+        const {
+          isWorkspaceOptionsLoading: selectorIsWorkspaceOptionsLoading,
+          selectedProjectId: selectorProjectId,
+          selectedWorkspace: selectorWorkspace,
+          workspaceOptions: selectorWorkspaceOptions,
+          workspaceSelectorOptions: selectorOptions,
+        } = workspaceSelectorStateRef.current;
+        return (
+          <header
+            className="pointer-events-auto relative z-[1202] bg-surface-1 px-4 py-2"
+            onClickCapture={(event) => {
+              if ((event.target as HTMLElement).closest('[data-testid="copilot-close-button"]')) {
+                document.querySelector<HTMLButtonElement>('[data-testid="copilot-chat-toggle"]')?.focus();
+                resetLauncherPosition();
               }
-              onChange={setSelectedProjectId}
-              options={workspaceSelectorOptions}
-              optionsClassName="!left-4 w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"
-              portal={false}
-              value={selectedProjectId ?? undefined}
-            />
-          </div>
-        </header>
-      ),
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-primary">
+                <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+                  <path
+                    d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeWidth="1.75"
+                  />
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+                </svg>
+                <div className="text-13 font-medium">{titleContent}</div>
+              </div>
+              <span data-testid="copilot-close-button">{closeButton}</span>
+            </div>
+            <div className="mt-2">
+              <CustomSearchSelect
+                buttonClassName="min-w-0 rounded-md border-subtle bg-surface-1 px-3 py-2 text-13 shadow-sm"
+                className="pointer-events-auto relative z-[1203] w-full"
+                disabled={selectorIsWorkspaceOptionsLoading || selectorWorkspaceOptions.length === 0}
+                label={
+                  selectorIsWorkspaceOptionsLoading
+                    ? "Loading Workspaces…"
+                    : (selectorWorkspace?.name ?? "Choose Workspace")
+                }
+                onChange={setSelectedProjectId}
+                options={selectorOptions}
+                optionsClassName="!left-4 w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"
+                portal={false}
+                value={selectorProjectId ?? undefined}
+              />
+            </div>
+          </header>
+        );
+      },
     }),
-    [
-      isWorkspaceOptionsLoading,
-      resetLauncherPosition,
-      selectedProjectId,
-      selectedWorkspace?.name,
-      workspaceOptions.length,
-      workspaceSelectorOptions,
-    ]
+    [resetLauncherPosition]
   );
 
   useFrontendTool(

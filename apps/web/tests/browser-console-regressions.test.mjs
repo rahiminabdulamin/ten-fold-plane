@@ -155,3 +155,14 @@ test("Copilot workspace selector presents its menu as part of the trigger", asyn
     /optionsClassName="!left-4 w-full min-w-full rounded-md border-subtle bg-surface-1 p-2 shadow-lg"/
   );
 });
+
+test("selecting a workspace does not replace the Copilot sidebar header", async () => {
+  const copilot = await read("core/components/copilot/root.tsx");
+
+  assert.match(copilot, /const workspaceSelectorStateRef = useRef\(/);
+  assert.match(
+    copilot,
+    /isWorkspaceOptionsLoading: selectorIsWorkspaceOptionsLoading,[\s\S]*selectedProjectId: selectorProjectId,[\s\S]*selectedWorkspace: selectorWorkspace,[\s\S]*workspaceOptions: selectorWorkspaceOptions,[\s\S]*workspaceSelectorOptions: selectorOptions/
+  );
+  assert.match(copilot, /const sidebarHeader = useMemo\([\s\S]*?\[resetLauncherPosition\]\n\s*\);/);
+});
