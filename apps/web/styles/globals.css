@@ -109,6 +109,11 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   font-size: 13px;
 }
 
+[data-copilotkit],
+[data-copilotkit] * {
+  line-height: 1.15 !important;
+}
+
 [data-copilotkit] [data-streamdown] {
   font-size: 13px;
   line-height: 1.15;
@@ -204,6 +209,20 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
 [data-copilot-sidebar] [data-testid="copilot-assistant-message"] > div {
   margin-block: 0 !important;
   padding-block: 0 !important;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-tool-activity"] {
+  margin-block: 0.25rem !important;
+  margin-inline: 0.625rem !important;
+  color: var(--text-color-tertiary);
+}
+
+[data-copilot-sidebar] [data-testid="copilot-tool-activity"] > summary {
+  cursor: pointer;
+}
+
+[data-copilot-sidebar] [data-testid="copilot-tool-activity"] > div {
+  padding-top: 0.25rem;
 }
 
 [data-copilot-sidebar] [data-testid="copilot-assistant-message"]:has(> div:only-child > div:only-child:empty) {

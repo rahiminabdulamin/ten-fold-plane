@@ -6,7 +6,7 @@ import {
   useHumanInTheLoop,
 } from "@copilotkit/react-core/v2";
 import { API_BASE_URL } from "@plane/constants";
-import type { ICustomSearchSelectOption } from "@plane/types";
+import { EIssuesStoreType, type ICustomSearchSelectOption } from "@plane/types";
 import { CustomSearchSelect } from "@plane/ui";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
@@ -21,6 +21,7 @@ import { ProjectService } from "@/services/project";
 import { WorkspaceService } from "@/services/workspace.service";
 import { SpreadsheetService } from "@/services/spreadsheet.service";
 import { useUser } from "@/hooks/store/user";
+import { useIssues } from "@/hooks/store/use-issues";
 import { getRetryDelay } from "@/lib/retry-delay";
 
 import {
@@ -37,6 +38,7 @@ import {
   normalizeRecurringWorkItemInput,
   RECURRENCE_WEEKDAYS,
   type ToolResult,
+  type WorkItemMutation,
   toWorkItemPayload,
   toWorkItemRecords,
   toolError,
@@ -172,24 +174,40 @@ const MonthEventsActivity = ({ month, year, total, events }: MonthEventsData) =>
   );
 };
 
+const ToolActivity = ({ children, status }: { children: React.ReactNode; status?: string }) => (
+  <details data-testid="copilot-tool-activity" data-status={status}>
+    <summary>Tool activity</summary>
+    <div>{children}</div>
+  </details>
+);
+
 const renderToolActivity =
   (activity: string) =>
   ({ status, result }: { status: string; result?: unknown }) => {
     if (status === "complete") {
       const parsed = parseToolActivityResult(result);
-      if (parsed?.ok && isMonthEventsData(parsed.data)) return <MonthEventsActivity {...parsed.data} />;
+      if (parsed?.ok && isMonthEventsData(parsed.data))
+        return (
+          <ToolActivity status="complete">
+            <MonthEventsActivity {...parsed.data} />
+          </ToolActivity>
+        );
       if (parsed?.ok && parsed.operation === "find_project") return null;
       return (
-        <p data-testid="copilot-tool-activity" data-status="complete" className="my-1 text-13 text-tertiary">
-          <span className="font-medium">{parsed?.ok ? "Completed" : "Needs attention"}</span>
-          {parsed?.message && ` — ${parsed.message}`}
-        </p>
+        <ToolActivity status="complete">
+          <p className="text-13 text-tertiary">
+            <span className="font-medium">{parsed?.ok ? "Completed" : "Needs attention"}</span>
+            {parsed?.message && ` — ${parsed.message}`}
+          </p>
+        </ToolActivity>
       );
     }
     return (
-      <p data-testid="copilot-tool-activity" role="status" className="my-1 text-13 text-tertiary">
-        {activity}
-      </p>
+      <ToolActivity status={status}>
+        <p role="status" className="text-13 text-tertiary">
+          {activity}
+        </p>
+      </ToolActivity>
     );
   };
 
@@ -397,6 +415,7 @@ function WorkspaceSelectorHeader({
 function PlaneTools() {
   const { workspaceSlug, projectId, spreadsheetId } = useParams();
   const { data: user } = useUser();
+  const { issues: projectIssues } = useIssues(EIssuesStoreType.PROJECT);
   const workspace = typeof workspaceSlug === "string" ? workspaceSlug : "";
   const [workspaceOptions, setWorkspaceOptions] = useState<WorkspaceOption[]>([]);
   const [isWorkspaceOptionsLoading, setIsWorkspaceOptionsLoading] = useState(false);
@@ -469,6 +488,15 @@ function PlaneTools() {
         ),
       })),
     [workspaceOptions]
+  );
+  const createActiveWorkItem = useCallback(
+    (targetProjectId: string, input: WorkItemMutation) => {
+      const payload = toWorkItemPayload(input);
+      return targetProjectId === projectId
+        ? projectIssues.createIssue(workspace, targetProjectId, payload)
+        : issueService.createIssue(workspace, targetProjectId, payload);
+    },
+    [projectId, projectIssues, workspace]
   );
   useAgentContext({
     description: "The selected UI Workspace is the authoritative default for unqualified work-item requests.",
@@ -966,7 +994,7 @@ function PlaneTools() {
           mutationFingerprint("create_work_item", workspace, targetProjectId, input),
           async () => {
             try {
-              const issue = await issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(input));
+              const issue = await createActiveWorkItem(targetProjectId, input);
               if (!isCanonicalRecord(issue)) return toolUncertainResult("create_work_item");
               return {
                 ...toolResult("create_work_item", `Created ${issue.name}.`, [issue.id]),
@@ -981,7 +1009,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, selectedProjectId]
+    [workspace, selectedProjectId, createActiveWorkItem]
   );
 
   useFrontendTool(
@@ -1006,7 +1034,7 @@ function PlaneTools() {
           mutationFingerprint("create_work_items", workspace, targetProjectId, items),
           async () => {
             const results = await createWorkItemsSequentially(items, async (item) =>
-              issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(item))
+              createActiveWorkItem(targetProjectId, item)
             );
             const created = results.created
               .filter(({ value }) => isCanonicalRecord(value))
@@ -1038,7 +1066,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, selectedProjectId]
+    [workspace, selectedProjectId, createActiveWorkItem]
   );
 
   useFrontendTool(
@@ -1084,7 +1112,7 @@ function PlaneTools() {
           mutationFingerprint("create_recurring_work_items", workspace, targetProjectId, series),
           async () => {
             const results = await createWorkItemsSequentially(items, async (item) =>
-              issueService.createIssue(workspace, targetProjectId, toWorkItemPayload(item))
+              createActiveWorkItem(targetProjectId, item)
             );
             const created = results.created
               .filter(({ value }) => isCanonicalRecord(value))
@@ -1120,7 +1148,7 @@ function PlaneTools() {
         return finishTool(result, startedAt, correlationId);
       },
     },
-    [workspace, selectedProjectId]
+    [workspace, selectedProjectId, createActiveWorkItem]
   );
 
   useFrontendTool(

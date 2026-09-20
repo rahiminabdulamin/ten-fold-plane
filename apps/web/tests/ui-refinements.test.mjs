@@ -76,6 +76,8 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
   assert.match(copilot, /const sidebarToggleButton = useMemo/);
   assert.match(copilot, /const renderToolActivity\s*=/);
   assert.match(copilot, /data-testid="copilot-tool-activity"/);
+  assert.match(copilot, /<details data-testid="copilot-tool-activity"/);
+  assert.match(copilot, /<summary>Tool activity<\/summary>/);
   assert.match(copilot, /const parseToolActivityResult = \(result: unknown\)/);
   assert.match(copilot, /status === "complete"/);
   assert.match(copilot, /JSON\.parse\(result\)/);
@@ -140,6 +142,11 @@ test("UI refinements preserve Home, assistant, and page consistency contracts", 
     styles,
     /\[data-copilotkit\] \[data-testid\^="copilot-"\]\[data-testid\$="-message"\][\s\S]*font-size:\s*13px/
   );
+  assert.match(
+    styles,
+    /\[data-copilot-sidebar\] \[data-testid="copilot-tool-activity"\][\s\S]*margin-inline:\s*0\.625rem !important/
+  );
+  assert.match(styles, /\[data-copilotkit\],\s*\[data-copilotkit\] \*[\s\S]*line-height:\s*1\.15 !important/);
   assert.match(
     styles,
     /\[data-copilot-sidebar\] \.copilot-user-message,\s*\[data-copilot-sidebar\] \.copilot-user-message \*[\s\S]*font-size:\s*13px !important/

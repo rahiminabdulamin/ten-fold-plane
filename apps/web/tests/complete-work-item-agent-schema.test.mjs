@@ -66,3 +66,13 @@ test("the assistant routes mutations through reliability controls", async () => 
   assert.match(root, /toolPartialResult\(/);
   assert.match(root, /\{ mutation: true \}/);
 });
+
+test("copilot work-item creation updates the active project store", async () => {
+  const root = await read("core/components/copilot/root.tsx");
+
+  assert.match(root, /useIssues\(EIssuesStoreType\.PROJECT\)/);
+  assert.match(root, /const createActiveWorkItem = useCallback/);
+  assert.match(root, /projectIssues\.createIssue\(workspace, targetProjectId, payload\)/);
+  assert.match(root, /createActiveWorkItem\(targetProjectId, input\)/);
+  assert.match(root, /createActiveWorkItem\(targetProjectId, item\)/);
+});
