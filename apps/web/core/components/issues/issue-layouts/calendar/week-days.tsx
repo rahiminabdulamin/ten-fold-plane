@@ -16,6 +16,7 @@ import type { IModuleIssuesFilter } from "@/store/issue/module";
 import type { IProjectIssuesFilter } from "@/store/issue/project";
 import type { IProjectViewIssuesFilter } from "@/store/issue/project-views";
 import type { TRenderQuickActions } from "../list/list-view-types";
+import { getCalendarIssueIdsByDate } from "./calendar-range";
 import { CalendarDayTile } from "./day-tile";
 
 type Props = {
@@ -74,6 +75,8 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
 
   if (!week) return null;
 
+  const issueIdsByDate = getCalendarIssueIdsByDate(issues ?? {}, Object.keys(week));
+
   const shouldShowDay = (dayDate: Date) => {
     if (showWeekends) return true;
     const day = dayDate.getDay();
@@ -101,7 +104,7 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
             key={renderFormattedPayloadDate(date.date)}
             date={date}
             issues={issues}
-            groupedIssueIds={groupedIssueIds}
+            groupedIssueIds={{ ...groupedIssueIds, ...issueIdsByDate }}
             loadMoreIssues={loadMoreIssues}
             getPaginationData={getPaginationData}
             getGroupIssueCount={getGroupIssueCount}

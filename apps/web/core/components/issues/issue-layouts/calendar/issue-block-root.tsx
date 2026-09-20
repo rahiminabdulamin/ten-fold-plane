@@ -19,6 +19,7 @@ import { CalendarIssueBlock } from "./issue-block";
 
 type Props = {
   issueId: string;
+  calendarDate: string;
   quickActions: TRenderQuickActions;
   isDragDisabled: boolean;
   isEpic?: boolean;
@@ -26,7 +27,7 @@ type Props = {
 };
 
 export const CalendarIssueBlockRoot = observer(function CalendarIssueBlockRoot(props: Props) {
-  const { issueId, quickActions, isDragDisabled, isEpic = false, canEditProperties } = props;
+  const { issueId, calendarDate, quickActions, isDragDisabled, isEpic = false, canEditProperties } = props;
 
   const issueRef = useRef<HTMLAnchorElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -57,7 +58,7 @@ export const CalendarIssueBlockRoot = observer(function CalendarIssueBlockRoot(p
         },
       })
     );
-  }, [issueRef?.current, issue, canDrag]);
+  }, [issue, canDrag]);
 
   useOutsideClickDetector(issueRef, () => {
     issueRef?.current?.classList?.remove(HIGHLIGHT_CLASS);
@@ -69,6 +70,7 @@ export const CalendarIssueBlockRoot = observer(function CalendarIssueBlockRoot(p
     <CalendarIssueBlock
       isDragging={isDragging}
       issue={issue}
+      calendarDate={calendarDate}
       quickActions={quickActions}
       ref={issueRef}
       isEpic={isEpic}

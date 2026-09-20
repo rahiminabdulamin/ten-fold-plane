@@ -13,7 +13,7 @@ import { useOutsideClickDetector } from "@plane/hooks";
 import { Popover } from "@plane/propel/popover";
 import type { TIssue } from "@plane/types";
 import { ControlLink } from "@plane/ui";
-import { cn, generateWorkItemLink } from "@plane/utils";
+import { cn, generateWorkItemLink, renderFormattedPayloadDate } from "@plane/utils";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useIssues } from "@/hooks/store/use-issues";
@@ -31,6 +31,7 @@ import type { CalendarStoreType } from "./base-calendar-root";
 
 type Props = {
   issue: TIssue;
+  calendarDate: string;
   quickActions: TRenderQuickActions;
   isDragging?: boolean;
   isEpic?: boolean;
@@ -38,7 +39,7 @@ type Props = {
 
 export const CalendarIssueBlock = observer(
   forwardRef(function CalendarIssueBlock(props: Props, ref: React.ForwardedRef<HTMLAnchorElement>) {
-    const { issue, quickActions, isDragging = false, isEpic = false } = props;
+    const { issue, calendarDate, quickActions, isDragging = false, isEpic = false } = props;
     // states
     const [isMenuActive, setIsMenuActive] = useState(false);
     // refs
@@ -56,6 +57,16 @@ export const CalendarIssueBlock = observer(
 
     const stateColor = getProjectStates(issue?.project_id)?.find((state) => state?.id == issue?.state_id)?.color || "";
     const projectIdentifier = getProjectIdentifierById(issue?.project_id);
+    const startDate = renderFormattedPayloadDate(issue.start_date);
+    const dueDate = renderFormattedPayloadDate(issue.target_date);
+    const isDateRange = !!startDate && !!dueDate && startDate !== dueDate;
+    const rangePosition = !isDateRange
+      ? "single"
+      : calendarDate === startDate
+        ? "start"
+        : calendarDate === dueDate
+          ? "end"
+          : "middle";
 
     // handlers
     const handleIssuePeekOverview = (peekIssue: TIssue) =>
@@ -104,7 +115,15 @@ export const CalendarIssueBlock = observer(
               id={`issue-${issue.id}`}
               href={workItemLink}
               onClick={() => handleIssuePeekOverview(issue)}
-              className="block w-full rounded-sm border-b border-subtle text-13 text-primary hover:border-subtle-1 md:border-[1px]"
+              className={cn(
+                "block w-full border-b border-subtle text-13 text-primary hover:border-subtle-1 md:border-[1px]",
+                {
+                  "rounded-sm": rangePosition === "single",
+                  "rounded-l-sm": rangePosition === "start",
+                  "rounded-r-sm": rangePosition === "end",
+                  "md:-mx-2 md:w-[calc(100%+1rem)]": isDateRange,
+                }
+              )}
               disabled={!!issue?.tempId || isMobile}
               ref={ref}
             >
@@ -116,8 +135,11 @@ export const CalendarIssueBlock = observer(
                 <div
                   ref={blockRef}
                   className={cn(
-                    "group/calendar-block flex h-10 w-full items-center justify-between gap-1.5 rounded-sm px-4 py-1.5 md:h-8 md:px-1",
+                    "group/calendar-block flex h-10 w-full items-center justify-between gap-1.5 px-4 py-1.5 md:h-8 md:px-1",
                     {
+                      "rounded-sm": rangePosition === "single",
+                      "rounded-l-sm": rangePosition === "start",
+                      "rounded-r-sm": rangePosition === "end",
                       "border-accent-strong bg-surface-2 shadow-raised-200": isDragging,
                       "bg-surface-1 hover:bg-surface-2": !isDragging,
                       "border border-accent-strong hover:border-accent-strong": getIsIssuePeeked(issue.id),

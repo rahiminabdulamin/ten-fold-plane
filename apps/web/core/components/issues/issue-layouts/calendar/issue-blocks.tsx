@@ -74,6 +74,7 @@ export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: 
         <div key={issueId} className="relative cursor-pointer p-1 px-2">
           <CalendarIssueBlockRoot
             issueId={issueId}
+            calendarDate={formattedDatePayload}
             quickActions={quickActions}
             isDragDisabled={isDragDisabled || isMobileView}
             canEditProperties={canEditProperties}
