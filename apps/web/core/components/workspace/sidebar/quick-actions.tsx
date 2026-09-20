@@ -79,6 +79,7 @@ export const SidebarQuickActions = observer(function SidebarQuickActions() {
       />
       <div className="flex cursor-pointer items-center justify-between gap-2">
         <SidebarAddButton
+          className="w-full border-0 bg-[#006196] text-white"
           label={
             <>
               <AddWorkItemOutline className="size-4" />

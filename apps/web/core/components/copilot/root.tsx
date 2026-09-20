@@ -12,6 +12,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { z } from "zod";
 import { useParams } from "react-router";
 
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-001.png?url";
 import { IssueService } from "@/services/issue";
 import { IssueLabelService } from "@/services/issue/issue_label.service";
 import { EstimateService } from "@/services/estimate.service";
@@ -1446,6 +1447,19 @@ function PlaneTools() {
         position="right"
         width="var(--copilot-panel-width)"
         toggleButton={sidebarToggleButton}
+        welcomeScreen={({ input, suggestionView }) => (
+          <div className="flex h-full flex-col">
+            <div className="flex flex-1 items-center justify-center px-4">
+              <img src={tenfoldClipart} alt="" className="h-auto w-[70%] opacity-30" />
+            </div>
+            <div className="px-8 pb-4">
+              <div className="mx-auto max-w-3xl">
+                <div className="mb-4 flex justify-center">{suggestionView}</div>
+                {input}
+              </div>
+            </div>
+          </div>
+        )}
       />
       <div
         className="copilot-panel-resize-handle"
