@@ -21,7 +21,7 @@ import {
 // components
 import { ExtendedSidebarItem } from "@/components/workspace/sidebar/extended-sidebar-item";
 import { ExtendedSidebarWrapper } from "./extended-sidebar-wrapper";
-import { getPersonalExtendedSidebarItems } from "./extended-sidebar.helpers";
+import { getPersonalExtendedSidebarItems } from "@/components/workspace/sidebar/extended-sidebar.helpers";
 
 export const ExtendedAppSidebar = observer(function ExtendedAppSidebar() {
   // refs
