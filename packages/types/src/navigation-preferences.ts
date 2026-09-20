@@ -53,8 +53,8 @@ export interface TNavigationPreferences {
 export const DEFAULT_PERSONAL_PREFERENCES: TPersonalNavigationPreferences = {
   items: {
     stickies: { enabled: false, sort_order: 0 },
-    your_work: { enabled: true, sort_order: 1 },
-    drafts: { enabled: true, sort_order: 2 },
+    your_work: { enabled: false, sort_order: 1 },
+    drafts: { enabled: false, sort_order: 2 },
   },
 };
 
