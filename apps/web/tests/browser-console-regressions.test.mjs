@@ -159,10 +159,8 @@ test("Copilot workspace selector presents its menu as part of the trigger", asyn
 test("selecting a workspace does not replace the Copilot sidebar header", async () => {
   const copilot = await read("core/components/copilot/root.tsx");
 
-  assert.match(copilot, /const workspaceSelectorStateRef = useRef\(/);
-  assert.match(
-    copilot,
-    /isWorkspaceOptionsLoading: selectorIsWorkspaceOptionsLoading,[\s\S]*selectedProjectId: selectorProjectId,[\s\S]*selectedWorkspace: selectorWorkspace,[\s\S]*workspaceOptions: selectorWorkspaceOptions,[\s\S]*workspaceSelectorOptions: selectorOptions/
-  );
-  assert.match(copilot, /const sidebarHeader = useMemo\([\s\S]*?\[resetLauncherPosition\]\n\s*\);/);
+  assert.match(copilot, /const WorkspaceSelectorContext = createContext/);
+  assert.match(copilot, /function WorkspaceSelectorHeader/);
+  assert.match(copilot, /<WorkspaceSelectorContext\.Provider value=\{workspaceSelectorContextValue\}>/);
+  assert.match(copilot, /const sidebarHeader = useMemo\(\(\) => \(\{ children: WorkspaceSelectorHeader \}\), \[\]\);/);
 });
