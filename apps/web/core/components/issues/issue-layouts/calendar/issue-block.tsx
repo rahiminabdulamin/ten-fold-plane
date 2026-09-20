@@ -12,12 +12,10 @@ import { MoreHorizontalOutline } from "@makeplane/propel/icons";
 import { useOutsideClickDetector } from "@plane/hooks";
 import { Popover } from "@plane/propel/popover";
 import type { TIssue } from "@plane/types";
-import { ControlLink } from "@plane/ui";
-import { cn, generateWorkItemLink, renderFormattedPayloadDate } from "@plane/utils";
+import { cn, renderFormattedPayloadDate } from "@plane/utils";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useIssues } from "@/hooks/store/use-issues";
-import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
 import { useIssueStoreType } from "@/hooks/use-issue-layout-store";
 import useIssuePeekOverviewRedirection from "@/hooks/use-issue-peek-overview-redirection";
@@ -38,7 +36,7 @@ type Props = {
 };
 
 export const CalendarIssueBlock = observer(
-  forwardRef(function CalendarIssueBlock(props: Props, ref: React.ForwardedRef<HTMLAnchorElement>) {
+  forwardRef(function CalendarIssueBlock(props: Props, ref: React.ForwardedRef<HTMLDivElement>) {
     const { issue, calendarDate, quickActions, isDragging = false, isEpic = false } = props;
     // states
     const [isMenuActive, setIsMenuActive] = useState(false);
@@ -53,10 +51,8 @@ export const CalendarIssueBlock = observer(
     const { isMobile } = usePlatformOS();
     const storeType = useIssueStoreType() as CalendarStoreType;
     const { issuesFilter } = useIssues(storeType);
-    const { getProjectIdentifierById } = useProject();
 
     const stateColor = getProjectStates(issue?.project_id)?.find((state) => state?.id == issue?.state_id)?.color || "";
-    const projectIdentifier = getProjectIdentifierById(issue?.project_id);
     const startDate = renderFormattedPayloadDate(issue.start_date);
     const dueDate = renderFormattedPayloadDate(issue.target_date);
     const isDateRange = !!startDate && !!dueDate && startDate !== dueDate;
@@ -96,25 +92,13 @@ export const CalendarIssueBlock = observer(
 
     const placement = isMenuActionRefAboveScreenBottom ? "bottom-end" : "top-end";
 
-    const workItemLink = generateWorkItemLink({
-      workspaceSlug: workspaceSlug?.toString(),
-      projectId: issue?.project_id,
-      issueId: issue?.id,
-      projectIdentifier,
-      sequenceId: issue?.sequence_id,
-      isEpic,
-      isArchived: !!issue?.archived_at,
-    });
-
     return (
       <Popover delay={100} openOnHover>
         <Popover.Button
           className="w-full"
           render={
-            <ControlLink
+            <div
               id={`issue-${issue.id}`}
-              href={workItemLink}
-              onClick={() => handleIssuePeekOverview(issue)}
               className={cn(
                 "block w-full border-b border-subtle text-13 text-primary hover:border-subtle-1 md:border-[1px]",
                 {
@@ -124,7 +108,6 @@ export const CalendarIssueBlock = observer(
                   "md:-mx-2 md:w-[calc(100%+1rem)]": isDateRange,
                 }
               )}
-              disabled={!!issue?.tempId || isMobile}
               ref={ref}
             >
               <>
@@ -185,19 +168,21 @@ export const CalendarIssueBlock = observer(
                   </div>
                 </div>
               </>
-            </ControlLink>
+            </div>
           }
         />
         <Popover.Panel side="bottom" align="start">
           <>
             {issue.project_id && (
-              <WorkItemPreviewCard
-                projectId={issue.project_id}
-                stateDetails={{
-                  id: issue.state_id ?? undefined,
-                }}
-                workItem={issue}
-              />
+              <button type="button" className="block text-left" onClick={() => handleIssuePeekOverview(issue)}>
+                <WorkItemPreviewCard
+                  projectId={issue.project_id}
+                  stateDetails={{
+                    id: issue.state_id ?? undefined,
+                  }}
+                  workItem={issue}
+                />
+              </button>
             )}
           </>
         </Popover.Panel>

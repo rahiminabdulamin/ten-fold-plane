@@ -12,6 +12,7 @@ import { useTranslation } from "@plane/i18n";
 import { EmptyStateDetailed } from "@plane/propel/empty-state";
 import { EUserProjectRoles } from "@plane/types";
 // components
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-005.png?url";
 import { ListLayout } from "@/components/core/list";
 import { ViewListLoader } from "@/components/ui/loader/view-list-loader";
 // hooks
@@ -63,7 +64,7 @@ export const ProjectViewsList = observer(function ProjectViewsList() {
         </div>
       ) : (
         <EmptyStateDetailed
-          assetKey="view"
+          asset={<img src={tenfoldClipart} alt="" className="w-80 max-w-none shrink-0 opacity-30" />}
           title={t("project_empty_state.views.title")}
           description={t("project_empty_state.views.description")}
           actions={[

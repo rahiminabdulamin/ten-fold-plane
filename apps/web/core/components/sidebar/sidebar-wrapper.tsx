@@ -46,6 +46,11 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [windowSize]);
 
+  const handleCustomizeNavigation = () => {
+    if (window.innerWidth < 768) toggleSidebar(true);
+    setIsCustomizeNavDialogOpen(true);
+  };
+
   return (
     <>
       <CustomizeNavigationDialog isOpen={isCustomizeNavDialogOpen} onClose={() => setIsCustomizeNavDialogOpen(false)} />
@@ -61,12 +66,7 @@ export const SidebarWrapper = observer(function SidebarWrapper(props: TSidebarWr
             )}
             <div className="flex items-center gap-2">
               {showTeamSelector && (
-                <IconButton
-                  size="base"
-                  variant="ghost"
-                  icon={PreferencesOutline}
-                  onClick={() => setIsCustomizeNavDialogOpen(true)}
-                />
+                <IconButton size="base" variant="ghost" icon={PreferencesOutline} onClick={handleCustomizeNavigation} />
               )}
               <AppSidebarToggleButton />
             </div>

@@ -23,10 +23,11 @@ type TIssueProjectSelectProps = {
   control: Control<TIssue>;
   disabled?: boolean;
   handleFormChange: () => void;
+  projectIds?: string[];
 };
 
 export const IssueProjectSelect = observer(function IssueProjectSelect(props: TIssueProjectSelectProps) {
-  const { control, disabled = false, handleFormChange } = props;
+  const { control, disabled = false, handleFormChange, projectIds } = props;
   // store hooks
   const { isMobile } = usePlatformOS();
   // context hooks
@@ -42,8 +43,9 @@ export const IssueProjectSelect = observer(function IssueProjectSelect(props: TI
         required: true,
       }}
       render={({ field: { value, onChange } }) => (
-        <div className="h-7">
+        <div className="h-7 min-w-0">
           <ProjectDropdown
+            projectIds={projectIds}
             value={value}
             onChange={(projectId) => {
               onChange(projectId);
@@ -51,7 +53,9 @@ export const IssueProjectSelect = observer(function IssueProjectSelect(props: TI
             }}
             multiple={false}
             buttonVariant="border-with-text"
-            renderCondition={(projectId) => allowedProjectIds.includes(projectId)}
+            renderCondition={(projectId) =>
+              projectIds ? projectIds.includes(projectId) : allowedProjectIds.includes(projectId)
+            }
             tabIndex={getIndex("project_id")}
             disabled={disabled}
           />

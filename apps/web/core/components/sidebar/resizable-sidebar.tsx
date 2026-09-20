@@ -146,13 +146,13 @@ export function ResizableSidebar({
     if (!isAnySidebarDropdownOpen && isCollapsed && isHoveringTrigger) {
       handlePeekLeave();
     }
-  }, [isAnySidebarDropdownOpen]);
+  }, [isAnySidebarDropdownOpen, isCollapsed, isHoveringTrigger, handlePeekLeave]);
 
   useEffect(() => {
     if (!isAnyExtendedSidebarExpanded && isCollapsed && isHoveringTrigger) {
       handlePeekLeave();
     }
-  }, [isAnyExtendedSidebarExpanded]);
+  }, [isAnyExtendedSidebarExpanded, isCollapsed, isHoveringTrigger, handlePeekLeave]);
 
   // Reset peek when sidebar is expanded
   useEffect(() => {
@@ -176,6 +176,14 @@ export function ResizableSidebar({
 
   return (
     <>
+      {!isCollapsed && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className="fixed top-10 right-0 bottom-0 left-0 z-[30] bg-black/40 md:hidden"
+          onClick={toggleCollapsed}
+        />
+      )}
       {/* Main Sidebar */}
       <div
         id="main-sidebar"
@@ -183,7 +191,7 @@ export function ResizableSidebar({
           "z-20 h-full border-r border-subtle bg-surface-1",
           !isResizing && "transition-all duration-300 ease-in-out",
           isCollapsed ? "w-0 translate-x-[-100%] opacity-0" : "translate-x-0 opacity-100",
-          isMobile && "fixed top-10 bottom-0 left-0 z-[40]",
+          "fixed top-10 bottom-0 left-0 z-[40] md:relative md:inset-auto md:z-20",
           className
         )}
         style={{
@@ -263,7 +271,7 @@ export function ResizableSidebar({
       </div>
 
       {/* Extended Sidebar */}
-      {extendedSidebar && extendedSidebar}
+      {extendedSidebar}
     </>
   );
 }

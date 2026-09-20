@@ -35,6 +35,7 @@ import {
   IssueParentTag,
   IssueProjectSelect,
   IssueTitleInput,
+  IssueWorkspaceSelect,
 } from "@/components/issues/issue-modal/components";
 // helpers
 // hooks
@@ -55,7 +56,11 @@ export interface IssueFormProps {
   onChange?: (formData: Partial<TIssue> | null) => void;
   onClose: () => void;
   onSubmit: (values: Partial<TIssue>, is_draft_issue?: boolean) => Promise<void>;
-  projectId: string;
+  projectId: string | null;
+  selectedWorkspaceSlug?: string;
+  availableProjectIds?: string[];
+  isWorkspaceSwitchable?: boolean;
+  onWorkspaceChange?: (workspaceSlug: string) => void;
   isDraft: boolean;
   moveToIssue?: boolean;
   modalTitle?: string;
@@ -81,6 +86,10 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
     onClose,
     onSubmit,
     projectId: defaultProjectId,
+    selectedWorkspaceSlug = "",
+    availableProjectIds,
+    isWorkspaceSwitchable = false,
+    onWorkspaceChange,
     isCreateMoreToggleEnabled,
     onCreateMoreToggleChange,
     isDraft,
@@ -107,6 +116,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
 
   // router
   const { workspaceSlug, projectId: routeProjectId } = useParams();
+  const effectiveWorkspaceSlug = isWorkspaceSwitchable ? selectedWorkspaceSlug : workspaceSlug?.toString();
 
   // store hooks
   const { getProjectById } = useProject();
@@ -150,7 +160,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
   const projectId = watch("project_id");
   const activeAdditionalPropertiesLength = getActiveAdditionalPropertiesLength({
     projectId: projectId,
-    workspaceSlug: workspaceSlug?.toString(),
+    workspaceSlug: effectiveWorkspaceSlug,
     watch: watch,
   });
 
@@ -170,10 +180,22 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
         reset(getUpdateFormDataForReset(projectId, getValues()));
       }
     }
-    if (projectId && routeProjectId !== projectId) fetchCycles(workspaceSlug?.toString(), projectId);
+    if (projectId && routeProjectId !== projectId) fetchCycles(effectiveWorkspaceSlug, projectId);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
+
+  useEffect(() => {
+    if (!isWorkspaceSwitchable) return;
+    const current = getValues();
+    reset({
+      ...DEFAULT_WORK_ITEM_FORM_VALUES,
+      name: current.name,
+      description_html: current.description_html,
+      project_id: defaultProjectId,
+    });
+    setSelectedParentIssue(null);
+  }, [selectedWorkspaceSlug, defaultProjectId, getValues, isWorkspaceSwitchable, reset, setSelectedParentIssue]);
 
   // Reset form when data prop changes
   useEffect(() => {
@@ -223,7 +245,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
     if (
       !handlePropertyValuesValidation({
         projectId: projectId,
-        workspaceSlug: workspaceSlug?.toString(),
+        workspaceSlug: effectiveWorkspaceSlug ?? "",
         watch: watch,
       })
     )
@@ -361,15 +383,26 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
           >
             <div className="rounded-t-lg bg-surface-1 p-5">
               <h3 className="pb-2 text-h4-medium text-secondary">{modalTitle}</h3>
-              <div className="flex items-center justify-between pt-2 pb-4">
-                <div className="flex items-center gap-x-1">
-                  <IssueProjectSelect
-                    control={control}
-                    disabled={!!data?.id || !!data?.sourceIssueId || isProjectSelectionDisabled}
-                    handleFormChange={handleFormChange}
+              <div className="flex flex-wrap items-center gap-2 pt-1 pb-4">
+                {isWorkspaceSwitchable && onWorkspaceChange && (
+                  <IssueWorkspaceSelect
+                    value={selectedWorkspaceSlug}
+                    onChange={onWorkspaceChange}
+                    disabled={isSubmitting}
                   />
-                </div>
+                )}
+                <IssueProjectSelect
+                  control={control}
+                  projectIds={availableProjectIds}
+                  disabled={!!data?.id || !!data?.sourceIssueId || isProjectSelectionDisabled || !projectId}
+                  handleFormChange={handleFormChange}
+                />
               </div>
+              {isWorkspaceSwitchable && availableProjectIds?.length === 0 && (
+                <p role="status" className="pb-4 text-11 text-secondary">
+                  No projects in this workspace allow you to create work items.
+                </p>
+              )}
               {watch("parent_id") && selectedParentIssue && (
                 <div className="pb-4">
                   <IssueParentTag
@@ -406,7 +439,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
                   editorRef={editorRef}
                   submitBtnRef={submitBtnRef}
                   gptAssistantModal={gptAssistantModal}
-                  workspaceSlug={workspaceSlug?.toString()}
+                  workspaceSlug={effectiveWorkspaceSlug}
                   projectId={projectId}
                   handleFormChange={handleFormChange}
                   handleDescriptionHTMLDataChange={(description_html) =>
@@ -430,7 +463,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
                   control={control}
                   id={data?.id}
                   projectId={projectId}
-                  workspaceSlug={workspaceSlug?.toString()}
+                  workspaceSlug={effectiveWorkspaceSlug ?? ""}
                   selectedParentIssue={selectedParentIssue}
                   startDate={watch("start_date")}
                   targetDate={watch("target_date")}
@@ -490,7 +523,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
                         type="submit"
                         ref={submitBtnRef}
                         loading={isSubmitting}
-                        disabled={isDisabled}
+                        disabled={!projectId || isDisabled}
                       >
                         {isSubmitting ? primaryButtonText.loading : primaryButtonText.default}
                       </Button>

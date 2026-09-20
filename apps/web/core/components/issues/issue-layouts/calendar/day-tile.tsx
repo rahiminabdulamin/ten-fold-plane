@@ -32,6 +32,8 @@ type Props = {
   date: ICalendarDate;
   issues: TIssueMap | undefined;
   groupedIssueIds: TGroupedIssues;
+  issueRowById: Record<string, number>;
+  issueRowCount: number;
   loadMoreIssues: (dateString: string) => void;
   getPaginationData: (groupId: string | undefined) => TPaginationData | undefined;
   getGroupIssueCount: (groupId: string | undefined) => number | undefined;
@@ -59,6 +61,8 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
     date,
     issues,
     groupedIssueIds,
+    issueRowById,
+    issueRowCount,
     loadMoreIssues,
     getPaginationData,
     getGroupIssueCount,
@@ -129,11 +133,15 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
         },
       })
     );
-  }, [dayTileRef?.current, formattedDatePayload]);
+  }, [formattedDatePayload, handleDragAndDrop, issues]);
 
   if (!formattedDatePayload) return null;
   const issueIds = groupedIssueIds?.[formattedDatePayload];
-
+  const getAdjacentIssueIds = (offset: number) => {
+    const adjacentDate = new Date(date.date);
+    adjacentDate.setDate(adjacentDate.getDate() + offset);
+    return groupedIssueIds?.[renderFormattedPayloadDate(adjacentDate) ?? ""];
+  };
   const isToday = date.date.toDateString() === new Date().toDateString();
   const isSelectedDate = date.date.toDateString() == selectedDate.toDateString();
 
@@ -196,24 +204,64 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
         </div>
 
         {/* Mobile view content */}
-        <div
+        <button
+          type="button"
           onClick={() => setSelectedDate(date.date)}
           className={cn(
-            "mx-auto flex h-full w-full cursor-pointer flex-col items-center justify-start py-2.5 text-13 font-medium opacity-80 md:hidden",
+            "relative mx-auto flex h-full w-full cursor-pointer flex-col items-center justify-start py-2.5 text-13 font-medium opacity-80 md:hidden",
             {
               "bg-layer-2": !isWeekend,
+              "min-h-14": issueIds?.length > 0,
             }
           )}
+          style={{ minHeight: issueIds?.length ? `${40 + issueRowCount * 16}px` : undefined }}
         >
           <div
             className={cn("flex size-6 items-center justify-center rounded-full", {
-              "bg-accent-primary text-on-color": isSelectedDate,
+              "bg-layer-3 text-primary": isSelectedDate,
               "bg-accent-primary/10 text-accent-primary": isToday && !isSelectedDate,
             })}
           >
             {date.date.getDate()}
           </div>
-        </div>
+          {issueIds?.length > 0 &&
+            issueIds.map((issueId) => {
+              const previousIssueIds = getAdjacentIssueIds(-1);
+              const nextIssueIds = getAdjacentIssueIds(1);
+              const sharesIssueWithPreviousDate = previousIssueIds?.includes(issueId) ?? false;
+              const sharesIssueWithNextDate = nextIssueIds?.includes(issueId) ?? false;
+
+              return (
+                <span
+                  key={issueId}
+                  className={cn("absolute flex h-4 items-center justify-center bg-accent-primary/10", {
+                    "right-0 left-0": sharesIssueWithPreviousDate && sharesIssueWithNextDate,
+                    "right-1/2 left-0 rounded-r-full": sharesIssueWithPreviousDate && !sharesIssueWithNextDate,
+                    "right-0 left-1/2 rounded-l-full": !sharesIssueWithPreviousDate && sharesIssueWithNextDate,
+                    "left-1/2 w-4 -translate-x-1/2 rounded-full":
+                      !sharesIssueWithPreviousDate && !sharesIssueWithNextDate,
+                  })}
+                  data-testid="mobile-calendar-issue-count"
+                  style={{ top: `${36 + (issueRowById[issueId] ?? 0) * 16}px` }}
+                >
+                  {!sharesIssueWithPreviousDate && (
+                    <span
+                      className="absolute left-0 size-3 -translate-x-1/2 rounded-full bg-accent-primary"
+                      data-testid="mobile-calendar-range-start"
+                    />
+                  )}
+                  {!sharesIssueWithPreviousDate && !sharesIssueWithNextDate
+                    ? null
+                    : !sharesIssueWithNextDate && (
+                        <span
+                          className="absolute right-0 size-3 translate-x-1/2 rounded-full bg-accent-primary"
+                          data-testid="mobile-calendar-range-end"
+                        />
+                      )}
+                </span>
+              );
+            })}
+        </button>
       </div>
     </>
   );

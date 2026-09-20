@@ -87,8 +87,26 @@
   }
 }
 
+/* Modal backdrops own the foreground. Keep the assistant and its resize handle
+ * beneath an active dialog so they are dimmed and cannot intercept input. */
+body:has([role="dialog"]) [data-copilot-sidebar],
+body:has([role="dialog"]) .copilot-panel-resize-handle {
+  z-index: 19 !important;
+}
+
 body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-button"] {
   display: none !important;
+}
+
+@media (max-width: 767px) {
+  [data-mobile-chat-armed="false"] [data-copilot-sidebar] {
+    transform: translateX(100%) !important;
+    pointer-events: none !important;
+  }
+
+  [data-mobile-chat-armed="false"] [data-slot="chat-toggle-button"] {
+    display: flex !important;
+  }
 }
 
 [data-slot="chat-toggle-button"] {

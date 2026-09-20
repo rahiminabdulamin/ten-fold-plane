@@ -4,17 +4,15 @@
  * See the LICENSE file for details.
  */
 
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-002.png?url";
+
 export function LogoSpinner() {
   return (
-    <div className="flex flex-col items-center justify-center gap-3">
-      <div className="animate-shimmer rounded-lg">
-        <img
-          src="/branding/tenfold-logo-square-rebrand-loader-v4.png"
-          alt="Ten-Fold"
-          className="h-[66px] w-auto object-contain sm:h-[132px]"
-        />
+    <div className="animate-shimmer flex flex-col items-center justify-center gap-8">
+      <div className="rounded-lg">
+        <img src={tenfoldClipart} alt="" className="w-56 opacity-30 sm:w-72" />
       </div>
-      <p className="animate-shimmer text-sm text-[#BFBFBF]">Please wait...</p>
+      <p className="text-base font-bold text-[#BFBFBF]">Getting you there, hang on...</p>
     </div>
   );
 }

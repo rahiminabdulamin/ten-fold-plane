@@ -18,6 +18,16 @@ test("Ten-Fold defaults to light mode and hides optional planning features", asy
   assert.match(flags, /MODULES: false/);
 });
 
+test("users have a fixed Light theme with no theme preference control", async () => {
+  const [root, preferences] = await Promise.all([
+    read("app/root.tsx"),
+    read("core/components/settings/profile/content/pages/preferences/default-list.tsx"),
+  ]);
+
+  assert.match(root, /<ThemeProvider themes=\{\["light"\]\} defaultTheme="light" forcedTheme="light">/);
+  assert.doesNotMatch(preferences, /ThemeSwitcher/);
+});
+
 test("new instructional projects are named Tutorial", async () => {
   const seedTask = await readFile(new URL("../../api/plane/bgtasks/workspace_seed_task.py", import.meta.url), "utf8");
   assert.match(seedTask, /name="Tutorial"/);
@@ -33,24 +43,31 @@ test("new workspaces use Singapore time and omit restricted settings links", asy
   assert.match(sidebar, /"billing-and-plans", "webhooks"/);
 });
 
-test("Ten-Fold brand marks link home, use the long workspace logo, and label loading states", async () => {
-  const [spinner, authBase, header, topNavigation, createWorkspace] = await Promise.all([
+test("Ten-Fold brand marks use the rebranded assets and label loading states", async () => {
+  const [spinner, authBase, header, topNavigation, createWorkspace, root] = await Promise.all([
     read("core/components/common/logo-spinner.tsx"),
     read("core/components/auth-screens/auth-base.tsx"),
     read("core/components/auth-screens/header.tsx"),
     read("core/components/navigation/top-navigation-root.tsx"),
     read("app/(all)/create-workspace/page.tsx"),
+    read("app/root.tsx"),
   ]);
 
-  assert.match(spinner, /src="\/branding\/tenfold-logo-square-rebrand-loader-v4\.png"/);
-  assert.match(authBase, /src="\/branding\/tenfold-logo-long-rebrand-white-v4\.png"/);
+  assert.match(spinner, /tenfold-clipart-002\.png\?url/);
+  assert.match(authBase, /tenfold-rebrand-logo-white\.png\?url/);
   assert.match(header, /src="\/branding\/tenfold-logo-long-rebrand-v4\.png"/);
-  assert.match(topNavigation, /src="\/branding\/tenfold-logo-long-rebrand-v4\.png"/);
-  assert.match(topNavigation, /<Link href="\/"[^>]*>[\s\S]*tenfold-logo-long-rebrand-v4\.png/);
+  assert.match(topNavigation, /tanfold-rebrand-mobile\.png\?url/);
+  assert.match(topNavigation, /tenfold-rebrand-logo\.png\?url/);
+  assert.match(topNavigation, /<Link href="\/"[^>]*>[\s\S]*src=\{desktopLogo\}/);
   assert.match(createWorkspace, /src="\/branding\/tenfold-logo-long-rebrand-v4\.png"/);
+  assert.match(root, /tanfold-rebrand-favicon\.png\?url/);
+  assert.match(root, /rel: "icon", type: "image\/png", href: favicon/);
   assert.match(spinner, /animate-shimmer/);
-  assert.match(spinner, /Please wait\.\.\./);
+  assert.match(spinner, /Getting you there, hang on\.\.\./);
   assert.match(spinner, /text-\[#BFBFBF\]/);
+  assert.match(spinner, /font-bold/);
+  assert.match(spinner, /opacity-30/);
+  assert.match(spinner, /w-56[\s\S]*sm:w-72/);
 });
 
 test("invitations and onboarding use the Ten-Fold wordmark", async () => {
@@ -86,10 +103,13 @@ test("Ten-Fold removes unavailable onboarding and profile surfaces", async () =>
   assert.match(sidebarWrapper, /href="\/privacy"/);
 });
 
-test("Ten-Fold loader shimmers the square logo instead of spinning", async () => {
+test("Ten-Fold loader shimmers the subdued clipart instead of spinning", async () => {
   const spinner = await read("core/components/common/logo-spinner.tsx");
-  assert.match(spinner, /tenfold-logo-square-rebrand-loader-v4\.png/);
+  assert.match(spinner, /tenfold-clipart-002\.png\?url/);
   assert.match(spinner, /animate-shimmer/);
+  assert.match(spinner, /className="animate-shimmer flex flex-col items-center justify-center gap-8"/);
+  assert.match(spinner, /className="text-base font-bold text-\[#BFBFBF\]"/);
+  assert.equal((spinner.match(/animate-shimmer/g) ?? []).length, 1);
   assert.doesNotMatch(spinner, /animate-spin/);
 });
 
@@ -100,7 +120,7 @@ test("authentication surfaces use Ten-Fold branding without a compact-layout pro
   ]);
 
   assert.match(authBase, /lg:grid-cols-2/);
-  assert.match(authBase, /tenfold-logo-long-rebrand-white-v4\.png/);
+  assert.match(authBase, /tenfold-rebrand-logo-white\.png\?url/);
   assert.match(authBase, /#00364c/);
   assert.match(authBase, /h-16/);
   assert.match(authBase, /dimensions[\s\S]*screenshot-landing\.png[\s\S]*A focused place for teams/);
@@ -123,6 +143,10 @@ test("CopilotKit is a compact resizable Ten-Fold panel below the viewport-wide n
   assert.match(copilot, /position="right"/);
   assert.match(copilot, /width="var\(--copilot-panel-width\)"/);
   assert.match(copilot, /Ten-Fold Assistant/);
+  assert.match(
+    copilot,
+    /<span className="rounded-sm bg-accent-primary\/20 px-1\.5 py-0\.5 text-10 font-medium text-accent-primary">beta<\/span>/
+  );
   assert.match(copilot, /const sidebarHeader = useMemo/);
   assert.match(copilot, /header=\{sidebarHeader\}/);
   assert.match(copilot, /<CopilotKit[\s\S]*showDevConsole=\{false\}/);

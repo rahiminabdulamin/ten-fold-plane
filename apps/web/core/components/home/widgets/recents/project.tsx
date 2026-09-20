@@ -6,7 +6,7 @@
 
 import { useRouter } from "next/navigation";
 // plane types
-import { Logo } from "@plane/propel/emoji-icon-picker";
+import { LayersIcon } from "@plane/propel/icons";
 import type { TActivityEntityData, TProjectEntityData } from "@plane/types";
 import { calculateTimeAgo } from "@plane/utils";
 // components
@@ -35,14 +35,7 @@ export function RecentProject(props: BlockProps) {
       key={activity.id}
       itemLink={projectLink}
       title={projectDetails?.name}
-      prependTitleElement={
-        <div className="flex flex-shrink-0 items-center gap-2">
-          <div className="grid size-8 flex-shrink-0 place-items-center rounded-sm bg-transparent">
-            <Logo logo={projectDetails?.logo_props} size={16} />
-          </div>
-          <div className="text-13 font-medium whitespace-nowrap text-placeholder">{projectDetails?.identifier}</div>
-        </div>
-      }
+      prependTitleElement={<LayersIcon className="size-4 flex-shrink-0 text-placeholder/50" />}
       appendTitleElement={
         <div className="flex-shrink-0 text-11 font-medium text-placeholder">
           {calculateTimeAgo(activity.visited_at)}
@@ -73,7 +66,7 @@ export function RecentProject(props: BlockProps) {
       }
       parentRef={ref}
       disableLink={false}
-      className="my-auto border-none !px-2 py-3"
+      className="my-auto !min-h-0 border-none !px-0 py-1 lg:py-2"
       itemClassName="my-auto"
       onItemClick={(e) => {
         e.preventDefault();

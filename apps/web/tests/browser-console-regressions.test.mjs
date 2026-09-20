@@ -41,6 +41,16 @@ test("the Copilot Web Inspector is disabled without hiding the chat toggle", asy
   assert.match(copilot, /data-testid="copilot-chat-toggle"/);
 });
 
+test("mobile Copilot stays gated until its launcher is pressed", async () => {
+  const [copilot, styles] = await Promise.all([read("core/components/copilot/root.tsx"), read("styles/globals.css")]);
+
+  assert.match(copilot, /const \[isMobileChatArmed, setIsMobileChatArmed\] = useState\(false\)/);
+  assert.match(copilot, /data-mobile-chat-armed=\{isMobileChatArmed\}/);
+  assert.match(copilot, /setIsMobileChatArmed\(true\)/);
+  assert.match(styles, /\[data-mobile-chat-armed="false"\] \[data-copilot-sidebar\]/);
+  assert.match(styles, /\[data-mobile-chat-armed="false"\] \[data-slot="chat-toggle-button"\]/);
+});
+
 test("issue root route synchronization happens inside a MobX action", async () => {
   const store = await read("core/store/issue/root.store.ts");
 

@@ -26,7 +26,10 @@ export function ProfileSettingsSidebarRoot(props: Props) {
       scrollType="hover"
       orientation="vertical"
       size="sm"
-      rootClassName={cn("shrink-0 overflow-y-scroll border-r border-r-subtle bg-surface-2 px-3 py-4", className)}
+      rootClassName={cn(
+        "shrink-0 overflow-y-scroll border-r border-r-subtle bg-surface-2 px-3 py-4 max-md:w-full max-md:overflow-x-auto max-md:overflow-y-hidden max-md:border-r-0 max-md:py-2",
+        className
+      )}
     >
       <ProfileSettingsSidebarHeader />
       <ProfileSettingsSidebarItemCategories activeTab={activeTab} updateActiveTab={updateActiveTab} />

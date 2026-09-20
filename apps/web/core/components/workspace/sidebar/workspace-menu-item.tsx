@@ -45,7 +45,7 @@ export const SidebarWorkspaceMenuItem = observer(function SidebarWorkspaceMenuIt
 
   const handleLinkClick = () => {
     if (window.innerWidth < 768) {
-      toggleSidebar();
+      toggleSidebar(true);
     }
   };
 

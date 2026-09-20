@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { useTranslation } from "@plane/i18n";
 import type { IWorkspaceMemberInvitation } from "@plane/types";
 // components
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-007.png?url";
 import { LogoSpinner } from "@/components/common/logo-spinner";
 import { WorkspaceLogo } from "@/components/workspace/logo";
 // helpers
@@ -111,6 +112,9 @@ type TAuthHeaderBase = {
 export function AuthHeaderBase(props: TAuthHeaderBase) {
   return (
     <div className="mb-4 flex flex-col gap-1 text-center">
+      {props.subHeader === "Welcome back to Ten-Fold." && (
+        <img src={tenfoldClipart} alt="" className="mb-8 w-[20.4rem] self-center opacity-30" />
+      )}
       {props.header && <span className="text-h4-semibold text-primary">{props.header}</span>}
       <span className="text-h4-semibold text-placeholder">{props.subHeader}</span>
     </div>

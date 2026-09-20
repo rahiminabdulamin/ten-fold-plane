@@ -4,6 +4,33 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
+test("recent activity rows use compact vertical spacing", async () => {
+  const rows = await Promise.all(
+    ["issue", "page", "project"].map((name) => read(`core/components/home/widgets/recents/${name}.tsx`))
+  );
+
+  rows.forEach((row) => assert.match(row, /className="my-auto border-none !min-h-0 !px-0 py-1 lg:py-2"/));
+});
+
+test("recent activity rows use the Plane layers icon", async () => {
+  const [issue, page, project] = await Promise.all(
+    ["issue", "page", "project"].map((name) => read(`core/components/home/widgets/recents/${name}.tsx`))
+  );
+
+  [issue, page, project].forEach((row) => {
+    assert.match(row, /LayersIcon/);
+    assert.match(row, /prependTitleElement=\{<LayersIcon className="size-4 flex-shrink-0 text-placeholder\/50" \/>\}/);
+  });
+});
+
+test("recent activity rows omit project identifiers", async () => {
+  const rows = await Promise.all(
+    ["issue", "page", "project"].map((name) => read(`core/components/home/widgets/recents/${name}.tsx`))
+  );
+
+  rows.forEach((row) => assert.doesNotMatch(row, /prependTitleElement/));
+});
+
 test("UI refinements preserve Home, assistant, and page consistency contracts", async () => {
   const [
     home,

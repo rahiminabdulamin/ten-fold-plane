@@ -11,6 +11,7 @@ import { EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { EmptyStateDetailed } from "@plane/propel/empty-state";
 import { EIssuesStoreType, EUserWorkspaceRoles } from "@plane/types";
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-006.png?url";
 import { CreateUpdateIssueModal } from "@/components/issues/issue-modal/modal";
 // constants
 import { useUserPermissions } from "@/hooks/store/user";
@@ -39,7 +40,7 @@ export const WorkspaceDraftEmptyState = observer(function WorkspaceDraftEmptySta
         <EmptyStateDetailed
           title={t("workspace_empty_state.drafts.title")}
           description={t("workspace_empty_state.drafts.description")}
-          assetKey="draft"
+          asset={<img src={tenfoldClipart} alt="" className="w-80 max-w-none shrink-0 opacity-30" />}
           actions={[
             {
               label: t("workspace_empty_state.drafts.cta_primary"),

@@ -7,5 +7,9 @@ test("Copilot welcome state uses responsive Ten-Fold clipart", async () => {
 
   assert.match(source, /import tenfoldClipart from "@\/app\/assets\/clipart\/tenfold-clipart-001\.png\?url";/);
   assert.match(source, /welcomeScreen=\{\(\{ input, suggestionView \}\) => \(/);
+  assert.match(
+    source,
+    /<img src=\{tenfoldClipart\} alt="" className="h-auto w-\[70%\] opacity-30" \/>\s*<strong className="text-16 text-\[#BFBFBF\]">Anything to help with\?<\/strong>/
+  );
   assert.match(source, /<img src=\{tenfoldClipart\} alt="" className="h-auto w-\[70%\] opacity-30" \/>/);
 });

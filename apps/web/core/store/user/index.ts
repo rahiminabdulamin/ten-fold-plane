@@ -54,6 +54,7 @@ export interface IUserStore {
   // computed
   canPerformAnyCreateAction: boolean;
   projectsWithCreatePermissions: { [projectId: string]: number } | null;
+  getProjectsWithCreatePermissions: (workspaceSlug: string) => { [projectId: string]: TUserPermissions } | null;
 }
 
 export class UserStore implements IUserStore {
@@ -270,10 +271,8 @@ export class UserStore implements IUserStore {
    * @description fetches the projects with write permissions
    * @returns {{[projectId: string]: number} || null}
    */
-  fetchProjectsWithCreatePermissions = (): { [key: string]: TUserPermissions } => {
-    const { workspaceSlug } = this.store.router;
-
-    const allWorkspaceProjectRoles = this.permission.getProjectRolesByWorkspaceSlug(workspaceSlug || "");
+  getProjectsWithCreatePermissions = (workspaceSlug: string): { [key: string]: TUserPermissions } | null => {
+    const allWorkspaceProjectRoles = this.permission.getProjectRolesByWorkspaceSlug(workspaceSlug);
 
     const userPermissions =
       (allWorkspaceProjectRoles &&
@@ -293,7 +292,7 @@ export class UserStore implements IUserStore {
    * @returns {{[projectId: string]: number} || null}
    */
   get projectsWithCreatePermissions() {
-    return this.fetchProjectsWithCreatePermissions();
+    return this.getProjectsWithCreatePermissions(this.store.router.workspaceSlug || "");
   }
 
   /**
@@ -301,7 +300,7 @@ export class UserStore implements IUserStore {
    * @returns {boolean}
    */
   get canPerformAnyCreateAction() {
-    const filteredProjects = this.fetchProjectsWithCreatePermissions();
+    const filteredProjects = this.getProjectsWithCreatePermissions(this.store.router.workspaceSlug || "");
     return filteredProjects ? Object.keys(filteredProjects).length > 0 : false;
   }
 }

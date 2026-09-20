@@ -6,6 +6,7 @@
 
 import React from "react";
 import { MoreVerticalOutline } from "@makeplane/propel/icons";
+import landingLogo from "@/app/assets/tenfold-rebrand/tenfold-rebrand-logo-white.png?url";
 import { AuthRoot } from "@/components/account/auth-forms/auth-root";
 import type { EAuthModes } from "@/helpers/authentication.helper";
 import { AuthHeader } from "./header";
@@ -21,11 +22,7 @@ export function AuthBase({ authType }: AuthBaseProps) {
         className="hidden p-12 text-white lg:flex lg:flex-col lg:justify-between lg:pb-6 xl:p-16 xl:pb-6"
         style={{ background: "radial-gradient(circle at 100% 0%, #176d88 0%, #003f56 52%, #00364c 100%)" }}
       >
-        <img
-          src="/branding/tenfold-logo-long-rebrand-white-v4.png"
-          alt="Ten-Fold"
-          className="h-16 w-auto self-start xl:h-20"
-        />
+        <img src={landingLogo} alt="Ten-Fold" className="h-16 w-auto self-start xl:h-20" />
         <div className="max-w-lg -translate-y-8 border-l border-white/25 pl-6 xl:pl-8">
           <h1 className="leading-[0.95] tracking-tight uppercase" style={{ fontSize: "46px", fontWeight: 900 }}>
             Work on all

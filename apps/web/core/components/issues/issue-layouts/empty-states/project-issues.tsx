@@ -12,6 +12,7 @@ import { useTranslation } from "@plane/i18n";
 import { EmptyStateDetailed } from "@plane/propel/empty-state";
 import { EIssuesStoreType, EUserProjectRoles } from "@plane/types";
 // hooks
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-003a.png?url";
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
 import { useUserPermissions } from "@/hooks/store/user";
 import { useWorkItemFilterInstance } from "@/hooks/store/work-item-filters/use-work-item-filter-instance";
@@ -51,7 +52,7 @@ export const ProjectEmptyState = observer(function ProjectEmptyState() {
         />
       ) : (
         <EmptyStateDetailed
-          assetKey="work-item"
+          asset={<img src={tenfoldClipart} alt="" className="w-[22.125rem] max-w-none shrink-0 opacity-30" />}
           title={t("project_empty_state.work_items.title")}
           description={t("project_empty_state.work_items.description")}
           actions={[

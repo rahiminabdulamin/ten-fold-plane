@@ -74,6 +74,8 @@ export const UserMenuRoot = observer(function UserMenuRoot() {
       onMenuClose={() => setIsUserMenuOpen(false)}
       placement="bottom-end"
       maxHeight="2xl"
+      portalElement={typeof document === "undefined" ? null : document.body}
+      menuItemsClassName="z-[1202]"
       optionsClassName="w-72 p-3 flex flex-col gap-y-3"
       closeOnSelect
     >

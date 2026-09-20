@@ -6,8 +6,7 @@
 
 import { observer } from "mobx-react";
 // plane types
-import { PriorityIcon, StateGroupIcon } from "@plane/propel/icons";
-import { WorkItemsOutline } from "@makeplane/propel/icons";
+import { LayersIcon, PriorityIcon, StateGroupIcon } from "@plane/propel/icons";
 import { Tooltip } from "@makeplane/propel/components/tooltip";
 import type { TActivityEntityData, TIssueEntityData } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
@@ -16,7 +15,6 @@ import { calculateTimeAgo, generateWorkItemLink } from "@plane/utils";
 // components
 import { ListItem } from "@/components/core/list";
 import { MemberDropdown } from "@/components/dropdowns/member/dropdown";
-import { IssueIdentifier } from "@/components/issues/issue-detail/issue-identifier";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useProject } from "@/hooks/store/use-project";
@@ -69,29 +67,7 @@ export const RecentIssue = observer(function RecentIssue(props: BlockProps) {
       id={`issue-${issueDetails?.id}`}
       itemLink={workItemLink}
       title={issueDetails?.name}
-      prependTitleElement={
-        <div className="flex flex-shrink-0 items-center gap-2">
-          {issueDetails.type ? (
-            <IssueIdentifier
-              size="lg"
-              issueTypeId={issueDetails?.type}
-              projectId={issueDetails?.project_id || ""}
-              projectIdentifier={issueDetails?.project_identifier || ""}
-              issueSequenceId={issueDetails?.sequence_id || ""}
-              variant="tertiary"
-            />
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              <div className="grid size-8 flex-shrink-0 place-items-center rounded-sm bg-transparent">
-                <WorkItemsOutline className="size-4 text-tertiary" />
-              </div>
-              <div className="text-13 font-medium whitespace-nowrap text-placeholder">
-                {issueDetails?.project_identifier}-{issueDetails?.sequence_id}
-              </div>
-            </div>
-          )}
-        </div>
-      }
+      prependTitleElement={<LayersIcon className="size-4 flex-shrink-0 text-placeholder/50" />}
       appendTitleElement={
         <div className="flex-shrink-0 text-11 font-medium text-placeholder">
           {calculateTimeAgo(activity.visited_at)}
@@ -135,7 +111,7 @@ export const RecentIssue = observer(function RecentIssue(props: BlockProps) {
       }
       parentRef={ref}
       disableLink={false}
-      className="my-auto border-none !px-2 py-3"
+      className="my-auto !min-h-0 border-none !px-0 py-1 lg:py-2"
       itemClassName="my-auto"
       onItemClick={handlePeekOverview}
       preventDefaultProgress

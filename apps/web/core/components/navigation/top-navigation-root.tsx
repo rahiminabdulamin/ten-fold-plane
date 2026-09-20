@@ -17,6 +17,8 @@ import { AppSidebarItem } from "@/components/sidebar/sidebar-item";
 import { InboxOutline } from "@makeplane/propel/icons";
 import useSWR from "swr";
 import { useWorkspaceNotifications } from "@/hooks/store/notifications";
+import desktopLogo from "@/app/assets/tenfold-rebrand/tenfold-rebrand-logo.png?url";
+import mobileLogo from "@/app/assets/tenfold-rebrand/tanfold-rebrand-mobile.png?url";
 
 export const TopNavigationRoot = observer(function TopNavigationRoot() {
   // router
@@ -52,12 +54,8 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
     >
       <div className="flex shrink-0 items-center sm:flex-1">
         <Link href="/" aria-label="Go to Home">
-          <img
-            src="/branding/tenfold-logo-square-rebrand-blackblack-v4.png"
-            alt="Ten-Fold"
-            className="size-7 object-contain sm:hidden"
-          />
-          <img src="/branding/tenfold-logo-long-rebrand-v4.png" alt="Ten-Fold" className="hidden h-7 w-auto sm:block" />
+          <img src={mobileLogo} alt="Ten-Fold" className="size-7 object-contain sm:hidden" />
+          <img src={desktopLogo} alt="Ten-Fold" className="hidden h-7 w-auto sm:block" />
         </Link>
       </div>
       {/* Power K Search */}

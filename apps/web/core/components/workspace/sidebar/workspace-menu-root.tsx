@@ -62,7 +62,7 @@ export const WorkspaceMenuRoot = observer(function WorkspaceMenuRoot(props: Work
 
   const handleItemClick = () => {
     if (window.innerWidth < 768) {
-      toggleSidebar();
+      toggleSidebar(true);
     }
   };
   const workspacesList = orderWorkspacesList(Object.values(workspaces ?? {}));

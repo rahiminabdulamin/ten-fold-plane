@@ -40,6 +40,7 @@ import { IssueLayoutHOC } from "../issue-layout-HOC";
 import type { TRenderQuickActions } from "../list/list-view-types";
 import { CalendarHeader } from "./header";
 import { CalendarIssueBlocks } from "./issue-blocks";
+import { getCalendarIssueIdsByDate } from "./calendar-range";
 import { CalendarWeekDays } from "./week-days";
 import { CalendarWeekHeader } from "./week-header";
 
@@ -122,7 +123,7 @@ export const CalendarChart = observer(function CalendarChart(props: Props) {
         element,
       })
     );
-  }, [scrollableContainerRef?.current]);
+  }, []);
 
   if (!calendarPayload || !formattedDatePayload)
     return (
@@ -131,7 +132,12 @@ export const CalendarChart = observer(function CalendarChart(props: Props) {
       </div>
     );
 
-  const issueIdList = groupedIssueIds ? groupedIssueIds[formattedDatePayload] : [];
+  const issueIdsByDate = getCalendarIssueIdsByDate(
+    issues ?? {},
+    [...new Set(Object.values(groupedIssueIds).flat())],
+    [formattedDatePayload]
+  );
+  const issueIdList = issueIdsByDate[formattedDatePayload] ?? [];
 
   return (
     <>
@@ -154,13 +160,13 @@ export const CalendarChart = observer(function CalendarChart(props: Props) {
               {layout === "month" && (
                 <div className="grid h-full w-full grid-cols-1 divide-y-[0.5px] divide-subtle-1">
                   {allWeeksOfActiveMonth &&
-                    Object.values(allWeeksOfActiveMonth).map((week: ICalendarWeek, weekIndex) => (
+                    Object.entries(allWeeksOfActiveMonth).map(([weekKey, week]: [string, ICalendarWeek]) => (
                       <CalendarWeekDays
                         selectedDate={selectedDate}
                         setSelectedDate={setSelectedDate}
                         handleDragAndDrop={handleDragAndDrop}
                         issuesFilterStore={issuesFilterStore}
-                        key={weekIndex}
+                        key={weekKey}
                         week={week}
                         issues={issues}
                         groupedIssueIds={groupedIssueIds}
@@ -204,7 +210,7 @@ export const CalendarChart = observer(function CalendarChart(props: Props) {
             </div>
 
             {/* mobile view */}
-            <div className="md:hidden">
+            <div className="md:hidden" data-testid="mobile-calendar-agenda">
               <p className="p-4 text-18 font-semibold">
                 {`${selectedDate.getDate()} ${
                   MONTHS_LIST[selectedDate.getMonth() + 1].title
@@ -230,32 +236,6 @@ export const CalendarChart = observer(function CalendarChart(props: Props) {
             </div>
           </div>
         </IssueLayoutHOC>
-
-        {/* mobile view */}
-        <div className="md:hidden">
-          <p className="p-4 text-18 font-semibold">
-            {`${selectedDate.getDate()} ${
-              MONTHS_LIST[selectedDate.getMonth() + 1].title
-            }, ${selectedDate.getFullYear()}`}
-          </p>
-          <CalendarIssueBlocks
-            date={selectedDate}
-            issueIdList={issueIdList}
-            quickActions={quickActions}
-            loadMoreIssues={loadMoreIssues}
-            getPaginationData={getPaginationData}
-            getGroupIssueCount={getGroupIssueCount}
-            enableQuickIssueCreate={enableQuickAdd}
-            disableIssueCreation={!enableIssueCreation}
-            quickAddCallback={quickAddCallback}
-            addIssuesToView={addIssuesToView}
-            readOnly={readOnly}
-            canEditProperties={canEditProperties}
-            isDragDisabled
-            isMobileView
-            isEpic={isEpic}
-          />
-        </div>
       </div>
     </>
   );

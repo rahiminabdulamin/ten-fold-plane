@@ -75,19 +75,48 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
 
   if (!week) return null;
 
+  const sortedWeekDays = getOrderedDays(Object.values(week), (item) => item.date.getDay(), startOfWeek);
+  const calendarDates = sortedWeekDays
+    .map((date) => renderFormattedPayloadDate(date.date))
+    .filter((date): date is string => !!date);
+  const getAdjacentCalendarDates = () => {
+    const firstDate = new Date(sortedWeekDays[0].date);
+    const lastDate = new Date(sortedWeekDays[sortedWeekDays.length - 1].date);
+    firstDate.setDate(firstDate.getDate() - 1);
+    lastDate.setDate(lastDate.getDate() + 1);
+    return [renderFormattedPayloadDate(firstDate), renderFormattedPayloadDate(lastDate)].filter(
+      (date): date is string => !!date
+    );
+  };
   const issueIdsByDate = getCalendarIssueIdsByDate(
     issues ?? {},
     [...new Set(Object.values(groupedIssueIds).flat())],
-    Object.keys(week)
+    [...calendarDates, ...getAdjacentCalendarDates()]
   );
+
+  const issueRowById: Record<string, number> = {};
+  const laneEnds: number[] = [];
+  const issueSpans = [...new Set(calendarDates.flatMap((date) => issueIdsByDate[date] ?? []))]
+    .map((issueId) => {
+      const dates = calendarDates
+        .map((date, index) => (issueIdsByDate[date]?.includes(issueId) ? index : -1))
+        .filter((index) => index >= 0);
+      return { issueId, start: dates[0], end: dates[dates.length - 1] };
+    })
+    .toSorted((a, b) => a.start - b.start || a.end - b.end);
+
+  issueSpans.forEach(({ issueId, start, end }) => {
+    const row = laneEnds.findIndex((laneEnd) => laneEnd < start);
+    const issueRow = row === -1 ? laneEnds.length : row;
+    laneEnds[issueRow] = end;
+    issueRowById[issueId] = issueRow;
+  });
 
   const shouldShowDay = (dayDate: Date) => {
     if (showWeekends) return true;
     const day = dayDate.getDay();
     return !(day === 0 || day === 6);
   };
-
-  const sortedWeekDays = getOrderedDays(Object.values(week), (item) => item.date.getDay(), startOfWeek);
 
   return (
     <div
@@ -109,6 +138,8 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
             date={date}
             issues={issues}
             groupedIssueIds={{ ...groupedIssueIds, ...issueIdsByDate }}
+            issueRowById={issueRowById}
+            issueRowCount={laneEnds.length}
             loadMoreIssues={loadMoreIssues}
             getPaginationData={getPaginationData}
             getGroupIssueCount={getGroupIssueCount}

@@ -36,7 +36,7 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
   );
 
   // store hooks
-  const { extendedSidebarMode, isExtendedSidebarOpened, openExtendedSidebar } = useAppTheme();
+  const { extendedSidebarMode, isExtendedSidebarOpened, openExtendedSidebar, toggleExtendedSidebar } = useAppTheme();
   // hooks
   const { preferences: personalPreferences } = usePersonalNavigationPreferences();
   const { preferences: workspacePreferences } = useWorkspaceNavigationPreferences();
@@ -45,6 +45,14 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
 
   const toggleListDisclosure = (isOpen: boolean) => {
     toggleWorkspaceMenu(isOpen);
+  };
+
+  const toggleExtendedSidebarMenu = (mode: "personal" | "workspace") => {
+    if (isExtendedSidebarOpened && extendedSidebarMode === mode) {
+      toggleExtendedSidebar(false);
+      return;
+    }
+    openExtendedSidebar(mode);
   };
 
   // Filter static navigation items based on personal preferences
@@ -77,13 +85,13 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
       <SidebarNavItem>
         <button
           type="button"
-          onClick={() => openExtendedSidebar("personal")}
+          onClick={() => toggleExtendedSidebarMenu("personal")}
           className="flex flex-grow items-center gap-1.5 text-13 font-medium text-tertiary"
           id="personal-extended-sidebar-toggle"
           aria-label={t("personal")}
         >
           <MoreHorizontalOutline className="size-4 flex-shrink-0" />
-          <span>More</span>
+          <span>{isExtendedSidebarOpened && extendedSidebarMode === "personal" ? "Hide" : "More"}</span>
         </button>
       </SidebarNavItem>
       <Disclosure as="div" className="flex flex-col" defaultOpen={!!isWorkspaceMenuOpen}>
@@ -145,7 +153,7 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
                 <SidebarNavItem>
                   <button
                     type="button"
-                    onClick={() => openExtendedSidebar("workspace")}
+                    onClick={() => toggleExtendedSidebarMenu("workspace")}
                     className="flex flex-grow items-center gap-1.5 text-13 font-medium text-tertiary"
                     id="extended-sidebar-toggle"
                     aria-label={t(

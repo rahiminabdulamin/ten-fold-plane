@@ -15,6 +15,7 @@ import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { TPage, TPageNavigationTabs } from "@plane/types";
 import { EUserProjectRoles } from "@plane/types";
 // components
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-005.png?url";
 import { PageLoader } from "@/components/pages/loaders/page-loader";
 import { useProject } from "@/hooks/store/use-project";
 import { useUserPermissions } from "@/hooks/store/user";
@@ -26,6 +27,8 @@ type Props = {
   pageType: TPageNavigationTabs;
   storeType: EPageStoreType;
 };
+
+const emptyPagesAsset = <img src={tenfoldClipart} alt="" className="w-80 max-w-none shrink-0 opacity-30" />;
 
 export const PagesListMainContent = observer(function PagesListMainContent(props: Props) {
   const { children, pageType, storeType } = props;
@@ -58,19 +61,19 @@ export const PagesListMainContent = observer(function PagesListMainContent(props
       access: pageType === "private" ? EPageAccess.PRIVATE : EPageAccess.PUBLIC,
     };
 
-    await createPage(payload)
-      .then((res) => {
-        const pageId = `/${workspaceSlug}/projects/${currentProjectDetails?.id}/pages/${res?.id}`;
-        router.push(pageId);
-      })
-      .catch((err) => {
-        setToast({
-          type: TOAST_TYPE.ERROR,
-          title: "Error!",
-          message: err?.data?.error || "Page could not be created. Please try again.",
-        });
-      })
-      .finally(() => setIsCreatingPage(false));
+    try {
+      const res = await createPage(payload);
+      const pageId = `/${workspaceSlug}/projects/${currentProjectDetails?.id}/pages/${res?.id}`;
+      router.push(pageId);
+    } catch (err: any) {
+      setToast({
+        type: TOAST_TYPE.ERROR,
+        title: "Error!",
+        message: err?.data?.error || "Page could not be created. Please try again.",
+      });
+    } finally {
+      setIsCreatingPage(false);
+    }
   };
 
   if (loader === "init-loader") return <PageLoader />;
@@ -79,7 +82,7 @@ export const PagesListMainContent = observer(function PagesListMainContent(props
     if (!isAnyPageAvailable) {
       return (
         <EmptyStateDetailed
-          assetKey="page"
+          asset={emptyPagesAsset}
           title={t("project_empty_state.pages.title")}
           description={t("project_empty_state.pages.description")}
           actions={[
@@ -98,7 +101,7 @@ export const PagesListMainContent = observer(function PagesListMainContent(props
     if (pageType === "public")
       return (
         <EmptyStateDetailed
-          assetKey="page"
+          asset={emptyPagesAsset}
           title={t("project_empty_state.pages.title")}
           description={t("project_empty_state.pages.description")}
           actions={[
@@ -116,7 +119,7 @@ export const PagesListMainContent = observer(function PagesListMainContent(props
     if (pageType === "private")
       return (
         <EmptyStateDetailed
-          assetKey="page"
+          asset={emptyPagesAsset}
           title={t("project_empty_state.pages.title")}
           description={t("project_empty_state.pages.description")}
           actions={[

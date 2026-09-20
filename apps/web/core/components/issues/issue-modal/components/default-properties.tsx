@@ -47,6 +47,8 @@ type TIssueDefaultPropertiesProps = {
   setSelectedParentIssue: (issue: ISearchIssueResponse) => void;
 };
 
+const propertyButtonClassName = "text-11 leading-4 [&_span]:!text-11 [&_span]:!leading-4";
+
 export const IssueDefaultProperties = observer(function IssueDefaultProperties(props: TIssueDefaultPropertiesProps) {
   const {
     control,
@@ -89,7 +91,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         control={control}
         name="state_id"
         render={({ field: { value, onChange } }) => (
-          <div className="h-7">
+          <div className="h-7 max-w-full min-w-0">
             <StateDropdown
               value={value}
               onChange={(stateId) => {
@@ -98,6 +100,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
               }}
               projectId={projectId ?? undefined}
               buttonVariant="border-with-text"
+              buttonClassName={propertyButtonClassName}
+              buttonContainerClassName="max-w-full"
               tabIndex={getIndex("state_id")}
               isForWorkItemCreation={!id}
             />
@@ -108,7 +112,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         control={control}
         name="priority"
         render={({ field: { value, onChange } }) => (
-          <div className="h-7">
+          <div className="h-7 max-w-full min-w-0">
             <PriorityDropdown
               value={value}
               onChange={(priority) => {
@@ -116,6 +120,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 handleFormChange();
               }}
               buttonVariant="border-with-text"
+              buttonClassName={propertyButtonClassName}
+              buttonContainerClassName="max-w-full"
               tabIndex={getIndex("priority")}
             />
           </div>
@@ -125,7 +131,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         control={control}
         name="assignee_ids"
         render={({ field: { value, onChange } }) => (
-          <div className="h-7">
+          <div className="h-7 max-w-full min-w-0">
             <MemberDropdown
               projectId={projectId ?? undefined}
               value={value}
@@ -134,7 +140,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 handleFormChange();
               }}
               buttonVariant={value?.length > 0 ? "transparent-without-text" : "border-with-text"}
-              buttonClassName={value?.length > 0 ? "hover:bg-transparent" : ""}
+              buttonClassName={`${propertyButtonClassName}${value?.length > 0 ? " hover:bg-transparent" : ""}`}
+              buttonContainerClassName="max-w-full"
               placeholder={t("assignees")}
               multiple
               tabIndex={getIndex("assignee_ids")}
@@ -146,7 +153,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         control={control}
         name="label_ids"
         render={({ field: { value, onChange } }) => (
-          <div className="h-7">
+          <div className="h-7 max-w-full min-w-0">
             <IssueLabelSelect
               value={value}
               onChange={(labelIds) => {
@@ -156,6 +163,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
               projectId={projectId ?? undefined}
               tabIndex={getIndex("label_ids")}
               createLabelEnabled={!!canCreateLabel}
+              buttonClassName={propertyButtonClassName}
+              buttonContainerClassName="max-w-full"
             />
           </div>
         )}
@@ -164,7 +173,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         control={control}
         name="start_date"
         render={({ field: { value, onChange } }) => (
-          <div className="h-7">
+          <div className="h-7 max-w-full min-w-0">
             <DateDropdown
               value={value}
               onChange={(date) => {
@@ -172,6 +181,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 handleFormChange();
               }}
               buttonVariant="border-with-text"
+              buttonClassName={propertyButtonClassName}
+              buttonContainerClassName="max-w-full"
               maxDate={maxDate ?? undefined}
               placeholder={t("start_date")}
               tabIndex={getIndex("start_date")}
@@ -183,7 +194,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         control={control}
         name="target_date"
         render={({ field: { value, onChange } }) => (
-          <div className="h-7">
+          <div className="h-7 max-w-full min-w-0">
             <DateDropdown
               value={value}
               onChange={(date) => {
@@ -191,6 +202,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 handleFormChange();
               }}
               buttonVariant="border-with-text"
+              buttonClassName={propertyButtonClassName}
+              buttonContainerClassName="max-w-full"
               minDate={minDate ?? undefined}
               placeholder={t("due_date")}
               tabIndex={getIndex("target_date")}
@@ -203,7 +216,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
           control={control}
           name="cycle_id"
           render={({ field: { value, onChange } }) => (
-            <div className="h-7">
+            <div className="h-7 max-w-full min-w-0">
               <CycleDropdown
                 projectId={projectId ?? undefined}
                 onChange={(cycleId) => {
@@ -213,6 +226,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 placeholder={t("cycle.label", { count: 1 })}
                 value={value}
                 buttonVariant="border-with-text"
+                buttonClassName={propertyButtonClassName}
+                buttonContainerClassName="max-w-full"
                 tabIndex={getIndex("cycle_id")}
               />
             </div>
@@ -224,7 +239,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
           control={control}
           name="module_ids"
           render={({ field: { value, onChange } }) => (
-            <div className="h-7">
+            <div className="h-7 max-w-full min-w-0">
               <ModuleDropdown
                 projectId={projectId ?? undefined}
                 value={value ?? []}
@@ -234,6 +249,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 }}
                 placeholder={t("modules")}
                 buttonVariant="border-with-text"
+                buttonClassName={propertyButtonClassName}
+                buttonContainerClassName="max-w-full"
                 tabIndex={getIndex("module_ids")}
                 multiple
                 showCount
@@ -247,7 +264,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
           control={control}
           name="estimate_point"
           render={({ field: { value, onChange } }) => (
-            <div className="h-7">
+            <div className="h-7 max-w-full min-w-0">
               <EstimateDropdown
                 value={value || undefined}
                 onChange={(estimatePoint) => {
@@ -256,6 +273,8 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                 }}
                 projectId={projectId}
                 buttonVariant="border-with-text"
+                buttonClassName={propertyButtonClassName}
+                buttonContainerClassName="max-w-full"
                 tabIndex={getIndex("estimate_point")}
                 placeholder={t("estimate")}
               />
@@ -263,13 +282,13 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
           )}
         />
       )}
-      <div className="h-7">
+      <div className="h-7 max-w-full min-w-0">
         {parentId ? (
           <CustomMenu
             customButton={
               <button
                 type="button"
-                className="flex h-full cursor-pointer items-center justify-between gap-1 rounded-sm border-[0.5px] border-strong px-2 py-0.5 text-caption-sm-regular hover:bg-layer-1"
+                className="flex h-full max-w-full min-w-0 cursor-pointer items-center justify-between gap-1 rounded-sm border-[0.5px] border-strong px-2 py-0.5 text-11 leading-4 hover:bg-layer-1"
               >
                 {selectedParentIssue?.project_id && (
                   <IssueIdentifier
@@ -283,7 +302,7 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
               </button>
             }
             placement="bottom-start"
-            className="h-full w-full"
+            className="h-full w-full max-w-full"
             customButtonClassName="h-full"
             tabIndex={getIndex("parent_id")}
           >
@@ -311,11 +330,11 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
         ) : (
           <button
             type="button"
-            className="flex h-full cursor-pointer items-center justify-between gap-1 rounded-sm border-[0.5px] border-strong px-2 py-0.5 text-caption-sm-regular hover:bg-layer-1"
+            className="flex h-full max-w-full min-w-0 cursor-pointer items-center justify-between gap-1 rounded-sm border-[0.5px] border-strong px-2 py-0.5 text-11 leading-4 hover:bg-layer-1"
             onClick={() => setParentIssueListModalOpen(true)}
           >
             <ParentOutline className="h-3 w-3 flex-shrink-0" />
-            <span className="whitespace-nowrap">{t("add_parent")}</span>
+            <span className="truncate whitespace-nowrap">{t("add_parent")}</span>
           </button>
         )}
       </div>

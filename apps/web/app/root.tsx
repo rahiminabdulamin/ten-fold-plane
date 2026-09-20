@@ -15,6 +15,7 @@ import { SITE_DESCRIPTION } from "@plane/constants";
 import icon180 from "@/app/assets/icons/icon-180x180.png?url";
 import icon512 from "@/app/assets/icons/icon-512x512.png?url";
 import ogImage from "@/app/assets/og-image.png?url";
+import favicon from "@/app/assets/tenfold-rebrand/tanfold-rebrand-favicon.png?url";
 import globalStyles from "@/styles/globals.css?url";
 import type { Route } from "./+types/root";
 // components
@@ -35,8 +36,8 @@ import "@fontsource/ibm-plex-mono";
 const APP_TITLE = "Ten-Fold | Project management";
 
 export const links: LinksFunction = () => [
-  { rel: "icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v4.png" },
-  { rel: "shortcut icon", type: "image/png", href: "/branding/tenfold-logo-square-rebrand-black-v4.png" },
+  { rel: "icon", type: "image/png", href: favicon },
+  { rel: "shortcut icon", type: "image/png", href: favicon },
   { rel: "apple-touch-icon", href: icon512 },
   { rel: "apple-touch-icon", sizes: "180x180", href: icon180 },
   { rel: "apple-touch-icon", sizes: "512x512", href: icon512 },
@@ -63,7 +64,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <body suppressHydrationWarning>
         <div id="context-menu-portal" />
         <div id="editor-portal" />
-        <ThemeProvider themes={["light", "dark", "light-contrast", "dark-contrast", "custom"]} defaultTheme="light">
+        <ThemeProvider themes={["light"]} defaultTheme="light" forcedTheme="light">
           {children}
         </ThemeProvider>
         <Scripts />

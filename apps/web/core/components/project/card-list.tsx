@@ -12,6 +12,7 @@ import { EmptyStateDetailed } from "@plane/propel/empty-state";
 import { ContentWrapper } from "@plane/ui";
 // components
 import { calculateTotalFilters } from "@plane/utils";
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-004a.png?url";
 import { ProjectsLoader } from "@/components/ui/loader/projects-loader";
 // hooks
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
@@ -94,8 +95,9 @@ export const ProjectCardList = observer(function ProjectCardList(props: TProject
           currentWorkspaceDisplayFilters?.archived_projects &&
           calculateTotalFilters(currentWorkspaceFilters ?? {}) === 0
             ? "archived-work-item"
-            : "search"
+            : undefined
         }
+        asset={<img src={tenfoldClipart} alt="" className="w-80 max-w-none shrink-0 opacity-30" />}
         assetClassName="size-40"
       />
     );

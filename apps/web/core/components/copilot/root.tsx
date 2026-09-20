@@ -392,7 +392,12 @@ function WorkspaceSelectorHeader({
             />
             <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
           </svg>
-          <div className="text-13 font-medium">{titleContent}</div>
+          <div className="flex items-center gap-1.5 text-13 font-medium">
+            {titleContent}
+            <span className="rounded-sm bg-accent-primary/20 px-1.5 py-0.5 text-10 font-medium text-accent-primary">
+              beta
+            </span>
+          </div>
         </div>
         <span data-testid="copilot-close-button">{closeButton}</span>
       </div>
@@ -426,6 +431,7 @@ function PlaneTools() {
   const [panelWidth, setPanelWidth] = useState(DEFAULT_COPILOT_PANEL_WIDTH);
   const panelWidthRef = useRef(DEFAULT_COPILOT_PANEL_WIDTH);
   const [launcherPosition, setLauncherPosition] = useState<LauncherPosition | null>(null);
+  const [isMobileChatArmed, setIsMobileChatArmed] = useState(false);
   const launcherPositionRef = useRef<LauncherPosition | null>(null);
   const dragStart = useRef<{ x: number; y: number; pointerX: number; pointerY: number; moved: boolean } | null>(null);
 
@@ -592,8 +598,13 @@ function PlaneTools() {
   }, []);
 
   const stopLauncherClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (dragStart.current?.moved) event.preventDefault();
+    const wasDragged = dragStart.current?.moved;
     dragStart.current = null;
+    if (wasDragged) {
+      event.preventDefault();
+      return;
+    }
+    if (window.matchMedia("(max-width: 767px)").matches) setIsMobileChatArmed(true);
   }, []);
 
   const sidebarToggleButton = useMemo(
@@ -1440,33 +1451,36 @@ function PlaneTools() {
 
   return (
     <WorkspaceSelectorContext.Provider value={workspaceSelectorContextValue}>
-      <CopilotSidebar
-        defaultOpen={false}
-        header={sidebarHeader}
-        labels={COPILOT_SIDEBAR_LABELS}
-        position="right"
-        width="var(--copilot-panel-width)"
-        toggleButton={sidebarToggleButton}
-        welcomeScreen={({ input, suggestionView }) => (
-          <div className="flex h-full flex-col">
-            <div className="flex flex-1 items-center justify-center px-4">
-              <img src={tenfoldClipart} alt="" className="h-auto w-[70%] opacity-30" />
-            </div>
-            <div className="px-8 pb-4">
-              <div className="mx-auto max-w-3xl">
-                <div className="mb-4 flex justify-center">{suggestionView}</div>
-                {input}
+      <div data-mobile-chat-armed={isMobileChatArmed}>
+        <CopilotSidebar
+          defaultOpen={false}
+          header={sidebarHeader}
+          labels={COPILOT_SIDEBAR_LABELS}
+          position="right"
+          width="var(--copilot-panel-width)"
+          toggleButton={sidebarToggleButton}
+          welcomeScreen={({ input, suggestionView }) => (
+            <div className="flex h-full flex-col">
+              <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
+                <img src={tenfoldClipart} alt="" className="h-auto w-[70%] opacity-30" />
+                <strong className="text-16 text-[#BFBFBF]">Anything to help with?</strong>
+              </div>
+              <div className="px-8 pb-4">
+                <div className="mx-auto max-w-3xl">
+                  <div className="mb-4 flex justify-center">{suggestionView}</div>
+                  {input}
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      />
-      <div
-        className="copilot-panel-resize-handle"
-        onPointerDown={startResize}
-        role="separator"
-        aria-orientation="vertical"
-      />
+          )}
+        />
+        <div
+          className="copilot-panel-resize-handle"
+          onPointerDown={startResize}
+          role="separator"
+          aria-orientation="vertical"
+        />
+      </div>
     </WorkspaceSelectorContext.Provider>
   );
 }
