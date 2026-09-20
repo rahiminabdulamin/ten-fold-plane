@@ -116,6 +116,14 @@ test("recents filter trigger is visual content rather than a nested button", asy
   assert.match(filters, /customButton=\{\s*<span/);
 });
 
+test("mobile layout selector trigger is visual content rather than a nested button", async () => {
+  const selector = await read("core/components/issues/issue-layouts/filters/header/mobile-layout-selection.tsx");
+
+  assert.doesNotMatch(selector, /customButton=\{\s*<Button/);
+  assert.match(selector, /customButton=\{\s*<span/);
+  assert.match(selector, /\.map\(\(layout\) => \([\s\S]*key=\{layout\.key\}/);
+});
+
 test("project cards render settings navigation as a button rather than a nested link", async () => {
   const projectCard = await read("core/components/project/card.tsx");
 
