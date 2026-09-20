@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useParams } from "react-router";
 
 import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-001.png?url";
+import tenfoldMovingEye from "@/app/assets/tenfold-rebrand/tenfold-rebrand-logo-moving-eye.gif?url";
 import { IssueService } from "@/services/issue";
 import { IssueLabelService } from "@/services/issue/issue_label.service";
 import { EstimateService } from "@/services/estimate.service";
@@ -608,7 +609,15 @@ function PlaneTools() {
   }, []);
 
   const sidebarToggleButton = useMemo(
-    () => ({ onPointerDown: startLauncherDrag, onClick: stopLauncherClick }),
+    () => ({
+      onPointerDown: startLauncherDrag,
+      onClick: stopLauncherClick,
+      openIcon: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg {...props} className="h-full w-full rounded-full" viewBox="0 0 1 1">
+          <image href={tenfoldMovingEye} height="1" width="1" />
+        </svg>
+      ),
+    }),
     [startLauncherDrag, stopLauncherClick]
   );
 
