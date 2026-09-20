@@ -43,16 +43,7 @@ class WorkspaceUserPreferenceViewSet(BaseAPIView):
                             user=request.user,
                             workspace=workspace,
                             sort_order=(65535 + (i * 10000)),
-                            is_pinned=(
-                                True
-                                if key
-                                in [
-                                    WorkspaceUserPreference.UserPreferenceKeys.DRAFTS,
-                                    WorkspaceUserPreference.UserPreferenceKeys.YOUR_WORK,
-                                    WorkspaceUserPreference.UserPreferenceKeys.STICKIES,
-                                ]
-                                else False
-                            ),
+                            is_pinned=False,
                         )
                         for i, key in enumerate(create_preference_keys)
                     ],

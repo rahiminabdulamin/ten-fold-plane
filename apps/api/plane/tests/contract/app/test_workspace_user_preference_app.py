@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
+import importlib
 from datetime import timedelta
 
 import pytest
+from django.apps import apps as django_apps
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -24,6 +26,38 @@ class TestWorkspaceUserPreferencePatch:
     """
 
     KEY = WorkspaceUserPreference.UserPreferenceKeys.ANALYTICS.value
+
+    @pytest.mark.django_db
+    def test_get_creates_personal_preferences_unpinned(self, session_client, create_user, workspace):
+        """Missing personal preferences are created hidden from the primary sidebar."""
+        response = session_client.get(reverse("workspace-user-preference", kwargs={"slug": workspace.slug}))
+
+        assert response.status_code == status.HTTP_200_OK
+        for key in ("drafts", "your_work", "stickies"):
+            assert response.data[key]["is_pinned"] is False
+
+    @pytest.mark.django_db
+    def test_personal_sidebar_pin_reset_preserves_order_and_other_preferences(self, create_user, workspace):
+        """The rollout reset hides personal items without touching any other preference state."""
+        personal_preferences = [
+            WorkspaceUserPreference.objects.create(
+                workspace=workspace, user=create_user, key=key, is_pinned=True, sort_order=sort_order
+            )
+            for key, sort_order in (("drafts", 11), ("your_work", 22), ("stickies", 33))
+        ]
+        analytics = WorkspaceUserPreference.objects.create(
+            workspace=workspace, user=create_user, key="analytics", is_pinned=True, sort_order=44
+        )
+
+        migration = importlib.import_module("plane.db.migrations.0129_reset_personal_sidebar_pins")
+        migration.reset_personal_sidebar_pins(django_apps, None)
+
+        for preference in personal_preferences:
+            preference.refresh_from_db()
+            assert preference.is_pinned is False
+        analytics.refresh_from_db()
+        assert analytics.is_pinned is True
+        assert [preference.sort_order for preference in personal_preferences] == [11, 22, 33]
 
     @pytest.mark.django_db
     def test_patch_only_updates_requesting_users_preference(self, session_client, create_user, workspace):
