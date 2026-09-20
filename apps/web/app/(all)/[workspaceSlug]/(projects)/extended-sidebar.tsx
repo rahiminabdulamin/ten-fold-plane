@@ -29,7 +29,7 @@ export const ExtendedAppSidebar = observer(function ExtendedAppSidebar() {
   // routers
   const { workspaceSlug } = useParams();
   // store hooks
-  const { isExtendedSidebarOpened, toggleExtendedSidebar } = useAppTheme();
+  const { extendedSidebarMode, isExtendedSidebarOpened, toggleExtendedSidebar } = useAppTheme();
   const { allowPermissions } = useUserPermissions();
   const {
     preferences: workspacePreferences,
@@ -162,36 +162,43 @@ export const ExtendedAppSidebar = observer(function ExtendedAppSidebar() {
       isExtendedSidebarOpened={!!isExtendedSidebarOpened}
       extendedSidebarRef={extendedSidebarRef}
       handleClose={handleClose}
-      excludedElementId="extended-sidebar-toggle"
+      excludedElementId={
+        extendedSidebarMode === "personal" ? "personal-extended-sidebar-toggle" : "extended-sidebar-toggle"
+      }
     >
-      <div className="mb-3 flex flex-col gap-0.5">
-        <span className="px-2 text-13 font-semibold text-placeholder">{t("personal")}</span>
-        {personalNavigationItems.map((item, index) => (
-          <ExtendedSidebarItem
-            key={item.key}
-            item={item}
-            isLastChild={index === personalNavigationItems.length - 1}
-            handleOnNavigationItemDrop={handleOnPersonalNavigationItemDrop}
-            isPinned={item.is_pinned}
-            onPin={(key) => togglePersonalItem(key as TPersonalNavigationItemKey, true)}
-            onUnpin={(key) => togglePersonalItem(key as TPersonalNavigationItemKey, false)}
-            group="personal"
-          />
-        ))}
-      </div>
-      <span className="px-2 text-13 font-semibold text-placeholder">{t("common.workspace")}</span>
-      {sortedNavigationItems.map((item, index) => (
-        <ExtendedSidebarItem
-          key={item.key}
-          item={item}
-          isLastChild={index === sortedNavigationItems.length - 1}
-          handleOnNavigationItemDrop={handleOnNavigationItemDrop}
-          isPinned={item.is_pinned}
-          onPin={(key) => toggleWorkspaceItem(key, true)}
-          onUnpin={(key) => toggleWorkspaceItem(key, false)}
-          group="workspace"
-        />
-      ))}
+      {extendedSidebarMode === "personal" ? (
+        <div className="flex flex-col gap-0.5">
+          <span className="px-2 text-13 font-semibold text-placeholder">{t("personal")}</span>
+          {personalNavigationItems.map((item, index) => (
+            <ExtendedSidebarItem
+              key={item.key}
+              item={item}
+              isLastChild={index === personalNavigationItems.length - 1}
+              handleOnNavigationItemDrop={handleOnPersonalNavigationItemDrop}
+              isPinned={item.is_pinned}
+              onPin={(key) => togglePersonalItem(key as TPersonalNavigationItemKey, true)}
+              onUnpin={(key) => togglePersonalItem(key as TPersonalNavigationItemKey, false)}
+              group="personal"
+            />
+          ))}
+        </div>
+      ) : (
+        <>
+          <span className="px-2 text-13 font-semibold text-placeholder">{t("common.workspace")}</span>
+          {sortedNavigationItems.map((item, index) => (
+            <ExtendedSidebarItem
+              key={item.key}
+              item={item}
+              isLastChild={index === sortedNavigationItems.length - 1}
+              handleOnNavigationItemDrop={handleOnNavigationItemDrop}
+              isPinned={item.is_pinned}
+              onPin={(key) => toggleWorkspaceItem(key, true)}
+              onUnpin={(key) => toggleWorkspaceItem(key, false)}
+              group="workspace"
+            />
+          ))}
+        </>
+      )}
     </ExtendedSidebarWrapper>
   );
 });

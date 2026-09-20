@@ -36,7 +36,7 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
   );
 
   // store hooks
-  const { isExtendedSidebarOpened, toggleExtendedSidebar } = useAppTheme();
+  const { extendedSidebarMode, isExtendedSidebarOpened, openExtendedSidebar } = useAppTheme();
   // hooks
   const { preferences: personalPreferences } = usePersonalNavigationPreferences();
   const { preferences: workspacePreferences } = useWorkspaceNavigationPreferences();
@@ -74,6 +74,18 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
           <SidebarItemBase key={`static_${_index}`} item={item} />
         ))}
       </div>
+      <SidebarNavItem>
+        <button
+          type="button"
+          onClick={() => openExtendedSidebar("personal")}
+          className="flex flex-grow items-center gap-1.5 text-13 font-medium text-tertiary"
+          id="personal-extended-sidebar-toggle"
+          aria-label={t("personal")}
+        >
+          <MoreHorizontalOutline className="size-4 flex-shrink-0" />
+          <span>More</span>
+        </button>
+      </SidebarNavItem>
       <Disclosure as="div" className="flex flex-col" defaultOpen={!!isWorkspaceMenuOpen}>
         <div className="group flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-placeholder hover:bg-layer-transparent-hover">
           <Disclosure.Button
@@ -133,17 +145,17 @@ export const SidebarMenuItems = observer(function SidebarMenuItems() {
                 <SidebarNavItem>
                   <button
                     type="button"
-                    onClick={() => toggleExtendedSidebar()}
+                    onClick={() => openExtendedSidebar("workspace")}
                     className="flex flex-grow items-center gap-1.5 text-13 font-medium text-tertiary"
                     id="extended-sidebar-toggle"
                     aria-label={t(
-                      isExtendedSidebarOpened
+                      isExtendedSidebarOpened && extendedSidebarMode === "workspace"
                         ? "aria_labels.app_sidebar.close_extended_sidebar"
                         : "aria_labels.app_sidebar.open_extended_sidebar"
                     )}
                   >
                     <MoreHorizontalOutline className="size-4 flex-shrink-0" />
-                    <span>{isExtendedSidebarOpened ? "Hide" : "More"}</span>
+                    <span>{isExtendedSidebarOpened && extendedSidebarMode === "workspace" ? "Hide" : "More"}</span>
                   </button>
                 </SidebarNavItem>
               </>

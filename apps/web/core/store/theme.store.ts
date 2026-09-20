@@ -12,6 +12,7 @@ export interface IThemeStore {
   sidebarCollapsed: boolean | undefined;
   sidebarPeek: boolean | undefined;
   isExtendedSidebarOpened: boolean | undefined;
+  extendedSidebarMode: "personal" | "workspace";
   isExtendedProjectSidebarOpened: boolean | undefined;
   profileSidebarCollapsed: boolean | undefined;
   workspaceAnalyticsSidebarCollapsed: boolean | undefined;
@@ -24,6 +25,7 @@ export interface IThemeStore {
   toggleSidebar: (collapsed?: boolean) => void;
   toggleSidebarPeek: (peek?: boolean) => void;
   toggleExtendedSidebar: (collapsed?: boolean) => void;
+  openExtendedSidebar: (mode: "personal" | "workspace") => void;
   toggleExtendedProjectSidebar: (collapsed?: boolean) => void;
   toggleProfileSidebar: (collapsed?: boolean) => void;
   toggleWorkspaceAnalyticsSidebar: (collapsed?: boolean) => void;
@@ -39,6 +41,7 @@ export class ThemeStore implements IThemeStore {
   sidebarCollapsed: boolean | undefined = undefined;
   sidebarPeek: boolean | undefined = undefined;
   isExtendedSidebarOpened: boolean | undefined = undefined;
+  extendedSidebarMode: "workspace" | "personal" = "workspace";
   isExtendedProjectSidebarOpened: boolean | undefined = undefined;
   profileSidebarCollapsed: boolean | undefined = undefined;
   workspaceAnalyticsSidebarCollapsed: boolean | undefined = undefined;
@@ -54,6 +57,7 @@ export class ThemeStore implements IThemeStore {
       sidebarCollapsed: observable.ref,
       sidebarPeek: observable.ref,
       isExtendedSidebarOpened: observable.ref,
+      extendedSidebarMode: observable.ref,
       isExtendedProjectSidebarOpened: observable.ref,
       profileSidebarCollapsed: observable.ref,
       workspaceAnalyticsSidebarCollapsed: observable.ref,
@@ -66,6 +70,7 @@ export class ThemeStore implements IThemeStore {
       toggleSidebar: action,
       toggleSidebarPeek: action,
       toggleExtendedSidebar: action,
+      openExtendedSidebar: action,
       toggleExtendedProjectSidebar: action,
       toggleProfileSidebar: action,
       toggleWorkspaceAnalyticsSidebar: action,
@@ -119,6 +124,14 @@ export class ThemeStore implements IThemeStore {
       this.isExtendedSidebarOpened = updatedState;
     });
     localStorage.setItem("extended_sidebar_collapsed", updatedState.toString());
+  };
+
+  openExtendedSidebar = (mode: "personal" | "workspace") => {
+    runInAction(() => {
+      this.extendedSidebarMode = mode;
+      this.isExtendedSidebarOpened = true;
+    });
+    localStorage.setItem("extended_sidebar_collapsed", "true");
   };
 
   /**
