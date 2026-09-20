@@ -25,7 +25,6 @@ import { UpgradeBadge } from "@/components/workspace/upgrade-badge";
 // hooks
 import { useAppTheme } from "@/hooks/store/use-app-theme";
 import { useUser, useUserPermissions } from "@/hooks/store/user";
-import { useWorkspaceNavigationPreferences } from "@/hooks/use-navigation-preferences";
 // local imports
 import { getSidebarNavigationItemIcon } from "./helper";
 
@@ -39,10 +38,24 @@ type TExtendedSidebarItemProps = {
   disableDrag?: boolean;
   disableDrop?: boolean;
   isLastChild: boolean;
+  isPinned: boolean;
+  onPin: (key: string) => void;
+  onUnpin: (key: string) => void;
+  group: "personal" | "workspace";
 };
 
 export const ExtendedSidebarItem = observer(function ExtendedSidebarItem(props: TExtendedSidebarItemProps) {
-  const { item, handleOnNavigationItemDrop, disableDrag = false, disableDrop = false, isLastChild } = props;
+  const {
+    item,
+    handleOnNavigationItemDrop,
+    disableDrag = false,
+    disableDrop = false,
+    isLastChild,
+    isPinned,
+    onPin,
+    onUnpin,
+    group,
+  } = props;
   const { t } = useTranslation();
   // states
   const [isDragging, setIsDragging] = useState(false);
@@ -58,10 +71,6 @@ export const ExtendedSidebarItem = observer(function ExtendedSidebarItem(props: 
   const { toggleExtendedSidebar } = useAppTheme();
   const { data } = useUser();
   const { allowPermissions } = useUserPermissions();
-  const { preferences: workspacePreferences, toggleWorkspaceItem } = useWorkspaceNavigationPreferences();
-
-  // derived values
-  const isPinned = workspacePreferences.items[item.key]?.is_pinned ?? false;
 
   const handleLinkClick = () => toggleExtendedSidebar(true);
 
@@ -76,7 +85,7 @@ export const ExtendedSidebarItem = observer(function ExtendedSidebarItem(props: 
         element,
         canDrag: () => !disableDrag,
         dragHandle: dragHandleElement ?? undefined,
-        getInitialData: () => ({ id: item.key, dragInstanceId: "NAVIGATION" }), // var1
+        getInitialData: () => ({ id: item.key, dragInstanceId: "NAVIGATION", group }),
         onDragStart: () => {
           setIsDragging(true);
         },
@@ -87,7 +96,10 @@ export const ExtendedSidebarItem = observer(function ExtendedSidebarItem(props: 
       dropTargetForElements({
         element,
         canDrop: ({ source }) =>
-          !disableDrop && source?.data?.id !== item.key && source?.data?.dragInstanceId === "NAVIGATION",
+          !disableDrop &&
+          source?.data?.id !== item.key &&
+          source?.data?.dragInstanceId === "NAVIGATION" &&
+          source?.data?.group === group,
         // oxlint-disable-next-line no-shadow
         getData: ({ input, element }) => {
           // oxlint-disable-next-line no-shadow
@@ -134,21 +146,13 @@ export const ExtendedSidebarItem = observer(function ExtendedSidebarItem(props: 
         },
       })
     );
-  }, [isLastChild, handleOnNavigationItemDrop, disableDrag, disableDrop, item.key]);
+  }, [isLastChild, handleOnNavigationItemDrop, disableDrag, disableDrop, item.key, group]);
 
   const itemHref =
     item.key === "your_work"
       ? `/${workspaceSlug.toString()}${item.href}${data?.id}`
       : `/${workspaceSlug.toString()}${item.href}`;
   const isActive = itemHref === pathname;
-
-  const pinNavigationItem = (key: string) => {
-    toggleWorkspaceItem(key, true);
-  };
-
-  const unPinNavigationItem = (key: string) => {
-    toggleWorkspaceItem(key, false);
-  };
 
   const icon = getSidebarNavigationItemIcon(item.key);
 
@@ -203,17 +207,15 @@ export const ExtendedSidebarItem = observer(function ExtendedSidebarItem(props: 
             )}
             {isPinned ? (
               <Tooltip label="Unpin">
-                <UnpinOutline
-                  className="size-3.5 flex-shrink-0 text-placeholder outline-none hover:text-tertiary"
-                  onClick={() => unPinNavigationItem(item.key)}
-                />
+                <button type="button" onClick={() => onUnpin(item.key)} aria-label="Unpin">
+                  <UnpinOutline className="size-3.5 flex-shrink-0 text-placeholder outline-none hover:text-tertiary" />
+                </button>
               </Tooltip>
             ) : (
               <Tooltip label="Pin">
-                <PinOutline
-                  className="size-3.5 flex-shrink-0 text-placeholder outline-none hover:text-tertiary"
-                  onClick={() => pinNavigationItem(item.key)}
-                />
+                <button type="button" onClick={() => onPin(item.key)} aria-label="Pin">
+                  <PinOutline className="size-3.5 flex-shrink-0 text-placeholder outline-none hover:text-tertiary" />
+                </button>
               </Tooltip>
             )}
           </div>

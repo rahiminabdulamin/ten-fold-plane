@@ -24,4 +24,16 @@ describe("personal extended sidebar items", () => {
     expect(getDropSortOrder("personal", "workspace", 0, 0, items)).toBeUndefined();
     expect(getDropSortOrder("personal", "personal", 0, 1, items)).toBe(150);
   });
+
+  it("returns only the user-pinned personal destination for the primary sidebar", () => {
+    const pinnedYourWork: TPersonalNavigationPreferences = {
+      ...preferences,
+      items: {
+        ...preferences.items,
+        your_work: { ...preferences.items.your_work, enabled: true },
+      },
+    };
+
+    expect(getPinnedPersonalItems(pinnedYourWork).map((item) => item.key)).toEqual(["your_work"]);
+  });
 });
