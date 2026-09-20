@@ -9,6 +9,7 @@ describe("getCalendarIssueIdsByDate", () => {
         span: { id: "span", start_date: "2026-11-10", target_date: "2026-11-13" },
         single: { id: "single", start_date: null, target_date: "2026-11-13" },
       },
+      ["span", "single"],
       ["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14"]
     );
 
@@ -19,6 +20,24 @@ describe("getCalendarIssueIdsByDate", () => {
       "2026-11-12": ["span"],
       "2026-11-13": ["span", "single"],
       "2026-11-14": [],
+    });
+  });
+
+  it("only places work items returned for the active calendar", () => {
+    const issueIds = getCalendarIssueIdsByDate(
+      {
+        current: { id: "current", start_date: "2026-11-10", target_date: "2026-11-13" },
+        cachedElsewhere: { id: "cachedElsewhere", start_date: "2026-11-10", target_date: "2026-11-13" },
+      },
+      ["current"],
+      ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13"]
+    );
+
+    expect(issueIds).toEqual({
+      "2026-11-10": ["current"],
+      "2026-11-11": ["current"],
+      "2026-11-12": ["current"],
+      "2026-11-13": ["current"],
     });
   });
 });

@@ -75,7 +75,11 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
 
   if (!week) return null;
 
-  const issueIdsByDate = getCalendarIssueIdsByDate(issues ?? {}, Object.keys(week));
+  const issueIdsByDate = getCalendarIssueIdsByDate(
+    issues ?? {},
+    [...new Set(Object.values(groupedIssueIds).flat())],
+    Object.keys(week)
+  );
 
   const shouldShowDay = (dayDate: Date) => {
     if (showWeekends) return true;

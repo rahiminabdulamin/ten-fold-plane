@@ -8,11 +8,13 @@ type CalendarIssue = {
 
 export const getCalendarIssueIdsByDate = (
   issues: Record<string, CalendarIssue | undefined>,
+  issueIds: string[],
   calendarDates: string[]
 ): Record<string, string[]> => {
   const issueIdsByDate = Object.fromEntries(calendarDates.map((date) => [date, [] as string[]]));
 
-  Object.values(issues).forEach((issue) => {
+  issueIds.forEach((issueId) => {
+    const issue = issues[issueId];
     if (!issue?.target_date) return;
 
     const dueDate = parseISO(issue.target_date);
@@ -21,7 +23,7 @@ export const getCalendarIssueIdsByDate = (
 
     calendarDates.forEach((date) => {
       const calendarDate = parseISO(date);
-      if (calendarDate >= startDate && calendarDate <= dueDate) issueIdsByDate[date].push(issue.id);
+      if (calendarDate >= startDate && calendarDate <= dueDate) issueIdsByDate[date].push(issueId);
     });
   });
 
