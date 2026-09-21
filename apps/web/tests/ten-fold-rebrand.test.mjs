@@ -75,6 +75,8 @@ test("the Copilot launcher uses the animated Ten-Fold eye mark", async () => {
 
   assert.match(copilot, /tenfold-rebrand-logo-moving-eye\.gif\?url/);
   assert.match(copilot, /openIcon:\s*\(props(?::[^)]*)?\)\s*=>\s*\(\s*<svg[^>]*>\s*<image href=\{tenfoldMovingEye\}/);
+  assert.match(copilot, /className: "cpk:rounded-2xl"/);
+  assert.match(copilot, /className="h-full w-full rounded-2xl"/);
 });
 
 test("invitations and onboarding use the Ten-Fold wordmark", async () => {

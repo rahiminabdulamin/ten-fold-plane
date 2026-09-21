@@ -612,8 +612,9 @@ function PlaneTools() {
     () => ({
       onPointerDown: startLauncherDrag,
       onClick: stopLauncherClick,
+      className: "cpk:rounded-2xl",
       openIcon: (props: React.SVGProps<SVGSVGElement>) => (
-        <svg {...props} className="h-full w-full rounded-full" viewBox="0 0 1 1">
+        <svg {...props} className="h-full w-full rounded-2xl" viewBox="0 0 1 1">
           <image href={tenfoldMovingEye} height="1" width="1" />
         </svg>
       ),
