@@ -41,6 +41,7 @@ from plane.db.models import (
     IssueVersion,
     IssueDescriptionVersion,
     ProjectMember,
+    WorkspaceMember,
     EstimatePoint,
 )
 from plane.utils.content_validator import (
@@ -146,12 +147,12 @@ class IssueCreateSerializer(BaseSerializer):
             if not is_valid:
                 raise serializers.ValidationError({"description_binary": "Invalid binary data"})
 
-        # Validate assignees are from project
+        # Assignees may be any active member of the issue workspace.
         if attrs.get("assignee_ids", []):
-            attrs["assignee_ids"] = ProjectMember.objects.filter(
-                project_id=self.context["project_id"],
-                role__gte=15,
+            attrs["assignee_ids"] = WorkspaceMember.objects.filter(
+                workspace_id=self.context["workspace_id"],
                 is_active=True,
+                member__is_bot=False,
                 member_id__in=attrs["assignee_ids"],
             ).values_list("member_id", flat=True)
 
@@ -233,11 +234,11 @@ class IssueCreateSerializer(BaseSerializer):
             # Then assign it to default assignee, if it is a valid assignee
             if (
                 default_assignee_id is not None
-                and ProjectMember.objects.filter(
+                and WorkspaceMember.objects.filter(
                     member_id=default_assignee_id,
-                    project_id=project_id,
-                    role__gte=15,
+                    workspace_id=workspace_id,
                     is_active=True,
+                    member__is_bot=False,
                 ).exists()
             ):
                 try:

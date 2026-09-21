@@ -329,12 +329,11 @@ class SearchEndpoint(BaseAPIView):
                             q |= Q(**{f"{field}__icontains": query})
 
                     users = (
-                        ProjectMember.objects.filter(
+                        WorkspaceMember.objects.filter(
                             q,
                             is_active=True,
                             workspace__slug=slug,
                             member__is_bot=False,
-                            project_id=project_id,
                         )
                         .annotate(
                             member__avatar_url=Case(
