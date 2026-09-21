@@ -1,0 +1,39 @@
+=== Production deploy started: 2026-09-21T08:35:11+08:00 ===
+Commit: bbc6e1015187468137f7ef54776d9b106efd19c6
+Working tree:
+?? deploy-20260921-083511.log
+Deploying checkout: /home/rahimin_amin/ten-fold-plane/ten-fold-plane
+Checkout commit: bbc6e10151
+Source fingerprint: 4521ab7fdd76898931ba65aab12adb2d656e92954a7054887547bba18ea6c3eb
+Uploading Ten-Fold to root@178.128.104.112:/opt/plane/app/ten-fold-plane...
+Connection closed by 178.128.104.112 port 22
+rsync: connection unexpectedly closed (0 bytes received so far) [sender]
+rsync error: unexplained error (code 255) at io.c(232) [sender=3.2.7]
+Deployment failed during source upload (line 41).
+Command exited with non-zero status 255
+	Command being timed: "./deploy-production.sh"
+	User time (seconds): 4.34
+	System time (seconds): 1.68
+	Percent of CPU this job got: 2%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:45.48
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7680
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 23
+	Minor (reclaiming a frame) page faults: 1384399
+	Voluntary context switches: 24744
+	Involuntary context switches: 281
+	Swaps: 0
+	File system inputs: 117768
+	File system outputs: 1240
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 255
+
+=== Production deploy finished: 2026-09-21T08:38:56+08:00 (exit=255, elapsed=3m 45s) ===
+Log: deploy-20260921-083511.log
