@@ -85,22 +85,15 @@ export function NameColumn(props: NameProps) {
                 data={[""]}
                 keyExtractor={(item) => item}
                 popoverClassName="justify-end"
-                buttonClassName="outline-none	origin-center rotate-90 size-8 aspect-square flex-shrink-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity"
+                buttonClassName="outline-none origin-center rotate-90 size-8 aspect-square flex-shrink-0 grid place-items-center"
                 render={() => (
-                  <div
-                    role="button"
-                    tabIndex={0}
+                  <button
+                    type="button"
                     className="flex cursor-pointer items-center gap-x-3"
                     onClick={() => setRemoveMemberModal(rowData)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setRemoveMemberModal(rowData);
-                      }
-                    }}
                   >
                     <DeleteOutline className="size-3.5 align-middle" /> {id === currentUser?.id ? "Leave " : "Remove "}
-                  </div>
+                  </button>
                 )}
               />
             )}
@@ -149,9 +142,9 @@ export const AccountTypeColumn = observer(function AccountTypeColumn(props: Acco
           name="role"
           control={control}
           rules={{ required: "Role is required." }}
-          render={({ field: { value } }) => (
+          render={({ field: { value: selectedRole } }) => (
             <CustomSelect
-              value={value as EUserPermissions}
+              value={selectedRole as EUserPermissions}
               onChange={async (value: EUserPermissions) => {
                 if (!workspaceSlug) return;
                 try {
