@@ -92,6 +92,7 @@ export const SendProjectInvitationModal = observer(function SendProjectInvitatio
           type: TOAST_TYPE.SUCCESS,
           message: "Members added successfully.",
         });
+        return undefined;
       })
       .catch((error) => {
         console.error(error);
@@ -189,8 +190,8 @@ export const SendProjectInvitationModal = observer(function SendProjectInvitatio
           </div>
 
           <div className="mb-3 space-y-4">
-            {fields.map((field, index) => (
-              <div key={field.id} className="group mb-1 flex w-full items-start justify-between gap-x-4 text-13">
+            {fields.map((memberField, index) => (
+              <div key={memberField.id} className="group mb-1 flex w-full items-start justify-between gap-x-4 text-13">
                 <div className="flex w-full grow flex-col gap-1">
                   <Controller
                     control={control}
@@ -232,6 +233,7 @@ export const SendProjectInvitationModal = observer(function SendProjectInvitatio
                           }}
                           options={options}
                           optionsClassName="w-48"
+                          portal={false}
                         />
                       );
                     }}
