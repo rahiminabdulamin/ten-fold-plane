@@ -62,37 +62,41 @@ export const IssuesHeader = observer(function IssuesHeader() {
 
   return (
     <Header>
-      <Header.LeftItem>
-        <div className="flex items-center gap-2.5">
-          <Breadcrumbs onBack={() => router.back()} isLoading={loader === "init-loader"} className="flex-grow-0">
-            <CommonProjectBreadcrumbs workspaceSlug={workspaceSlug?.toString()} projectId={projectId?.toString()} />
-            <Breadcrumbs.Item
-              component={
-                <BreadcrumbLink
-                  label="Work Items"
-                  href={`/${workspaceSlug}/projects/${projectId}/issues/`}
-                  icon={<WorkItemsOutline className="h-4 w-4 text-tertiary" />}
-                  isLast
-                />
-              }
-              isLast
-            />
-          </Breadcrumbs>
+      <Header.LeftItem className="min-w-0 flex-1 flex-nowrap overflow-hidden">
+        <div className="flex min-w-0 flex-nowrap items-center gap-2.5 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <Breadcrumbs onBack={() => router.back()} isLoading={loader === "init-loader"} className="flex-grow-0">
+              <CommonProjectBreadcrumbs workspaceSlug={workspaceSlug?.toString()} projectId={projectId?.toString()} />
+              <Breadcrumbs.Item
+                component={
+                  <BreadcrumbLink
+                    label="Work Items"
+                    href={`/${workspaceSlug}/projects/${projectId}/issues/`}
+                    icon={<WorkItemsOutline className="h-4 w-4 text-tertiary" />}
+                    isLast
+                  />
+                }
+                isLast
+              />
+            </Breadcrumbs>
+          </div>
           {issuesCount && issuesCount > 0 ? (
-            <Tooltip
-              label={`There are ${issuesCount} ${issuesCount > 1 ? "work items" : "work item"} in this project`}
-              layout="stacked"
-              side="bottom"
-              disabled={isMobile}
-            >
-              <CountChip count={issuesCount} />
-            </Tooltip>
+            <div className="shrink-0">
+              <Tooltip
+                label={`There are ${issuesCount} ${issuesCount > 1 ? "work items" : "work item"} in this project`}
+                layout="stacked"
+                side="bottom"
+                disabled={isMobile}
+              >
+                <CountChip count={issuesCount} />
+              </Tooltip>
+            </div>
           ) : null}
         </div>
         {currentProjectDetails?.anchor ? (
           <a
             href={publishedURL}
-            className="group flex items-center gap-1.5 rounded-sm bg-accent-primary/10 px-2.5 py-1 text-11 font-medium text-accent-primary"
+            className="group flex shrink-0 items-center gap-1.5 rounded-sm bg-accent-primary/10 px-2.5 py-1 text-11 font-medium text-accent-primary"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -104,7 +108,7 @@ export const IssuesHeader = observer(function IssuesHeader() {
           <></>
         )}
       </Header.LeftItem>
-      <Header.RightItem>
+      <Header.RightItem className="shrink-0">
         <div className="hidden gap-2 md:flex">
           <HeaderFilters
             projectId={projectId}

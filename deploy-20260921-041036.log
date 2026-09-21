@@ -4640,3 +4640,35 @@ Running migrations:
 #23 4.573 ✓ Lockfile passes supply-chain policies (verified 54s ago)
 #23 4.599 Lockfile is up to date, resolution step is skipped
 #23 5.408 Already up to date
+#23 10.01 
+#23 10.01 devDependencies:
+#23 10.01 + husky 9.1.7
+#23 10.01 + lint-staged 16.2.7
+#23 10.01 + oxfmt 0.35.0
+#23 10.01 + oxlint 1.51.0
+#23 10.01 + react-doctor 0.4.2
+#23 10.01 + turbo 2.10.11
+#23 10.01 
+#23 10.02 . prepare$ husky
+#23 10.15 . prepare: .git can't be found
+#23 10.15 . prepare: Done
+#23 10.49 Done in 7.8s using pnpm v11.10.0
+#23 DONE 10.7s
+
+#24 [installer 12/12] RUN pnpm turbo run build --filter=live
+#24 2.999 Scope: all 13 workspace projects
+#24 3.992 ✓ Lockfile passes supply-chain policies (verified 1m ago)
+#24 4.034 Lockfile is up to date, resolution step is skipped
+#24 4.526 Already up to date
+#24 4.638 
+#24 4.638    ╭──────────────────────────────────────────────╮
+#24 4.638    │                                              │
+#24 4.638    │     Update available! 11.10.0 → 12.5.1.      │
+#24 4.638    │     Changelog: https://pnpm.io/v/12.5.1      │
+#24 4.638    │   To update, run: corepack use pnpm@12.5.1   │
+#24 4.638    │                                              │
+#24 4.638    ╰──────────────────────────────────────────────╯
+#24 4.638 
+
+=== Production deploy finished: 2026-09-21T04:39:42+08:00 (exit=0, elapsed=29m 6s) ===
+Log: deploy-20260921-041036.log

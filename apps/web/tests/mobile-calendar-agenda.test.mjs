@@ -24,6 +24,16 @@ test("mobile calendar dates indicate the number of work items", async () => {
   assert.match(dayTile, /issueIds\?\.length > 0/);
 });
 
+test("mobile calendar uses the requested neutral range colors", async () => {
+  const dayTile = await readFile(
+    new URL("../core/components/issues/issue-layouts/calendar/day-tile.tsx", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(dayTile, /bg-\[#BFBFBF\]/);
+  assert.match(dayTile, /bg-\[#71777A\]/);
+});
+
 test("mobile calendar joins adjacent dates that share a work item", async () => {
   const dayTile = await readFile(
     new URL("../core/components/issues/issue-layouts/calendar/day-tile.tsx", import.meta.url),
