@@ -41,6 +41,7 @@ def project_add_user_email(current_site, project_member_id, invitor_id):
             "email": member_email,
             "inviter_first_name": inviter_first_name,
             "project_url": project_url,
+            "logo_url": f"{current_site}/branding/tenfold-rebrand-logo-white.png",
         }
 
         # Get the email configuration
@@ -55,7 +56,7 @@ def project_add_user_email(current_site, project_member_id, invitor_id):
         ) = get_email_configuration()
 
         # Set the subject
-        subject = "You have been invited to a Plane project"
+        subject = "You have been invited to a Ten-Fold project"
 
         # Render the email template
         html_content = render_to_string("emails/notifications/project_addition.html", context)

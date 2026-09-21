@@ -114,6 +114,8 @@ body:has([data-copilot-sidebar][aria-hidden="false"]) [data-slot="chat-toggle-bu
   top: var(--copilot-launcher-top) !important;
   right: auto !important;
   bottom: auto !important;
+  border-radius: 1rem !important;
+  overflow: hidden !important;
   touch-action: none;
 }
 

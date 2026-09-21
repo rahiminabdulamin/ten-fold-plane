@@ -71,12 +71,14 @@ test("Ten-Fold brand marks use the rebranded assets and label loading states", a
 });
 
 test("the Copilot launcher uses the animated Ten-Fold eye mark", async () => {
-  const copilot = await read("core/components/copilot/root.tsx");
+  const [copilot, styles] = await Promise.all([read("core/components/copilot/root.tsx"), read("styles/globals.css")]);
 
   assert.match(copilot, /tenfold-rebrand-logo-moving-eye\.gif\?url/);
   assert.match(copilot, /openIcon:\s*\(props(?::[^)]*)?\)\s*=>\s*\(\s*<svg[^>]*>\s*<image href=\{tenfoldMovingEye\}/);
-  assert.match(copilot, /className: "cpk:rounded-2xl"/);
-  assert.match(copilot, /className="h-full w-full rounded-2xl"/);
+  assert.match(
+    styles,
+    /\[data-slot="chat-toggle-button"\][\s\S]*border-radius:\s*1rem !important[\s\S]*overflow:\s*hidden/
+  );
 });
 
 test("invitations and onboarding use the Ten-Fold wordmark", async () => {
