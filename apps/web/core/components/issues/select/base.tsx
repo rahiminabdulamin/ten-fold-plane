@@ -195,6 +195,7 @@ export const WorkItemLabelSelectBase = observer(function WorkItemLabelSelectBase
           as="ul"
           className="pointer-events-auto fixed z-[9999]"
           data-prevent-outside-click
+          modal={false}
           onMouseDown={(event) => event.stopPropagation()}
           static
         >
