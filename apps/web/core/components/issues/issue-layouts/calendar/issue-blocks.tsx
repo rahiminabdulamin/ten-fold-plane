@@ -32,6 +32,8 @@ type Props = {
   isMobileView?: boolean;
   canEditProperties: (projectId: string | undefined) => boolean;
   isEpic?: boolean;
+  hiddenIssueIds?: string[];
+  desktopContentOffset?: number;
 };
 
 export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: Props) {
@@ -49,6 +51,8 @@ export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: 
     isMobileView = false,
     canEditProperties,
     isEpic = false,
+    hiddenIssueIds = [],
+    desktopContentOffset = 0,
   } = props;
   const formattedDatePayload = renderFormattedPayloadDate(date);
   const { t } = useTranslation();
@@ -69,19 +73,21 @@ export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: 
       : !!nextPageResults;
 
   return (
-    <>
-      {issueIdList?.map((issueId) => (
-        <div key={issueId} className="relative cursor-pointer p-1 px-2">
-          <CalendarIssueBlockRoot
-            issueId={issueId}
-            calendarDate={formattedDatePayload}
-            quickActions={quickActions}
-            isDragDisabled={isDragDisabled || isMobileView}
-            canEditProperties={canEditProperties}
-            isEpic={isEpic}
-          />
-        </div>
-      ))}
+    <div style={{ paddingTop: desktopContentOffset || undefined }}>
+      {issueIdList
+        ?.filter((issueId) => !hiddenIssueIds.includes(issueId))
+        .map((issueId) => (
+          <div key={issueId} className="relative cursor-pointer p-1 px-2">
+            <CalendarIssueBlockRoot
+              issueId={issueId}
+              calendarDate={formattedDatePayload}
+              quickActions={quickActions}
+              isDragDisabled={isDragDisabled || isMobileView}
+              canEditProperties={canEditProperties}
+              isEpic={isEpic}
+            />
+          </div>
+        ))}
 
       {isPaginating && (
         <div className="p-1 px-2">
@@ -113,6 +119,6 @@ export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: 
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 });

@@ -33,11 +33,21 @@ type Props = {
   quickActions: TRenderQuickActions;
   isDragging?: boolean;
   isEpic?: boolean;
+  rangePosition?: "single" | "start" | "middle" | "end";
+  labelPrefix?: string;
 };
 
 export const CalendarIssueBlock = observer(
   forwardRef(function CalendarIssueBlock(props: Props, ref: React.ForwardedRef<HTMLDivElement>) {
-    const { issue, calendarDate, quickActions, isDragging = false, isEpic = false } = props;
+    const {
+      issue,
+      calendarDate,
+      quickActions,
+      isDragging = false,
+      isEpic = false,
+      rangePosition: rangePositionOverride,
+      labelPrefix,
+    } = props;
     // states
     const [isMenuActive, setIsMenuActive] = useState(false);
     // refs
@@ -56,13 +66,9 @@ export const CalendarIssueBlock = observer(
     const startDate = renderFormattedPayloadDate(issue.start_date);
     const dueDate = renderFormattedPayloadDate(issue.target_date);
     const isDateRange = !!startDate && !!dueDate && startDate !== dueDate;
-    const rangePosition = !isDateRange
-      ? "single"
-      : calendarDate === startDate
-        ? "start"
-        : calendarDate === dueDate
-          ? "end"
-          : "middle";
+    const rangePosition =
+      rangePositionOverride ??
+      (!isDateRange ? "single" : calendarDate === startDate ? "start" : calendarDate === dueDate ? "end" : "middle");
 
     // handlers
     const handleIssuePeekOverview = (peekIssue: TIssue) =>
@@ -145,7 +151,10 @@ export const CalendarIssueBlock = observer(
                         displayProperties={issuesFilter?.issueFilters?.displayProperties}
                       />
                     )}
-                    <div className="truncate text-13 font-medium md:text-11 md:font-regular">{issue.name}</div>
+                    <div className="truncate text-13 font-medium md:text-11 md:font-regular">
+                      {labelPrefix}
+                      {issue.name}
+                    </div>
                   </div>
                   {/* Wrapper exists only to stop clicks reaching the ControlLink; the
                       quick-action menu inside carries its own interactive semantics. */}

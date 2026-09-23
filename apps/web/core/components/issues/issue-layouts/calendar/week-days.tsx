@@ -4,6 +4,7 @@
  * See the LICENSE file for details.
  */
 
+import type { CSSProperties } from "react";
 import { observer } from "mobx-react";
 // plane imports
 import type { TGroupedIssues, TIssue, TIssueMap, TPaginationData, ICalendarDate, ICalendarWeek } from "@plane/types";
@@ -17,7 +18,9 @@ import type { IProjectIssuesFilter } from "@/store/issue/project";
 import type { IProjectViewIssuesFilter } from "@/store/issue/project-views";
 import type { TRenderQuickActions } from "../list/list-view-types";
 import { getCalendarIssueIdsByDate } from "./calendar-range";
+import { getCalendarIssueSpans } from "./calendar-range";
 import { CalendarDayTile } from "./day-tile";
+import { CalendarIssueBlockRoot } from "./issue-block-root";
 
 type Props = {
   issuesFilterStore: IProjectIssuesFilter | IModuleIssuesFilter | ICycleIssuesFilter | IProjectViewIssuesFilter;
@@ -76,7 +79,13 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
   if (!week) return null;
 
   const sortedWeekDays = getOrderedDays(Object.values(week), (item) => item.date.getDay(), startOfWeek);
-  const calendarDates = sortedWeekDays
+  const shouldShowDay = (dayDate: Date) => {
+    if (showWeekends) return true;
+    const day = dayDate.getDay();
+    return !(day === 0 || day === 6);
+  };
+  const visibleWeekDays = sortedWeekDays.filter((date) => shouldShowDay(date.date));
+  const calendarDates = visibleWeekDays
     .map((date) => renderFormattedPayloadDate(date.date))
     .filter((date): date is string => !!date);
   const getAdjacentCalendarDates = () => {
@@ -96,14 +105,9 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
 
   const issueRowById: Record<string, number> = {};
   const laneEnds: number[] = [];
-  const issueSpans = [...new Set(calendarDates.flatMap((date) => issueIdsByDate[date] ?? []))]
-    .map((issueId) => {
-      const dates = calendarDates
-        .map((date, index) => (issueIdsByDate[date]?.includes(issueId) ? index : -1))
-        .filter((index) => index >= 0);
-      return { issueId, start: dates[0], end: dates[dates.length - 1] };
-    })
-    .toSorted((a, b) => a.start - b.start || a.end - b.end);
+  const issueSpans = [...getCalendarIssueSpans(issues ?? {}, issueIdsByDate, calendarDates)].toSorted(
+    (a, b) => a.start - b.start || a.end - b.end
+  );
 
   issueSpans.forEach(({ issueId, start, end }) => {
     const row = laneEnds.findIndex((laneEnd) => laneEnd < start);
@@ -112,49 +116,87 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
     issueRowById[issueId] = issueRow;
   });
 
-  const shouldShowDay = (dayDate: Date) => {
-    if (showWeekends) return true;
-    const day = dayDate.getDay();
-    return !(day === 0 || day === 6);
-  };
+  const weekHeight = calendarLayout === "month" ? 32 + Math.max(80, 40 + laneEnds.length * 40) : undefined;
 
   return (
     <div
-      className={cn("grid divide-subtle-1 md:divide-x-[0.5px]", {
-        "grid-cols-7": showWeekends,
-        "grid-cols-5": !showWeekends,
-        "h-full": calendarLayout !== "month",
-      })}
+      className="relative md:h-[var(--calendar-week-height)] md:overflow-hidden"
+      style={weekHeight ? ({ "--calendar-week-height": `${weekHeight}px` } as CSSProperties) : undefined}
     >
-      {sortedWeekDays.map((date: ICalendarDate) => {
-        if (!shouldShowDay(date.date)) return null;
+      <div
+        className={cn("grid divide-subtle-1 md:divide-x-[0.5px]", {
+          "grid-cols-7": showWeekends,
+          "grid-cols-5": !showWeekends,
+          "h-full": calendarLayout !== "month",
+        })}
+      >
+        {sortedWeekDays.map((date: ICalendarDate) => {
+          if (!shouldShowDay(date.date)) return null;
 
-        return (
-          <CalendarDayTile
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            issuesFilterStore={issuesFilterStore}
-            key={renderFormattedPayloadDate(date.date)}
-            date={date}
-            issues={issues}
-            groupedIssueIds={{ ...groupedIssueIds, ...issueIdsByDate }}
-            issueRowById={issueRowById}
-            issueRowCount={laneEnds.length}
-            loadMoreIssues={loadMoreIssues}
-            getPaginationData={getPaginationData}
-            getGroupIssueCount={getGroupIssueCount}
-            quickActions={quickActions}
-            enableQuickIssueCreate={enableQuickIssueCreate}
-            disableIssueCreation={disableIssueCreation}
-            quickAddCallback={quickAddCallback}
-            addIssuesToView={addIssuesToView}
-            readOnly={readOnly}
-            handleDragAndDrop={handleDragAndDrop}
-            canEditProperties={canEditProperties}
-            isEpic={isEpic}
-          />
-        );
-      })}
+          return (
+            <CalendarDayTile
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              issuesFilterStore={issuesFilterStore}
+              key={renderFormattedPayloadDate(date.date)}
+              date={date}
+              issues={issues}
+              groupedIssueIds={{ ...groupedIssueIds, ...issueIdsByDate }}
+              issueRowById={issueRowById}
+              issueRowCount={laneEnds.length}
+              loadMoreIssues={loadMoreIssues}
+              getPaginationData={getPaginationData}
+              getGroupIssueCount={getGroupIssueCount}
+              quickActions={quickActions}
+              enableQuickIssueCreate={enableQuickIssueCreate}
+              disableIssueCreation={disableIssueCreation}
+              quickAddCallback={quickAddCallback}
+              addIssuesToView={addIssuesToView}
+              readOnly={readOnly}
+              handleDragAndDrop={handleDragAndDrop}
+              canEditProperties={canEditProperties}
+              isEpic={isEpic}
+              desktopHiddenIssueIds={issueSpans.map(({ issueId }) => issueId)}
+            />
+          );
+        })}
+      </div>
+      <div
+        className={cn("auto-rows-10 pointer-events-none absolute top-8 right-0 left-0 z-10 hidden md:grid", {
+          "grid-cols-7": showWeekends,
+          "grid-cols-5": !showWeekends,
+        })}
+      >
+        {issueSpans.map((span) => {
+          const rangePosition = span.continuesBefore
+            ? span.continuesAfter
+              ? "middle"
+              : "end"
+            : span.continuesAfter
+              ? "start"
+              : "single";
+          const calendarDate = calendarDates[span.start];
+
+          return (
+            <div
+              key={span.issueId}
+              className="pointer-events-auto z-10 min-w-0 px-2 py-1"
+              style={{ gridColumn: `${span.start + 1} / ${span.end + 2}`, gridRow: issueRowById[span.issueId] + 1 }}
+            >
+              <CalendarIssueBlockRoot
+                issueId={span.issueId}
+                calendarDate={calendarDate}
+                quickActions={quickActions}
+                isDragDisabled={readOnly}
+                canEditProperties={canEditProperties}
+                isEpic={isEpic}
+                rangePosition={rangePosition}
+                labelPrefix={span.continuesBefore ? "↳ " : undefined}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 });

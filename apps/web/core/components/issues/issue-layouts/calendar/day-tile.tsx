@@ -53,6 +53,7 @@ type Props = {
   setSelectedDate: (date: Date) => void;
   canEditProperties: (projectId: string | undefined) => boolean;
   isEpic?: boolean;
+  desktopHiddenIssueIds?: string[];
 };
 
 export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
@@ -77,6 +78,7 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
     setSelectedDate,
     canEditProperties,
     isEpic = false,
+    desktopHiddenIssueIds = [],
   } = props;
 
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -183,6 +185,7 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
                 "min-h-[5rem]": isMonthLayout,
               }
             )}
+            style={{ minHeight: isMonthLayout ? `${Math.max(80, 40 + issueRowCount * 40)}px` : undefined }}
           >
             <CalendarIssueBlocks
               date={date.date}
@@ -199,6 +202,8 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
               readOnly={readOnly}
               canEditProperties={canEditProperties}
               isEpic={isEpic}
+              hiddenIssueIds={desktopHiddenIssueIds}
+              desktopContentOffset={issueRowCount * 40}
             />
           </div>
         </div>
