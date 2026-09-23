@@ -452,6 +452,7 @@ export function PriorityDropdown(props: Props) {
             as="div"
             static
             modal={false}
+            data-prevent-outside-click
             className="z-40 my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none"
             ref={setPopperElement}
             style={styles.popper}

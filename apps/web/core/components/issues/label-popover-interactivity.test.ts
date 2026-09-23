@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 
 const createDialogSelector = new URL("./select/base.tsx", import.meta.url);
 const detailPanelSelector = new URL("./issue-detail/label/select/label-select.tsx", import.meta.url);
+const stateDropdown = new URL("../dropdowns/state/base.tsx", import.meta.url);
+const priorityDropdown = new URL("../dropdowns/priority.tsx", import.meta.url);
 
 describe("label popover interactivity", () => {
   it("protects interactions inside the create-dialog label menu", () => {
@@ -29,5 +31,12 @@ describe("label popover interactivity", () => {
     const content = readFileSync(fileURLToPath(detailPanelSelector), "utf8");
     expect(content).not.toContain('as="li"\n                    value={query}');
     expect(content).toMatch(/canCreateLabel \? \(\s*<button/);
+  });
+
+  it("keeps the detail panel open while choosing State or Priority", () => {
+    for (const selector of [stateDropdown, priorityDropdown]) {
+      const content = readFileSync(fileURLToPath(selector), "utf8");
+      expect(content).toContain("data-prevent-outside-click");
+    }
   });
 });
