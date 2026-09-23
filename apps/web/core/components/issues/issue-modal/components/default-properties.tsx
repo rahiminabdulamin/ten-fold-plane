@@ -299,6 +299,9 @@ export const IssueDefaultProperties = observer(function IssueDefaultProperties(p
                     size="xs"
                   />
                 )}
+                <span className="max-w-40 truncate">
+                  {selectedParentIssue?.name?.substring(0, 50) ?? t("add_parent")}
+                </span>
               </button>
             }
             placement="bottom-start"
