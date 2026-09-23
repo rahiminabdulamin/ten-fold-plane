@@ -23,7 +23,7 @@ class GristClient:
         self.secret = getattr(settings, "GRIST_INTERNAL_SECRET", "")
 
     def document_path(self, document_id, suffix=""):
-        if not self._ID.fullmatch(document_id) or not suffix.startswith("/"):
+        if not self._ID.fullmatch(document_id) or (suffix and not suffix.startswith("/")):
             raise ValueError("Invalid Grist document path")
         return f"/api/docs/{document_id}{suffix}"
 
@@ -36,6 +36,7 @@ class GristClient:
             json=json,
             timeout=timeout,
             headers={
+                "Content-Type": "application/json",
                 "X-Ten-Fold-Internal-Secret": self.secret,
                 "X-Ten-Fold-User": "spreadsheet-system@tenfold.internal",
             },

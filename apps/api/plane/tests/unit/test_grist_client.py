@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 import pytest
+from types import SimpleNamespace
 
 from plane.integrations.grist import GristClient, GristConfigurationError
 
@@ -20,6 +21,7 @@ def test_grist_client_builds_allowlisted_document_paths(settings):
     settings.GRIST_INTERNAL_SECRET = "test-secret"
     client = GristClient()
 
+    assert client.document_path("doc_123") == "/api/docs/doc_123"
     assert client.document_path("doc_123", "/tables") == "/api/docs/doc_123/tables"
 
     with pytest.raises(ValueError):
@@ -46,3 +48,20 @@ def test_create_document_accepts_scalar_document_id(settings, monkeypatch):
     monkeypatch.setattr(client, "request", lambda *args, **kwargs: 123)
 
     assert client.create_document("Budget", 1) == "123"
+
+
+@pytest.mark.unit
+def test_grist_client_marks_empty_body_requests_as_json_api_requests(settings, monkeypatch):
+    settings.GRIST_INTERNAL_URL = "http://grist:8484"
+    client = GristClient()
+    captured = {}
+
+    def request(*_args, **kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(content=b"", raise_for_status=lambda: None)
+
+    monkeypatch.setattr("plane.integrations.grist.requests.request", request)
+
+    client.archive_document("doc_123")
+
+    assert captured["headers"]["Content-Type"] == "application/json"

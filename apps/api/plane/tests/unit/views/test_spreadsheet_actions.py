@@ -199,6 +199,7 @@ def test_grist_forward_auth_uses_the_launch_document_for_session_routes():
     assert _grist_authorization_document_id(
         "/grist/o/ten-fold/api/session/access/active", {"document": "g31document"}
     ) == "g31document"
+    assert _grist_authorization_document_id("/o/ten-fold/boot", {"document": "g31document"}) == "g31document"
 
 
 @pytest.mark.unit

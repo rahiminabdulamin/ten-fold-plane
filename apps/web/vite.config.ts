@@ -33,6 +33,13 @@ export default defineConfig(() => ({
   },
   server: {
     host: "127.0.0.1",
+    proxy: {
+      "/o": { target: "http://127.0.0.1:8485", ws: true },
+      "/dw": { target: "http://127.0.0.1:8485", ws: true },
+      "/v": { target: "http://127.0.0.1:8485" },
+      "/icons": { target: "http://127.0.0.1:8485" },
+      "/locales": { target: "http://127.0.0.1:8485" },
+    },
   },
   // No SSR-specific overrides needed; alias resolves to ESM build
 }));

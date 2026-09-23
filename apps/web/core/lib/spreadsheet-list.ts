@@ -3,6 +3,11 @@ import type { TSpreadsheetDocument, TSpreadsheetStatus } from "@/services/spread
 export type TSpreadsheetSort = "updated-desc" | "created-desc" | "name-asc" | "name-desc";
 export type TSpreadsheetStatusFilter = TSpreadsheetStatus | "all";
 
+export const prependSpreadsheetDocument = (documents: TSpreadsheetDocument[], document: TSpreadsheetDocument) => [
+  document,
+  ...documents.filter((item) => item.id !== document.id),
+];
+
 export const filterAndSortSpreadsheetDocuments = (
   documents: TSpreadsheetDocument[],
   query: string,

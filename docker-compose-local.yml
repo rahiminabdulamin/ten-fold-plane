@@ -8,6 +8,11 @@ services:
       GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET:-local-grist-session-secret}
       GRIST_FORWARD_AUTH_HEADER: X-Ten-Fold-User
       GRIST_DEFAULT_EMAIL: spreadsheet-system@tenfold.internal
+      GRIST_ADMIN_EMAIL: spreadsheet-system@tenfold.internal
+      # Local development is already protected by the authenticated Ten-Fold proxy.
+      # Never expose Grist's operator-only bootstrap screen to product users.
+      GRIST_BOOT_KEY: ""
+      GRIST_IN_SERVICE: "true"
       GRIST_IGNORE_SESSION: "true"
       GRIST_SUPPORT_ANON: "true"
       GRIST_SINGLE_ORG: ten-fold
@@ -18,6 +23,19 @@ services:
       - gristdata:/persist
     ports:
       - "127.0.0.1:8484:8484"
+
+  grist-proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    networks:
+      - dev_env
+    volumes:
+      - ./apps/proxy/Caddyfile.local-grist:/etc/caddy/Caddyfile:ro
+    ports:
+      - "127.0.0.1:8485:8080"
+    depends_on:
+      - api
+      - grist
 
   plane-redis:
     image: valkey/valkey:7.2.11-alpine

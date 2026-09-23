@@ -135,7 +135,7 @@ def _grist_authorization_document_id(path, capability):
     path = urlsplit(path).path
     path = re.sub(r"^/dw/self/v/[A-Za-z0-9_-]+(?=/)", "", path)
     if re.fullmatch(
-        r"(?:/grist)?/o/ten-fold/?|(?:/grist)?/o/ten-fold/api/(?:session/access/(?:active|all)|log)",
+        r"(?:/grist)?/o/ten-fold(?:/boot)?/?|(?:/grist)?/o/ten-fold/api/(?:session/access/(?:active|all)|log)",
         path,
     ):
         return capability.get("document")
@@ -224,7 +224,7 @@ class SpreadsheetListCreateEndpoint(SpreadsheetBaseEndpoint):
         return Response(SpreadsheetDocumentSerializer(items, many=True, expand=["created_by"]).data)
 
     def post(self, request, slug, project_id):
-        serializer = SpreadsheetDocumentSerializer(data=request.data)
+        serializer = SpreadsheetDocumentSerializer(data=request.data, context={"project_id": project_id})
         serializer.is_valid(raise_exception=True)
         workspace = Workspace.objects.get(slug=slug)
         spreadsheet = serializer.save(workspace=workspace, project_id=project_id)

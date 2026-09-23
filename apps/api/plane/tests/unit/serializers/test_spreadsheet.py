@@ -1,5 +1,7 @@
 from plane.api.serializers import SpreadsheetDocumentSerializer
-from plane.db.models import SpreadsheetDocument, SpreadsheetFormPublication
+import pytest
+
+from plane.db.models import Project, SpreadsheetDocument, SpreadsheetFormPublication
 
 
 def test_sheet_serializes_without_a_publication():
@@ -32,3 +34,14 @@ def test_form_serializes_its_default_publication_summary():
         "created_at": None,
         "updated_at": None,
     }
+
+
+@pytest.mark.django_db
+def test_sheet_name_error_explains_that_the_name_is_already_used(workspace, create_user):
+    project = Project.objects.create(name="Sheets", identifier="SH", workspace=workspace, created_by=create_user)
+    SpreadsheetDocument.objects.create(workspace=workspace, project=project, name="Budget", created_by=create_user)
+
+    serializer = SpreadsheetDocumentSerializer(data={"name": "Budget"}, context={"project_id": project.id})
+
+    assert not serializer.is_valid()
+    assert serializer.errors["name"] == ["A sheet named \u201cBudget\u201d already exists in this project."]

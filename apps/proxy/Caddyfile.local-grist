@@ -1,0 +1,26 @@
+:8080 {
+	# Match the production editor route locally: authorize each editor request
+	# with the signed launch capability cookie, then forward the resolved identity
+	# to Grist. This also supports Grist's WebSocket requests.
+	@grist_shared_api path /o/ten-fold/api/s/*
+	handle @grist_shared_api {
+		reverse_proxy grist:8484 {
+			header_up -X-Ten-Fold-User
+			header_up -X-Ten-Fold-Name
+		}
+	}
+
+	@grist_editor path /o/ten-fold /o/ten-fold/* /dw/self/*
+	handle @grist_editor {
+		vars grist_original_uri {uri}
+		forward_auth api:8000 {
+			uri /api/v1/internal/grist/authorize/
+			header_up X-Ten-Fold-Original-Uri {vars.grist_original_uri}
+			copy_headers X-Ten-Fold-User X-Ten-Fold-Name
+		}
+		reverse_proxy grist:8484
+	}
+
+	# These are static Grist assets referenced by the editor HTML.
+	reverse_proxy grist:8484
+}

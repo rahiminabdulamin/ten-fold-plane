@@ -28,6 +28,7 @@ import {
   type TResourceAction,
 } from "./resource-list";
 import type { Route } from "./+types/page";
+import { prependSpreadsheetDocument } from "@/lib/spreadsheet-list";
 
 const service = new SpreadsheetService();
 type Props = { params: Route.ComponentProps["params"]; documentType?: TSpreadsheetDocumentType };
@@ -103,7 +104,7 @@ export function SpreadsheetDocumentsPage({ params, documentType = "sheet" }: Pro
   };
   const submitCreate = async (name: string) => {
     const created = await service.create(workspaceSlug, projectId, name, documentType);
-    setDocuments((current) => [created, ...current]);
+    setDocuments((current) => prependSpreadsheetDocument(current, created));
     notify(`${isForm ? "Form" : "Sheet"} created.`);
   };
   const submitRename = async (name: string) => {
@@ -114,7 +115,7 @@ export function SpreadsheetDocumentsPage({ params, documentType = "sheet" }: Pro
   const submitDuplicate = async (name: string) => {
     if (!selected) return;
     const duplicate = await service.duplicate(workspaceSlug, projectId, selected.id, name);
-    setDocuments((current) => [duplicate, ...current]);
+    setDocuments((current) => prependSpreadsheetDocument(current, duplicate));
     notify(`${isForm ? "Form" : "Sheet"} duplicated.`);
   };
   const submitArchive = async () => {

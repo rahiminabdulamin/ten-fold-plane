@@ -29,6 +29,12 @@ class SpreadsheetDocumentSerializer(BaseSerializer):
         value = value.strip()
         if not value:
             raise serializers.ValidationError("A spreadsheet name is required.")
+        project_id = self.context.get("project_id")
+        existing = SpreadsheetDocument.objects.filter(project_id=project_id, name=value, deleted_at__isnull=True)
+        if self.instance:
+            existing = existing.exclude(pk=self.instance.pk)
+        if project_id and existing.exists():
+            raise serializers.ValidationError(f"A sheet named \u201c{value}\u201d already exists in this project.")
         return value
 
     def get_publication(self, obj):

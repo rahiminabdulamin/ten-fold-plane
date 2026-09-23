@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { TSpreadsheetDocument } from "@/services/spreadsheet.service";
-import { filterAndSortSpreadsheetDocuments } from "./spreadsheet-list";
+import { filterAndSortSpreadsheetDocuments, prependSpreadsheetDocument } from "./spreadsheet-list";
 
 const document = (overrides: Partial<TSpreadsheetDocument>): TSpreadsheetDocument => ({
   id: "1",
@@ -34,4 +34,11 @@ describe("filterAndSortSpreadsheetDocuments", () => {
     expect(filterAndSortSpreadsheetDocuments(items, "", "all", "name-asc").map(({ id }) => id)).toEqual(["1", "2"]);
     expect(items.map(({ id }) => id)).toEqual(["2", "1"]);
   });
+});
+
+it("replaces an already-listed document when prepending", () => {
+  const current = [document({ id: "1", name: "Budget" })];
+  const updated = document({ id: "1", name: "Budget 2027" });
+
+  expect(prependSpreadsheetDocument(current, updated)).toEqual([updated]);
 });

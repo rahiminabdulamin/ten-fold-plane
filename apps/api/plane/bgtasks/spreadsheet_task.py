@@ -7,6 +7,7 @@ import requests
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 
 from plane.db.models import ProjectMember, SpreadsheetDocument, SpreadsheetOperation
 from plane.integrations.grist import GristClient, GristConfigurationError
@@ -46,7 +47,7 @@ def process_spreadsheet_operation_now(operation_or_id):
             operation = operation_or_id
         else:
             operation = (
-                SpreadsheetOperation.objects.select_for_update()
+                SpreadsheetOperation.objects.select_for_update(of=("self",))
                 .select_related("spreadsheet__project")
                 .get(id=operation_or_id)
             )
@@ -58,7 +59,7 @@ def process_spreadsheet_operation_now(operation_or_id):
 
     spreadsheet = operation.spreadsheet
     try:
-        client = GristClient()
+        client = GristClient() if spreadsheet.grist_document_id or operation.kind != SpreadsheetOperation.Kind.ARCHIVE else None
         if operation.kind == SpreadsheetOperation.Kind.PROVISION:
             if not spreadsheet.grist_document_id:
                 spreadsheet.grist_document_id = client.create_document(spreadsheet.name, settings.GRIST_WORKSPACE_ID)
@@ -96,8 +97,10 @@ def process_spreadsheet_operation_now(operation_or_id):
             spreadsheet.grist_permissions = current
             spreadsheet.status = SpreadsheetDocument.Status.READY
         elif operation.kind == SpreadsheetOperation.Kind.ARCHIVE:
-            client.archive_document(spreadsheet.grist_document_id)
+            if client:
+                client.archive_document(spreadsheet.grist_document_id)
             spreadsheet.status = SpreadsheetDocument.Status.ARCHIVED
+            spreadsheet.deleted_at = timezone.now()
         spreadsheet.last_error_code = ""
         spreadsheet.save(
             update_fields=[
@@ -106,6 +109,7 @@ def process_spreadsheet_operation_now(operation_or_id):
                 "grist_form_view_section_id",
                 "grist_permissions",
                 "status",
+                "deleted_at",
                 "last_error_code",
                 "updated_at",
             ]
