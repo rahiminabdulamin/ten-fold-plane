@@ -103,8 +103,10 @@ export const CalendarIssueBlock = observer(
         <Popover.Button
           className="w-full"
           render={
+            // oxlint-disable-next-line jsx_a11y/click-events-have-key-events oxlint-disable-next-line jsx_a11y/no-static-element-interactions
             <div
               id={`issue-${issue.id}`}
+              onClick={() => handleIssuePeekOverview(issue)}
               className={cn(
                 "block w-full border-b border-subtle text-13 text-primary hover:border-subtle-1 md:border-[1px]",
                 {
