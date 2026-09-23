@@ -8,7 +8,7 @@ import { Fragment, useState } from "react";
 import { observer } from "mobx-react";
 import { usePopper } from "react-popper";
 import { AddOutline, LoadingOutline, SearchOutline, TickOutline } from "@makeplane/propel/icons";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Portal } from "@headlessui/react";
 // plane imports
 import { EUserPermissionsLevel, getRandomLabelColor } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
@@ -40,7 +40,7 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
   const { allowPermissions } = useUserPermissions();
   // states
   const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [query, setQuery] = useState("");
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -79,6 +79,7 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
 
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: "bottom-start",
+    strategy: "fixed",
     modifiers: [
       {
         name: "preventOverflow",
@@ -91,7 +92,7 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
 
   const issueLabels = values ?? [];
 
-  const label = <span className="text-body-xs-medium text-placeholder">{t("label.select")}</span>;
+  const buttonLabel = <span className="text-body-xs-medium text-placeholder">{t("label.select")}</span>;
 
   const searchInputKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (query !== "" && e.key === "Escape") {
@@ -108,8 +109,8 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
 
   const handleAddLabel = async (labelName: string) => {
     setSubmitting(true);
-    const label = await onAddLabel(workspaceSlug, projectId, { name: labelName, color: getRandomLabelColor() });
-    onSelect([...values, label.id]);
+    const createdLabel = await onAddLabel(workspaceSlug, projectId, { name: labelName, color: getRandomLabelColor() });
+    onSelect([...values, createdLabel.id]);
     setQuery("");
     setSubmitting(false);
   };
@@ -134,16 +135,19 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
             prependIcon={<AddOutline />}
             onClick={() => !projectLabels && fetchLabels()}
           >
-            {label}
+            {buttonLabel}
           </Button>
         </Combobox.Button>
 
-        <Combobox.Options as="ul" className="fixed z-10">
-          <div
-            className={`z-10 my-1 w-48 rounded-sm border border-strong bg-surface-1 py-2.5 text-11 whitespace-nowrap shadow-raised-200 focus:outline-none`}
+        <Portal>
+          <Combobox.Options
+            as="div"
+            static
+            modal={false}
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}
+            className="z-40 my-1 w-48 rounded-sm border border-strong bg-surface-1 py-2.5 text-11 whitespace-nowrap shadow-raised-200 focus:outline-none"
           >
             <div className="px-2">
               <div className="flex w-full items-center justify-start rounded-sm border border-subtle bg-surface-2 px-2">
@@ -201,6 +205,13 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
                       if (!query.length) return;
                       handleAddLabel(query);
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key !== "Enter") return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!query.length) return;
+                      handleAddLabel(query);
+                    }}
                     className={`text-left text-secondary ${query.length ? "cursor-pointer" : "cursor-default"}`}
                   >
                     {query.length ? (
@@ -217,8 +228,8 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
                 <p className="text-left text-secondary">{t("common.search.no_matching_results")}</p>
               )}
             </div>
-          </div>
-        </Combobox.Options>
+          </Combobox.Options>
+        </Portal>
       </Combobox>
     </>
   );
