@@ -142,8 +142,8 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
         <Portal>
           <Combobox.Options
             as="div"
-            static
             modal={false}
+            data-prevent-outside-click
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}

@@ -20,5 +20,7 @@ describe("label popover interactivity", () => {
     expect(content).toContain("<Portal>");
     expect(content).toContain("modal={false}");
     expect(content).toContain("z-40");
+    expect(content).toContain("data-prevent-outside-click");
+    expect(content).not.toContain("            static\n");
   });
 });
