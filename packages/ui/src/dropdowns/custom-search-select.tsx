@@ -85,6 +85,26 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
 
   if (multiple) comboboxProps.multiple = true;
 
+  const handleOptionSelection = (event: React.MouseEvent, optionValue: any, optionDisabled?: boolean) => {
+    if (event.button !== 0 || optionDisabled) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (multiple) {
+      const selectedValues = Array.isArray(value) ? value : [];
+      onChange(
+        selectedValues.includes(optionValue)
+          ? selectedValues.filter((item) => item !== optionValue)
+          : [...selectedValues, optionValue]
+      );
+      return;
+    }
+
+    onChange(optionValue);
+    referenceElement?.click();
+  };
+
   return (
     // oxlint-disable-next-line jsx_a11y/no-static-element-interactions
     <Combobox
@@ -181,6 +201,9 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
                                 as="li"
                                 key={option.value}
                                 value={option.value}
+                                onMouseDownCapture={(event) =>
+                                  handleOptionSelection(event, option.value, option.disabled)
+                                }
                                 className={({ active }) =>
                                   cn(
                                     "flex w-full cursor-pointer items-center justify-between gap-2 truncate rounded-sm px-1 py-1.5 select-none",
@@ -267,6 +290,9 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
                               as="li"
                               key={option.value}
                               value={option.value}
+                              onMouseDownCapture={(event) =>
+                                handleOptionSelection(event, option.value, option.disabled)
+                              }
                               className={({ active }) =>
                                 cn(
                                   "flex w-full cursor-pointer items-center justify-between gap-2 truncate rounded-sm px-1 py-1.5 select-none",
