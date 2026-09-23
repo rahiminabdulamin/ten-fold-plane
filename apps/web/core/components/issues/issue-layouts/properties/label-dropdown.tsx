@@ -217,7 +217,7 @@ export function LabelDropdown(props: ILabelDropdownProps) {
                 ref={setPopperElement}
                 style={styles.popper}
                 {...attributes.popper}
-                className={`z-40 my-1 h-auto w-48 rounded-sm border border-strong bg-surface-1 px-2 py-2.5 text-caption-sm-regular whitespace-nowrap shadow-raised-200 focus:outline-none ${optionsClassName}`}
+                className={`pointer-events-auto z-[9999] my-1 h-auto w-48 rounded-sm border border-strong bg-surface-1 px-2 py-2.5 text-caption-sm-regular whitespace-nowrap shadow-raised-200 focus:outline-none ${optionsClassName}`}
               >
                 <div className="relative z-10 flex w-full items-center justify-start rounded-sm border border-subtle bg-surface-2 px-2">
                   <SearchOutline className="h-3.5 w-3.5 text-tertiary" />
