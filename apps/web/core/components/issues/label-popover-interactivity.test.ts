@@ -24,4 +24,10 @@ describe("label popover interactivity", () => {
     expect(content).not.toContain("            static\n");
     expect(content).toContain("onMouseDown={(event) => event.stopPropagation()}");
   });
+
+  it("does not submit the typed label name as a selected label ID", () => {
+    const content = readFileSync(fileURLToPath(detailPanelSelector), "utf8");
+    expect(content).not.toContain('as="li"\n                    value={query}');
+    expect(content).toMatch(/canCreateLabel \? \(\s*<button/);
+  });
 });

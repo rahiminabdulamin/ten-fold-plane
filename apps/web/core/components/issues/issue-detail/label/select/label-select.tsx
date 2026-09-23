@@ -196,35 +196,23 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
               ) : submitting ? (
                 <LoadingOutline className="spin h-3.5 w-3.5" />
               ) : canCreateLabel ? (
-                <ul className="space-y-1">
-                  <Combobox.Option
-                    as="li"
-                    value={query}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (!query.length) return;
-                      handleAddLabel(query);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key !== "Enter") return;
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (!query.length) return;
-                      handleAddLabel(query);
-                    }}
-                    className={`text-left text-secondary ${query.length ? "cursor-pointer" : "cursor-default"}`}
-                  >
-                    {query.length ? (
-                      <>
-                        {/* TODO: Translate here */}+ Add <span className="text-primary">&quot;{query}&quot;</span> to
-                        labels
-                      </>
-                    ) : (
-                      t("label.create.type")
-                    )}
-                  </Combobox.Option>
-                </ul>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!query.length) return;
+                    handleAddLabel(query);
+                  }}
+                  className={`text-left text-secondary ${query.length ? "cursor-pointer" : "cursor-default"}`}
+                >
+                  {query.length ? (
+                    <>
+                      {/* TODO: Translate here */}+ Add <span className="text-primary">&quot;{query}&quot;</span> to
+                      labels
+                    </>
+                  ) : (
+                    t("label.create.type")
+                  )}
+                </button>
               ) : (
                 <p className="text-left text-secondary">{t("common.search.no_matching_results")}</p>
               )}
