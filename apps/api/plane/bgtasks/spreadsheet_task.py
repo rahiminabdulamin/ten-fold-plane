@@ -114,7 +114,7 @@ def process_spreadsheet_operation_now(operation_or_id):
         operation.last_error_code = ""
         operation.save(update_fields=["status", "last_error_code", "updated_at"])
     except Exception as error:
-        logger.exception("Spreadsheet operation %s failed", operation_id)
+        logger.exception("Spreadsheet operation %s failed", operation.id)
         spreadsheet.status = SpreadsheetDocument.Status.DEGRADED
         spreadsheet.last_error_code = grist_failure_code(error)
         spreadsheet.save(update_fields=["status", "last_error_code", "updated_at"])
