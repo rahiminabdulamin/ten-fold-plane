@@ -139,6 +139,7 @@ export function CustomSearchSelect(props: ICustomSearchSelectProps) {
                   <Combobox.Options
                     as="ul"
                     data-prevent-outside-click
+                    modal={false}
                     ref={setPopperElement}
                     style={styles.popper}
                     {...attributes.popper}
