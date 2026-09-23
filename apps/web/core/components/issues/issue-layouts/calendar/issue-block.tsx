@@ -108,7 +108,7 @@ export const CalendarIssueBlock = observer(
               id={`issue-${issue.id}`}
               onClick={() => handleIssuePeekOverview(issue)}
               className={cn(
-                "block w-full border-b border-subtle text-13 text-primary hover:border-subtle-1 md:border-[1px]",
+                "block w-full cursor-pointer border-b border-subtle text-13 text-primary hover:border-subtle-1 md:border-[1px]",
                 {
                   "rounded-sm": rangePosition === "single",
                   "rounded-l-sm": rangePosition === "start",

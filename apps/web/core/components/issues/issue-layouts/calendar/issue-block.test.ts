@@ -9,5 +9,6 @@ describe("CalendarIssueBlock", () => {
     const source = readFileSync(fileURLToPath(calendarIssueBlock), "utf8");
 
     expect(source.match(/onClick=\{\(\) => handleIssuePeekOverview\(issue\)\}/g)).toHaveLength(2);
+    expect(source).toContain("block w-full cursor-pointer border-b");
   });
 });
