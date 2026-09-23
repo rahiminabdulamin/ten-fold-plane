@@ -22,5 +22,6 @@ describe("label popover interactivity", () => {
     expect(content).toContain("z-40");
     expect(content).toContain("data-prevent-outside-click");
     expect(content).not.toContain("            static\n");
+    expect(content).toContain("onMouseDown={(event) => event.stopPropagation()}");
   });
 });

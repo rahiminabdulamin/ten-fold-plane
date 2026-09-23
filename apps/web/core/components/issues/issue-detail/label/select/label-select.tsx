@@ -156,6 +156,7 @@ export const IssueLabelSelect = observer(function IssueLabelSelect(props: IIssue
                   className="w-full bg-transparent px-2 py-1 text-11 text-secondary placeholder:text-placeholder focus:outline-none"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
+                  onMouseDown={(event) => event.stopPropagation()}
                   placeholder={t("common.search.label")}
                   displayValue={(assigned: any) => assigned?.name}
                   onKeyDown={searchInputKeyDown}
