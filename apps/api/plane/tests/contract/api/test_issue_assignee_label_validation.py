@@ -107,6 +107,18 @@ class TestIssueAssigneeLabelValidationContract:
         assert list(create_issue.assignees.all()) == []
 
     @pytest.mark.django_db
+    def test_update_with_workspace_member_assignee_succeeds(
+        self, api_key_client, workspace, project, create_issue, create_user
+    ):
+        url = self.get_detail_url(workspace.slug, project.id, create_issue.id)
+
+        response = api_key_client.patch(url, {"assignee_ids": [str(create_user.id)]}, format="json")
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        create_issue.refresh_from_db()
+        assert list(create_issue.assignees.values_list("id", flat=True)) == [create_user.id]
+
+    @pytest.mark.django_db
     def test_create_with_mix_of_valid_and_invalid_assignee_is_rejected_entirely(
         self, api_key_client, workspace, project, create_user, outsider_user
     ):
