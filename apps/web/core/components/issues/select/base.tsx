@@ -191,7 +191,13 @@ export const WorkItemLabelSelectBase = observer(function WorkItemLabelSelectBase
         )}
       </button>
       {isDropdownOpen && (
-        <Combobox.Options as="ul" className="pointer-events-auto fixed z-[9999]" static>
+        <Combobox.Options
+          as="ul"
+          className="pointer-events-auto fixed z-[9999]"
+          data-prevent-outside-click
+          onMouseDown={(event) => event.stopPropagation()}
+          static
+        >
           <div
             className="my-1 w-48 rounded-sm border-[0.5px] border-strong bg-surface-1 px-2 py-2.5 text-11 shadow-raised-200 focus:outline-none"
             ref={setPopperElement}

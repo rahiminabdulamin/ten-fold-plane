@@ -13,6 +13,8 @@ describe("label popover interactivity", () => {
       const content = readFileSync(fileURLToPath(source), "utf8");
       expect(content).toContain("pointer-events-auto");
       expect(content).toContain("z-[9999]");
+      expect(content).toContain("data-prevent-outside-click");
+      expect(content).toContain("onMouseDown={(event) => event.stopPropagation()}");
     }
   });
 });
