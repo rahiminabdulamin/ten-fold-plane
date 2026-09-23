@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const createDialogSelector = new URL("./select/base.tsx", import.meta.url);
 const detailPanelSelector = new URL("./issue-detail/label/select/label-select.tsx", import.meta.url);
+const parentPicker = new URL("./parent-issues-list-modal.tsx", import.meta.url);
 const stateDropdown = new URL("../dropdowns/state/base.tsx", import.meta.url);
 const priorityDropdown = new URL("../dropdowns/priority.tsx", import.meta.url);
 
@@ -39,5 +40,10 @@ describe("label popover interactivity", () => {
       const content = readFileSync(fileURLToPath(selector), "utf8");
       expect(content).toContain("data-prevent-outside-click");
     }
+  });
+
+  it("keeps the detail panel open while choosing a parent", () => {
+    const content = readFileSync(fileURLToPath(parentPicker), "utf8");
+    expect(content).toContain("data-prevent-outside-click");
   });
 });
