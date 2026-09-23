@@ -33,6 +33,11 @@ describe("label popover interactivity", () => {
     expect(content).toMatch(/canCreateLabel \? \(\s*<button/);
   });
 
+  it("creates a new label from the create-dialog action before Combobox option handling", () => {
+    const content = readFileSync(fileURLToPath(createDialogSelector), "utf8");
+    expect(content).toMatch(/<button\s+type="button"\s+onMouseDown=\{[^}]*handleAddLabel\(query\)/s);
+  });
+
   it("keeps the detail panel open while choosing State or Priority", () => {
     for (const selector of [stateDropdown, priorityDropdown]) {
       const content = readFileSync(fileURLToPath(selector), "utf8");

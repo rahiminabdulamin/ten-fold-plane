@@ -300,7 +300,9 @@ export const WorkItemLabelSelectBase = observer(function WorkItemLabelSelectBase
                 ) : createLabelEnabled ? (
                   <button
                     type="button"
-                    onClick={() => {
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
                       if (!query.length) return;
                       handleAddLabel(query);
                     }}
