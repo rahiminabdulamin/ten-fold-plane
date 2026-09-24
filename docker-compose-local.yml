@@ -17,7 +17,9 @@ services:
       GRIST_SUPPORT_ANON: "true"
       GRIST_SINGLE_ORG: ten-fold
       GRIST_ORG_IN_PATH: "true"
-      GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-pynbox}
+      # `pynbox` is not a valid Grist sandbox flavor and causes every formula
+      # evaluation to fail.  Keep local development explicit and functional.
+      GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-unsandboxed}
       GRIST_ENABLE_REQUEST_FUNCTION: "false"
     volumes:
       - gristdata:/persist
