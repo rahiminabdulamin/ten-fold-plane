@@ -156,7 +156,7 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
               handleDragAndDrop={handleDragAndDrop}
               canEditProperties={canEditProperties}
               isEpic={isEpic}
-              desktopHiddenIssueIds={issueSpans.map(({ issueId }) => issueId)}
+              desktopHiddenIssueIds={issueSpans.filter(({ isRange }) => isRange).map(({ issueId }) => issueId)}
             />
           );
         })}
@@ -167,35 +167,37 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
           "grid-cols-5": !showWeekends,
         })}
       >
-        {issueSpans.map((span) => {
-          const rangePosition = span.continuesBefore
-            ? span.continuesAfter
-              ? "middle"
-              : "end"
-            : span.continuesAfter
-              ? "start"
-              : "single";
-          const calendarDate = calendarDates[span.start];
+        {issueSpans
+          .filter(({ isRange }) => isRange)
+          .map((span) => {
+            const rangePosition = span.continuesBefore
+              ? span.continuesAfter
+                ? "middle"
+                : "end"
+              : span.continuesAfter
+                ? "start"
+                : "single";
+            const calendarDate = calendarDates[span.start];
 
-          return (
-            <div
-              key={span.issueId}
-              className="pointer-events-auto z-10 min-w-0 px-2 py-1"
-              style={{ gridColumn: `${span.start + 1} / ${span.end + 2}`, gridRow: issueRowById[span.issueId] + 1 }}
-            >
-              <CalendarIssueBlockRoot
-                issueId={span.issueId}
-                calendarDate={calendarDate}
-                quickActions={quickActions}
-                isDragDisabled={readOnly}
-                canEditProperties={canEditProperties}
-                isEpic={isEpic}
-                rangePosition={rangePosition}
-                labelPrefix={span.continuesBefore ? "↳ " : undefined}
-              />
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={span.issueId}
+                className="pointer-events-auto z-10 min-w-0 px-2 py-1"
+                style={{ gridColumn: `${span.start + 1} / ${span.end + 2}`, gridRow: issueRowById[span.issueId] + 1 }}
+              >
+                <CalendarIssueBlockRoot
+                  issueId={span.issueId}
+                  calendarDate={calendarDate}
+                  quickActions={quickActions}
+                  isDragDisabled={readOnly}
+                  canEditProperties={canEditProperties}
+                  isEpic={isEpic}
+                  rangePosition={rangePosition}
+                  labelPrefix={span.continuesBefore ? "↳ " : undefined}
+                />
+              </div>
+            );
+          })}
       </div>
     </div>
   );

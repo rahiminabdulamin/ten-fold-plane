@@ -10,6 +10,7 @@ export type CalendarIssueSpan = {
   issueId: string;
   start: number;
   end: number;
+  isRange: boolean;
   continuesBefore: boolean;
   continuesAfter: boolean;
 };
@@ -52,8 +53,6 @@ export const getCalendarIssueSpans = (
     const firstVisibleDate = parseISO(visibleDates[0]);
     const lastVisibleDate = parseISO(visibleDates[visibleDates.length - 1]);
     if (![dueDate, startDate, firstVisibleDate, lastVisibleDate].every(isValid)) return [];
-    if (startDate.getTime() === dueDate.getTime()) return [];
-
     const indexes = visibleDates
       .map((date, index) => (issueIdsByDate[date]?.includes(issueId) ? index : -1))
       .filter((index) => index >= 0);
@@ -64,6 +63,7 @@ export const getCalendarIssueSpans = (
         issueId,
         start: indexes[0],
         end: indexes[indexes.length - 1],
+        isRange: startDate.getTime() !== dueDate.getTime(),
         continuesBefore: startDate < firstVisibleDate,
         continuesAfter: dueDate > lastVisibleDate,
       },

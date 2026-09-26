@@ -66,10 +66,10 @@ describe("getCalendarIssueIdsByDate", () => {
 
     expect(
       getCalendarIssueSpans(issues, getCalendarIssueIdsByDate(issues, ["crossing"], firstWeekDates), firstWeekDates)
-    ).toEqual([{ issueId: "crossing", start: 3, end: 6, continuesBefore: false, continuesAfter: true }]);
+    ).toEqual([{ issueId: "crossing", start: 3, end: 6, isRange: true, continuesBefore: false, continuesAfter: true }]);
     expect(
       getCalendarIssueSpans(issues, getCalendarIssueIdsByDate(issues, ["crossing"], secondWeekDates), secondWeekDates)
-    ).toEqual([{ issueId: "crossing", start: 0, end: 1, continuesBefore: true, continuesAfter: false }]);
+    ).toEqual([{ issueId: "crossing", start: 0, end: 1, isRange: true, continuesBefore: true, continuesAfter: false }]);
   });
 
   it("keeps a range continuous across hidden weekend columns", () => {
@@ -80,15 +80,17 @@ describe("getCalendarIssueIdsByDate", () => {
 
     expect(
       getCalendarIssueSpans(issues, getCalendarIssueIdsByDate(issues, ["weekend"], visibleWeekdays), visibleWeekdays)
-    ).toEqual([{ issueId: "weekend", start: 0, end: 1, continuesBefore: false, continuesAfter: false }]);
+    ).toEqual([{ issueId: "weekend", start: 0, end: 1, isRange: true, continuesBefore: false, continuesAfter: false }]);
   });
 
-  it("does not create a span for a one-day work item", () => {
+  it("allocates one-day work items to lanes without rendering them as range bars", () => {
     const issues = {
       single: { id: "single", start_date: null, target_date: "2026-11-10" },
     };
     const dates = ["2026-11-09", "2026-11-10", "2026-11-11"];
 
-    expect(getCalendarIssueSpans(issues, getCalendarIssueIdsByDate(issues, ["single"], dates), dates)).toEqual([]);
+    expect(getCalendarIssueSpans(issues, getCalendarIssueIdsByDate(issues, ["single"], dates), dates)).toEqual([
+      { issueId: "single", start: 1, end: 1, continuesBefore: false, continuesAfter: false, isRange: false },
+    ]);
   });
 });

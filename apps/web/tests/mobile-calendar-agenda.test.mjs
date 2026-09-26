@@ -42,7 +42,7 @@ test("mobile calendar joins adjacent dates that share a work item", async () => 
 
   assert.match(dayTile, /sharesIssueWithPreviousDate/);
   assert.match(dayTile, /sharesIssueWithNextDate/);
-  assert.match(dayTile, /"left-0 right-0": sharesIssueWithPreviousDate && sharesIssueWithNextDate/);
+  assert.match(dayTile, /"right-0 left-0": sharesIssueWithPreviousDate && sharesIssueWithNextDate/);
 });
 
 test("mobile calendar gives range rows room and marks their start and due dates", async () => {
@@ -54,6 +54,21 @@ test("mobile calendar gives range rows room and marks their start and due dates"
   assert.match(dayTile, /"min-h-14": issueIds\?\.length > 0/);
   assert.match(dayTile, /data-testid="mobile-calendar-range-start"/);
   assert.match(dayTile, /data-testid="mobile-calendar-range-end"/);
+});
+
+test("calendar keeps every desktop bar and mobile dot lane visible", async () => {
+  const [calendar, weekDays, dayTile] = await Promise.all([
+    readFile(new URL("../core/components/issues/issue-layouts/calendar/calendar.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../core/components/issues/issue-layouts/calendar/week-days.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../core/components/issues/issue-layouts/calendar/day-tile.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(calendar, /flex w-full flex-col overflow-y-auto md:h-full/);
+  assert.match(weekDays, /40 \+ laneEnds\.length \* 40/);
+  assert.match(weekDays, /--calendar-week-height/);
+  assert.doesNotMatch(weekDays, /\.toSorted\(/);
+  assert.match(dayTile, /40 \+ issueRowCount \* 16/);
+  assert.match(dayTile, /36 \+ \(issueRowById\[issueId\] \?\? 0\) \* 16/);
 });
 
 test("mobile agenda resolves work items across their calendar range", async () => {
