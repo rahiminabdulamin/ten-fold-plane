@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-002.png?url";
+import tenfoldClipart from "@/app/assets/clipart/tenfold-clipart-002a.png?url";
 
 export function LogoSpinner() {
   return (

@@ -4,32 +4,12 @@
  * See the LICENSE file for details.
  */
 
-import { useTheme } from "next-themes";
 // plane imports
 import { Button } from "@plane/propel/button";
 // assets
-import maintenanceModeDarkModeImage from "@/app/assets/instance/maintenance-mode-dark.svg?url";
-import maintenanceModeLightModeImage from "@/app/assets/instance/maintenance-mode-light.svg?url";
+import errorIllustration from "@/app/assets/clipart/tenfold-clipart-008.png?url";
 // layouts
 import DefaultLayout from "@/layouts/default-layout";
-
-const linkMap = [
-  {
-    key: "mail_to",
-    label: "Contact Support",
-    value: "mailto:support@plane.so",
-  },
-  {
-    key: "status",
-    label: "Status Page",
-    value: "https://status.plane.so/",
-  },
-  {
-    key: "twitter_handle",
-    label: "@planepowers",
-    value: "https://x.com/planepowers",
-  },
-];
 
 // Production Error Component
 interface ProdErrorComponentProps {
@@ -37,21 +17,15 @@ interface ProdErrorComponentProps {
 }
 
 export function ProdErrorComponent({ onGoHome }: ProdErrorComponentProps) {
-  // hooks
-  const { resolvedTheme } = useTheme();
-
-  // derived values
-  const maintenanceModeImage = resolvedTheme === "dark" ? maintenanceModeDarkModeImage : maintenanceModeLightModeImage;
-
   return (
     <DefaultLayout>
       <div className="relative container mx-auto flex h-full w-full max-w-xl flex-col items-center justify-center gap-2 gap-y-6 bg-surface-1 px-6 text-center">
         <div className="relative w-full">
           <img
-            src={maintenanceModeImage}
-            height="176"
-            width="288"
-            alt="ProjectSettingImg"
+            src={errorIllustration}
+            height="524"
+            width="784"
+            alt="Ten-Fold support illustration"
             className="h-full w-full object-fill object-center"
           />
         </div>
@@ -65,18 +39,9 @@ export function ProdErrorComponent({ onGoHome }: ProdErrorComponentProps) {
           </div>
 
           <div className="mt-1 flex items-center justify-start gap-6">
-            {linkMap.map((link) => (
-              <div key={link.key}>
-                <a
-                  href={link.value}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-13 text-accent-primary hover:underline"
-                >
-                  {link.label}
-                </a>
-              </div>
-            ))}
+            <a href="mailto:contact@kognitif.ai" className="text-13 text-accent-primary hover:underline">
+              Contact Support
+            </a>
           </div>
 
           <div className="flex items-center justify-start gap-6">
