@@ -31,3 +31,14 @@ def test_issue_updates_email_uses_ten_fold_branding_without_plane_social_links()
         assert legacy_reference not in html
 
     assert "plane" not in get_template("emails/notifications/issue-updates.html").template.source.lower()
+
+
+@pytest.mark.unit
+def test_issue_updates_email_is_monochrome_except_for_primary_blue_actions():
+    source = get_template("emails/notifications/issue-updates.html").template.source
+
+    assert 'class="email-brand-header"' in source
+    assert ".email-brand-header { background-color: #3e63dd !important; }" in source
+    assert ".email-cta { background-color: #3e63dd !important;" in source
+    assert "body, p, span, td, a, div { color: #171717 !important; }" in source
+    assert '[style*="background-color"] { background-color: #ffffff !important; }' in source

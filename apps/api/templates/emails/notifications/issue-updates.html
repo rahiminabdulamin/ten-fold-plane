@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Updates on {{entity_type}}</title>
-    <style type="text/css" emogrify="no"> html { font-family: system-ui; } p, h1, h2, h3, h4, ol, ul { margin: 0; } h-full { height: 100%; } a:hover { color: #3358d4 !important; } </style>
+    <style type="text/css" emogrify="no"> html { font-family: system-ui; } p, h1, h2, h3, h4, ol, ul { margin: 0; } h-full { height: 100%; } body, p, span, td, a, div { color: #171717 !important; } [style*="background-color"] { background-color: #ffffff !important; } [style*="border-color"] { border-color: #d4d4d4 !important; } .email-brand-header { background-color: #3e63dd !important; } .email-cta { background-color: #3e63dd !important; border-color: #2f4ba8 !important; color: #ffffff !important; } </style>
     <style> *[class="gmail-fix"] { display: none !important; } </style>
     <style type="text/css" emogrify="no"> @media (max-width: 600px) { .gmx-killpill { content: " \03D1"; } } </style>
   </head>
@@ -12,7 +12,7 @@
     <div style=" width: 600px; table-layout: fixed; height: 100%; margin-left: auto; margin-right: auto; " >
       <!-- Header --> 
       <div>
-        <table style="width: 600px" cellspacing="0">
+        <table class="email-brand-header" style="width: 600px" cellspacing="0">
           <tr>
             <td>
               <div style="margin-left: 30px; margin-bottom: 20px; margin-top: 20px" > <img src="https://ten-fold.co/branding/tenfold-rebrand-logo-white.png" width="150" border="0" alt="Ten-Fold" /> </div>
@@ -212,7 +212,7 @@
           {% endif %} 
         </div>
         <a href="{{ issue_url }}" style="text-decoration: none;">
-          <div style=" max-width: min-content; white-space: nowrap; background-color: #3e63dd; padding: 10px 15px; border: 1px solid #2f4ba8; border-radius: 4px; margin-top: 15px; cursor: pointer; font-size: 0.8rem; color: white; " > View {{entity_type}} </div>
+          <div class="email-cta" style=" max-width: min-content; white-space: nowrap; background-color: #3e63dd; padding: 10px 15px; border: 1px solid #2f4ba8; border-radius: 4px; margin-top: 15px; cursor: pointer; font-size: 0.8rem; color: white; " > View {{entity_type}} </div>
         </a>
       </div>
       <!-- Footer --> 
