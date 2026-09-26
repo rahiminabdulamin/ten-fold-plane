@@ -71,6 +71,17 @@ test("calendar keeps every desktop bar and mobile dot lane visible", async () =>
   assert.match(dayTile, /36 \+ \(issueRowById\[issueId\] \?\? 0\) \* 16/);
 });
 
+test("same-day cards are offset only by multi-day range lanes", async () => {
+  const [weekDays, dayTile] = await Promise.all([
+    readFile(new URL("../core/components/issues/issue-layouts/calendar/week-days.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../core/components/issues/issue-layouts/calendar/day-tile.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(weekDays, /const rangeLaneCount = issueSpans/);
+  assert.match(weekDays, /desktopContentOffset=\{rangeLaneCount \* 40\}/);
+  assert.match(dayTile, /desktopContentOffset: number;/);
+});
+
 test("mobile agenda resolves work items across their calendar range", async () => {
   const calendar = await readFile(
     new URL("../core/components/issues/issue-layouts/calendar/calendar.tsx", import.meta.url),

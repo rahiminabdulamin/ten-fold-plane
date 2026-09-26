@@ -116,6 +116,10 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
     issueRowById[issueId] = issueRow;
   });
 
+  const rangeLaneCount = issueSpans
+    .filter(({ isRange }) => isRange)
+    .reduce((count, { issueId }) => Math.max(count, (issueRowById[issueId] ?? 0) + 1), 0);
+
   const weekHeight = calendarLayout === "month" ? 32 + Math.max(80, 40 + laneEnds.length * 40) : undefined;
 
   return (
@@ -144,6 +148,7 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
               groupedIssueIds={{ ...groupedIssueIds, ...issueIdsByDate }}
               issueRowById={issueRowById}
               issueRowCount={laneEnds.length}
+              desktopContentOffset={rangeLaneCount * 40}
               loadMoreIssues={loadMoreIssues}
               getPaginationData={getPaginationData}
               getGroupIssueCount={getGroupIssueCount}

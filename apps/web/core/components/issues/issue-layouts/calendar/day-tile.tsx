@@ -34,6 +34,7 @@ type Props = {
   groupedIssueIds: TGroupedIssues;
   issueRowById: Record<string, number>;
   issueRowCount: number;
+  desktopContentOffset: number;
   loadMoreIssues: (dateString: string) => void;
   getPaginationData: (groupId: string | undefined) => TPaginationData | undefined;
   getGroupIssueCount: (groupId: string | undefined) => number | undefined;
@@ -64,6 +65,7 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
     groupedIssueIds,
     issueRowById,
     issueRowCount,
+    desktopContentOffset,
     loadMoreIssues,
     getPaginationData,
     getGroupIssueCount,
@@ -203,7 +205,7 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
               canEditProperties={canEditProperties}
               isEpic={isEpic}
               hiddenIssueIds={desktopHiddenIssueIds}
-              desktopContentOffset={issueRowCount * 40}
+              desktopContentOffset={desktopContentOffset}
             />
           </div>
         </div>
