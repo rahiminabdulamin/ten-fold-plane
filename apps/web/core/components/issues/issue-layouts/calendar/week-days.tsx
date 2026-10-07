@@ -17,8 +17,7 @@ import type { IModuleIssuesFilter } from "@/store/issue/module";
 import type { IProjectIssuesFilter } from "@/store/issue/project";
 import type { IProjectViewIssuesFilter } from "@/store/issue/project-views";
 import type { TRenderQuickActions } from "../list/list-view-types";
-import { getCalendarIssueIdsByDate } from "./calendar-range";
-import { getCalendarIssueSpans } from "./calendar-range";
+import { getCalendarDesktopRowCount, getCalendarIssueIdsByDate, getCalendarIssueSpans } from "./calendar-range";
 import { CalendarDayTile } from "./day-tile";
 import { CalendarIssueBlockRoot } from "./issue-block-root";
 
@@ -105,7 +104,9 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
 
   const issueRowById: Record<string, number> = {};
   const laneEnds: number[] = [];
-  const issueSpans = [...getCalendarIssueSpans(issues ?? {}, issueIdsByDate, calendarDates)].toSorted(
+  // Sort the freshly allocated spans in place; retain support for browsers without toSorted.
+  // eslint-disable-next-line unicorn/no-array-sort
+  const issueSpans = getCalendarIssueSpans(issues ?? {}, issueIdsByDate, calendarDates).sort(
     (a, b) => a.start - b.start || a.end - b.end
   );
 
@@ -120,7 +121,8 @@ export const CalendarWeekDays = observer(function CalendarWeekDays(props: Props)
     .filter(({ isRange }) => isRange)
     .reduce((count, { issueId }) => Math.max(count, (issueRowById[issueId] ?? 0) + 1), 0);
 
-  const weekHeight = calendarLayout === "month" ? 32 + Math.max(80, 40 + laneEnds.length * 40) : undefined;
+  const desktopRowCount = getCalendarDesktopRowCount(issueSpans, rangeLaneCount);
+  const weekHeight = calendarLayout === "month" ? 32 + Math.max(80, 40 + desktopRowCount * 40) : undefined;
 
   return (
     <div

@@ -15,6 +15,15 @@ export type CalendarIssueSpan = {
   continuesAfter: boolean;
 };
 
+export const getCalendarDesktopRowCount = (spans: CalendarIssueSpan[], rangeLaneCount: number): number => {
+  const singleDayCounts: Record<number, number> = {};
+  for (const span of spans) {
+    if (!span.isRange) singleDayCounts[span.start] = (singleDayCounts[span.start] ?? 0) + 1;
+  }
+  // Desktop cards stack below the range overlay, even when their dates do not overlap it.
+  return rangeLaneCount + Math.max(0, ...Object.values(singleDayCounts));
+};
+
 export const getCalendarIssueIdsByDate = (
   issues: Record<string, CalendarIssue | undefined>,
   issueIds: string[],

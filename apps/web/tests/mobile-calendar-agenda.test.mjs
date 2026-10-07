@@ -64,7 +64,8 @@ test("calendar keeps every desktop bar and mobile dot lane visible", async () =>
   ]);
 
   assert.match(calendar, /flex w-full flex-col overflow-y-auto md:h-full/);
-  assert.match(weekDays, /40 \+ laneEnds\.length \* 40/);
+  assert.match(weekDays, /getCalendarDesktopRowCount\(issueSpans, rangeLaneCount\)/);
+  assert.match(weekDays, /40 \+ desktopRowCount \* 40/);
   assert.match(weekDays, /--calendar-week-height/);
   assert.doesNotMatch(weekDays, /\.toSorted\(/);
   assert.match(dayTile, /40 \+ issueRowCount \* 16/);
