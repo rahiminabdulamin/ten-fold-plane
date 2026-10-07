@@ -4,6 +4,34 @@ import test from "node:test";
 
 const countOccurrences = (source, value) => source.split(value).length - 1;
 
+test("isolated mobile entries show one centered dot without a stub or duplicate endpoint", async () => {
+  const dayTile = await readFile(
+    new URL("../core/components/issues/issue-layouts/calendar/day-tile.tsx", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(dayTile, /cn\("absolute flex h-4 items-center justify-center",/);
+  assert.match(
+    dayTile,
+    /!sharesIssueWithPreviousDate && !sharesIssueWithNextDate && \(\s*<span\s+className="size-3 rounded-full bg-\[#71777A\]"\s+data-testid="mobile-calendar-single-dot"/
+  );
+  assert.match(dayTile, /!sharesIssueWithPreviousDate && sharesIssueWithNextDate && \(/);
+});
+
+test("mobile range connectors are centered and thinner than their endpoint dots", async () => {
+  const dayTile = await readFile(
+    new URL("../core/components/issues/issue-layouts/calendar/day-tile.tsx", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(
+    dayTile,
+    /\(sharesIssueWithPreviousDate \|\| sharesIssueWithNextDate\) && \(\s*<span\s+className="absolute inset-x-0 top-1\/2 h-1 -translate-y-1\/2 bg-\[#BFBFBF\]"/
+  );
+  assert.match(dayTile, /className="absolute left-0 size-3 -translate-x-1\/2/);
+  assert.match(dayTile, /className="absolute right-0 size-3 translate-x-1\/2/);
+});
+
 test("mobile calendar renders one selected-date agenda", async () => {
   const calendar = await readFile(
     new URL("../core/components/issues/issue-layouts/calendar/calendar.tsx", import.meta.url),

@@ -241,7 +241,7 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
               return (
                 <span
                   key={issueId}
-                  className={cn("absolute flex h-4 items-center justify-center bg-[#BFBFBF]", {
+                  className={cn("absolute flex h-4 items-center justify-center", {
                     "right-0 left-0": sharesIssueWithPreviousDate && sharesIssueWithNextDate,
                     "right-1/2 left-0 rounded-r-full": sharesIssueWithPreviousDate && !sharesIssueWithNextDate,
                     "right-0 left-1/2 rounded-l-full": !sharesIssueWithPreviousDate && sharesIssueWithNextDate,
@@ -251,7 +251,13 @@ export const CalendarDayTile = observer(function CalendarDayTile(props: Props) {
                   data-testid="mobile-calendar-issue-count"
                   style={{ top: `${36 + (issueRowById[issueId] ?? 0) * 16}px` }}
                 >
-                  {!sharesIssueWithPreviousDate && (
+                  {(sharesIssueWithPreviousDate || sharesIssueWithNextDate) && (
+                    <span className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-[#BFBFBF]" />
+                  )}
+                  {!sharesIssueWithPreviousDate && !sharesIssueWithNextDate && (
+                    <span className="size-3 rounded-full bg-[#71777A]" data-testid="mobile-calendar-single-dot" />
+                  )}
+                  {!sharesIssueWithPreviousDate && sharesIssueWithNextDate && (
                     <span
                       className="absolute left-0 size-3 -translate-x-1/2 rounded-full bg-[#71777A]"
                       data-testid="mobile-calendar-range-start"
