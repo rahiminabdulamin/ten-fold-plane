@@ -536,6 +536,15 @@ function PlaneTools() {
     window.localStorage.setItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY, JSON.stringify(launcherPosition));
   }, [launcherPosition]);
 
+  useEffect(() => {
+    const keepLauncherInViewport = () => {
+      const position = launcherPositionRef.current;
+      if (position) setLauncherPosition(clampLauncherPosition(position));
+    };
+    window.addEventListener("resize", keepLauncherInViewport);
+    return () => window.removeEventListener("resize", keepLauncherInViewport);
+  }, []);
+
   const resetLauncherPosition = useCallback(() => {
     const position = getDefaultLauncherPosition();
     window.localStorage.removeItem(COPILOT_LAUNCHER_POSITION_STORAGE_KEY);
