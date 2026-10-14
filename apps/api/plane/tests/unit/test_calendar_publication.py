@@ -162,3 +162,86 @@ def test_concurrent_writes_cannot_lose_sequence_increments(calendar_project):
     seq = issue.ical_sequence
     issue.refresh_from_db()
     assert issue.ical_sequence == seq + 8
+
+
+@pytest.mark.parametrize("operation, group", [("insert", "cancelled"), ("move", "triage")])
+def test_state_group_edit_cannot_miss_uncommitted_membership(calendar_project, operation, group):
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+    from django.db import connections
+    from plane.db.models import Issue, State
+    _, workspace, project, state, _, issue = calendar_project
+    destination = State.objects.create(project=project, workspace=workspace, name="Destination", group="unstarted")
+    ready, release, editing, edited = (threading.Event() for _ in range(4))
+    record_ids = []
+    def writer():
+        try:
+            with transaction.atomic():
+                if operation == "insert":
+                    record = Issue.objects.create(project=project, workspace=workspace, state=destination,
+                                                  name="Concurrent new issue", target_date=date(2026, 11, 1))
+                    record_ids.append(record.pk)
+                else:
+                    Issue.all_objects.filter(pk=issue.pk).update(state=destination)
+                    record_ids.append(issue.pk)
+                ready.set()
+                assert release.wait(timeout=5)
+        finally:
+            connections.close_all()
+    def editor():
+        try:
+            editing.set()
+            State.all_objects.filter(pk=destination.pk).update(group=group)
+            edited.set()
+        finally:
+            connections.close_all()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        writing = pool.submit(writer)
+        assert ready.wait(timeout=5)
+        updating = pool.submit(editor)
+        assert editing.wait(timeout=5)
+        edited.wait(timeout=0.2)
+        release.set()
+        writing.result(timeout=5)
+        updating.result(timeout=5)
+    record = Issue.all_objects.get(pk=record_ids[0])
+    assert record.ical_state_group == group
+    assert (record.ical_cancelled_at is not None) == (group == "cancelled")
+
+
+def test_stale_issue_save_does_not_take_a_reverse_state_lock(calendar_project):
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+    from django.db import connections
+    from plane.db.models import State
+    state, stale = calendar_project[3], calendar_project[-1]
+    State.all_objects.filter(pk=state.pk).update(group="cancelled")
+    locked, saving, release = (threading.Event() for _ in range(3))
+    def editor():
+        try:
+            with transaction.atomic():
+                State.all_objects.select_for_update().get(pk=state.pk)
+                locked.set()
+                assert release.wait(timeout=5)
+                State.all_objects.filter(pk=state.pk).update(group="unstarted")
+        finally:
+            connections.close_all()
+    def writer():
+        try:
+            stale.name = "Saved stale instance"
+            saving.set()
+            stale.save()
+        finally:
+            connections.close_all()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        editing = pool.submit(editor)
+        assert locked.wait(timeout=5)
+        writing = pool.submit(writer)
+        assert saving.wait(timeout=5)
+        threading.Event().wait(0.1)
+        release.set()
+        writing.result(timeout=5)
+        editing.result(timeout=5)
+    stale.refresh_from_db()
+    assert stale.ical_state_group == "unstarted"
+    assert stale.ical_sequence == 3

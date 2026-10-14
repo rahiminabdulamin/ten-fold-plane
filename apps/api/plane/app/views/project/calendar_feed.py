@@ -1,6 +1,7 @@
 """Project-admin management and anonymous bearer-token publication."""
 
 import asyncio
+import logging
 from urllib.parse import urlsplit
 
 from asgiref.sync import sync_to_async
@@ -106,14 +107,6 @@ class ProjectCalendarFeedEndpoint(BaseAPIView):
         return Response(status=204)
 
 
-def project_calendar_feed(request, token):
-    if request.method != "GET":
-        response = HttpResponse(status=405)
-        response["Allow"] = "GET"
-        return response
-    return feed_response(prepare_feed(token, request.headers))
-
-
 async def project_calendar_feed_async(request, token):
     if request.method != "GET":
         response = HttpResponse(status=405)
@@ -130,6 +123,7 @@ async def project_calendar_feed_async(request, token):
                 result = task.result()
                 if result is not None and result.file is not None:
                     result.file.close()
+                    logging.getLogger("plane.api.calendar_feed").info("feed disconnected during preparation")
         preparation.add_done_callback(discard)
         raise
     return feed_response(export, asynchronous=isinstance(request, ASGIRequest))

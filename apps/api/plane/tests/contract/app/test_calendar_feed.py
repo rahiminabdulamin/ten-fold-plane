@@ -145,12 +145,15 @@ def test_invalid_token_and_validation_errors(calendar_project):
     assert client.patch(path, {"token": "chosen-token"}, format="json").status_code == 400
 
 
-def test_disconnect_closes_file_without_marking_published(calendar_project):
+def test_disconnect_closes_file_without_marking_published(calendar_project, caplog):
+    import logging
     feed, issue = calendar_project[-2:]
-    response = APIClient().get(public_path(feed))
-    response.close()
+    with caplog.at_level(logging.INFO, logger="plane.api.calendar_feed"):
+        response = APIClient().get(public_path(feed))
+        response.close()
     issue.refresh_from_db()
     assert issue.last_published_at is None
+    assert "feed disconnected" in caplog.text
 
 
 def test_feed_paths_never_appear_in_logs(calendar_project, caplog):
@@ -275,6 +278,54 @@ def test_serializer_failure_closes_spool_and_records_error(calendar_project, mon
     with pytest.raises(ValueError, match="Broken event"):
         calendar_feed.prepare_feed(feed.token, {})
     assert files[0].closed
+
+
+def test_cleanup_cannot_make_last_modified_move_backwards(calendar_project, monkeypatch):
+    from plane.db.models import CalendarFeed, Issue, Project
+    from plane.utils import calendar_feed
+    feed, issue = calendar_project[-2:]
+    now = timezone.now()
+    old = now - timedelta(days=2)
+    CalendarFeed.objects.filter(pk=feed.pk).update(created_at=old, updated_at=old)
+    Project.objects.filter(pk=feed.project_id).update(updated_at=old)
+    Issue.objects.filter(pk=issue.pk).delete()
+    client = APIClient()
+    previous = client.get(public_path(feed))
+    assert Calendar.from_ical(content(previous)).walk("VEVENT")
+    previous_modified = previous["Last-Modified"]
+    monkeypatch.setattr(calendar_feed.timezone, "now", lambda: now + timedelta(days=31))
+    assert calendar_feed.clean_expired_cancellations() == 1
+    response = client.get(public_path(feed), HTTP_IF_MODIFIED_SINCE=previous_modified)
+    assert response.status_code == 200
+    assert not Calendar.from_ical(content(response)).walk("VEVENT")
+
+
+def test_observability_emits_request_cache_error_and_duration_metrics(calendar_project, monkeypatch):
+    from opentelemetry import metrics
+    from opentelemetry.sdk.metrics import MeterProvider
+    from opentelemetry.sdk.metrics.export import InMemoryMetricReader
+    from plane.utils import calendar_feed
+    reader = InMemoryMetricReader()
+    metrics.set_meter_provider(MeterProvider(metric_readers=[reader]))
+    feed = calendar_project[-2]
+    export = calendar_feed.prepare_feed(feed.token, {})
+    export.file.close()
+    assert calendar_feed.prepare_feed(feed.token, {"If-None-Match": export.etag}).file is None
+    def disk_full(**kwargs):
+        raise OSError("No space left")
+    monkeypatch.setattr(calendar_feed, "SpooledTemporaryFile", disk_full)
+    with pytest.raises(OSError, match="No space"):
+        calendar_feed.prepare_feed(feed.token, {})
+    data = reader.get_metrics_data()
+    emitted = {metric.name: metric for resource in data.resource_metrics
+               for scope in resource.scope_metrics for metric in scope.metrics}
+    assert {"feed_requests_total", "feed_generation_duration", "feed_generation_errors",
+            "feed_cache_hits", "feed_cache_misses"} <= emitted.keys()
+    assert sum(point.value for point in emitted["feed_requests_total"].data.data_points) >= 3
+    assert sum(point.value for point in emitted["feed_cache_hits"].data.data_points) >= 1
+    assert sum(point.value for point in emitted["feed_generation_errors"].data.data_points) >= 1
+    assert sum(point.count for point in emitted["feed_generation_duration"].data.data_points) >= 2
+    assert all("token" not in dict(point.attributes) for metric in emitted.values() for point in metric.data.data_points)
 
 
 @pytest.mark.slow

@@ -8,18 +8,20 @@ from plane.tests.unit.test_calendar_publication import calendar_project, calenda
 
 
 @pytest.mark.django_db(transaction=True)
-def test_backfill_generates_distinct_uids_and_migrations_reverse(calendar_project):
+def test_backfill_generates_distinct_uids_and_migrations_reverse(calendar_project, request):
+    if request.config.getoption("nomigrations", default=False):
+        pytest.skip("Use --migrations to test historical schema backfill and rollback")
     _, workspace, project, state, _, issue = calendar_project
     executor = MigrationExecutor(connection)
-    latest = [("db", "0133_calendar_publication_indexes")]
+    latest = [("db", "0134_calendar_feed_retention_watermark")]
     try:
         executor.migrate([("db", "0131_project_calendar_feeds")])
         old_apps = executor.loader.project_state([("db", "0131_project_calendar_feeds")]).apps
         OldIssue = old_apps.get_model("db", "Issue")
-        older = OldIssue.objects.create(id=uuid4(), project_id=project.pk, workspace_id=workspace.pk,
+        older = OldIssue._base_manager.create(id=uuid4(), project_id=project.pk, workspace_id=workspace.pk,
                                        state_id=state.pk, name="Existing event")
-        OldIssue.objects.filter(pk=issue.pk).update(ical_uid=None, ical_changed_at=None)
-        before = OldIssue.objects.get(pk=issue.pk)
+        OldIssue._base_manager.filter(pk=issue.pk).update(ical_uid=None, ical_changed_at=None)
+        before = OldIssue._base_manager.get(pk=issue.pk)
         executor = MigrationExecutor(connection)
         executor.migrate(latest)
         from plane.db.models import Issue

@@ -14,7 +14,8 @@ from uuid import UUID
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db import connections, transaction
-from django.db.models import Max, Q
+from django.db.models import Max, Q, Value
+from django.db.models.functions import Greatest
 from django.http import HttpResponse, HttpResponseNotModified, StreamingHttpResponse
 from django.utils import timezone
 from django.utils.http import http_date, parse_etags, parse_http_date_safe
@@ -24,7 +25,7 @@ from plane.db.models import CalendarFeed, CalendarFeedCancellation, Issue
 from plane.utils.html_processor import strip_tags
 from plane.utils.icalendar import calendar_footer, calendar_header, serialize_event
 
-logger = logging.getLogger("plane.calendar_feed")
+logger = logging.getLogger("plane.api.calendar_feed")
 meter = metrics.get_meter("tenfold.calendar_feed")
 requests_total = meter.create_counter("feed_requests_total")
 generation_errors = meter.create_counter("feed_generation_errors")
@@ -96,7 +97,8 @@ def prepare_feed(token, headers):
             header = calendar_header(feed.project.name)
             digest = hashlib.sha256(header)
             digest.update(f"v1:{settings.CALENDAR_FEED_RETENTION_DAYS}:{feed.updated_at.isoformat()}".encode())
-            modified = max(feed.created_at, feed.updated_at, feed.project.updated_at)
+            modified = max(feed.created_at, feed.updated_at, feed.project.updated_at,
+                           feed.last_removed_at or feed.created_at)
             event_count = 0
             for query, fields in (
                 (issues, ("ical_uid", "ical_sequence", "ical_changed_at")),
@@ -142,11 +144,15 @@ def prepare_feed(token, headers):
                                 etag, modified, event_count, spool, time.monotonic() - started)
         # Access bookkeeping cannot invalidate the content or sequence.
         CalendarFeed.objects.using("default").filter(pk=result.feed_id).update(last_accessed_at=now)
+        if spool is not None:
+            generation_duration.record(result.duration)
+            logger.info("feed generated", extra={"duration": result.duration, "event_count": result.event_count})
         return result
     except Exception:
         if spool is not None:
             spool.close()
         generation_errors.add(1)
+        generation_duration.record(time.monotonic() - started)
         logger.error("feed generation failed", extra={"duration": time.monotonic() - started})
         raise
 
@@ -172,21 +178,25 @@ class FeedStream:
     def __init__(self, export):
         self.export = export
         self.closed = False
+        self.completed = False
+        self.failed = False
 
     def close(self):
         if not self.closed:
             self.closed = True
             self.export.file.close()
+            if not self.completed and not self.failed:
+                logger.info("feed disconnected", extra={"event_count": self.export.event_count})
 
     def _finish(self):
+        self.completed = True
         try:
             _published(self.export)
         except Exception:
             # The feed is already sent; bookkeeping failure must not corrupt delivery.
             generation_errors.add(1)
             logger.error("feed publication bookkeeping failed")
-        generation_duration.record(self.export.duration)
-        logger.info("feed generated", extra={"duration": self.export.duration, "event_count": self.export.event_count})
+        logger.info("feed delivered", extra={"event_count": self.export.event_count})
 
     def __iter__(self):
         try:
@@ -194,6 +204,7 @@ class FeedStream:
                 yield block
             self._finish()
         except Exception:
+            self.failed = True
             generation_errors.add(1)
             logger.error("feed streaming failed")
             raise
@@ -206,6 +217,7 @@ class FeedStream:
                 yield block
             await sync_to_async(self._finish)()
         except Exception:
+            self.failed = True
             generation_errors.add(1)
             logger.error("feed streaming failed")
             raise
@@ -240,6 +252,19 @@ def clean_expired_cancellations(batch_size=1000):
     query = CalendarFeedCancellation.objects.using("default").filter(cancelled_at__lte=cutoff)
     count = 0
     while ids := list(query.values_list("id", flat=True)[:batch_size]):
-        deleted, _ = query.filter(id__in=ids).delete()
-        count += deleted
+        with transaction.atomic(using="default"):
+            rows = list(query.filter(id__in=ids).select_for_update().values(
+                "project_id", "cancelled_at", "changed_at",
+            ))
+            removals = {}
+            for row in rows:
+                removed_at = max(row["changed_at"], row["cancelled_at"] + timedelta(days=settings.CALENDAR_FEED_RETENTION_DAYS))
+                key = row["project_id"]
+                removals[key] = max(removals.get(key, removed_at), removed_at)
+            for project_id, removed_at in removals.items():
+                CalendarFeed.objects.using("default").filter(project_id=project_id).update(
+                    last_removed_at=Greatest("last_removed_at", Value(removed_at)),
+                )
+            deleted, _ = query.filter(id__in=ids).delete()
+            count += deleted
     return count

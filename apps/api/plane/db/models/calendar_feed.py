@@ -27,6 +27,7 @@ class CalendarFeed(models.Model):
     last_accessed_at = models.DateTimeField(null=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     token_rotated_at = models.DateTimeField(null=True)
+    last_removed_at = models.DateTimeField(null=True, editable=False)
 
     class Meta:
         db_table = "calendar_feeds"

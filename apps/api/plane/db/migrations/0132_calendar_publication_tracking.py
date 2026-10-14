@@ -53,9 +53,13 @@ BEGIN
             NEW.ical_cancelled_at := OLD.ical_cancelled_at;
         END IF;
         IF TG_OP = 'INSERT' OR NEW.state_id IS DISTINCT FROM OLD.state_id
-           OR NEW.ical_state_group IS DISTINCT FROM OLD.ical_state_group THEN
-            NEW.ical_state_group := COALESCE((SELECT "group" FROM states WHERE id = NEW.state_id), '');
+           OR (pg_trigger_depth() > 1 AND NEW.ical_state_group IS DISTINCT FROM OLD.ical_state_group) THEN
+            -- Hold the state stable until membership commits. Otherwise a group
+            -- edit can scan before this new/moved issue becomes visible and miss it.
+            NEW.ical_state_group := COALESCE((SELECT "group" FROM states WHERE id = NEW.state_id FOR SHARE), '');
         ELSE
+            -- A stale model instance can carry old derived metadata. Only a
+            -- nested state trigger may change it without changing membership.
             NEW.ical_state_group := OLD.ical_state_group;
         END IF;
         new_visible := NEW.target_date IS NOT NULL AND NEW.deleted_at IS NULL
