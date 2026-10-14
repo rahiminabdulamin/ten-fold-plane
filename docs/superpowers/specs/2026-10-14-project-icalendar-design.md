@@ -73,6 +73,8 @@ Reversible PostgreSQL triggers enforce UID immutability and advance sequence onl
 for changes to exported title, description, dates, status, or membership. Metadata,
 sort order, assignees, analytics, and publication bookkeeping do not advance it.
 State-group edits must update affected publication status even without issue saves.
+Membership changes hold a shared state-row lock until commit; derived state metadata
+from stale model instances is ignored unless the nested state trigger is updating it.
 Track changes atomically under concurrent writes and honor actual persisted fields.
 Trigger logic must not change existing issue state, identifiers, or timestamps.
 
@@ -131,7 +133,8 @@ disconnect, or error. Conditional matches skip file generation entirely.
 
 Compute validators from indexed publication metadata, count, project/feed metadata,
 serializer version, retention configuration, and the eligible cancellation set.
-Retention expiry must change validators even with no writes. ETag is weak if based
+Retention expiry must change validators even with no writes. Cleanup retains a
+per-feed removal watermark so date validators cannot forget expired cancellations. ETag is weak if based
 on metadata; do not claim a byte hash. Last-Modified includes creation, publication,
 withdrawal, and retention-removal times. Avoid false 304s for multiple changes in
 the same HTTP timestamp second; when date-only validation is ambiguous return 200.
