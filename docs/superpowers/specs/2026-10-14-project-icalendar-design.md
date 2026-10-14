@@ -9,7 +9,23 @@ date editing, state transitions, and deletion behavior.
 
 This is publishing, not importing remote calendars or two-way synchronization.
 No workspace, user, module, cycle, or saved-view feeds. Deliver backend management
-APIs, deployment routing, tests, operator documentation, and sample output.
+APIs, a project settings panel, deployment routing, tests, operator documentation,
+and sample output.
+
+### User access
+
+Add a **Calendar subscription** section to Project settings → General, visible
+only to project admins. Use existing settings typography, buttons, and layout.
+Before creation, explain which issues are shared and offer **Enable subscription**.
+After creation, display the full HTTPS URL in a labelled read-only field with
+**Copy URL**, **Disable/Enable**, **Rotate URL**, and **Revoke subscription**.
+Rotation and revocation require an inline confirmation that explains that current
+subscriptions will stop updating. Never rotate silently on enable/disable.
+Explain that anyone with the URL can read issue titles and descriptions, and that
+users paste it into their calendar app's Subscribe by URL action. Refresh intervals
+are controlled by the subscriber. Show loading, recoverable errors, and disabled
+states; prevent duplicate mutations. The backend constructs the URL from the
+configured public application origin, never an unvalidated request host.
 
 ## Options and recommendation
 
@@ -105,13 +121,13 @@ DTSTART, DTEND, CREATED, LAST-MODIFIED, SEQUENCE, STATUS. Use CRLF, escape TEXT,
 and fold at 75 UTF-8 octets without splitting characters. Deterministic ordering
 and timestamps make identical exports byte-stable.
 
-Use a bounded database iterator and serialize one event at a time. Do not assemble
-the whole feed in memory or perform one query per event. Use a stable database
-snapshot for validators and exported rows so concurrent changes cannot produce
-an ETag describing different content. Explicitly manage generator transaction and
-cursor lifetime; close them on disconnect and error. Confirm the approach works
-with the deployed ASGI server and connection pooling; streaming must stay bounded
-under ASGI as well as synchronous tests.
+Use a bounded database iterator and serialize one event at a time into a temporary
+file, spilling to disk beyond 1 MiB. Compute validators and build the file inside
+one repeatable-read snapshot, then close the database transaction before streaming
+the file to the subscriber. This bounds memory and avoids holding a database cursor
+or transaction during slow network delivery. Under ASGI use an asynchronous file
+iterator; under WSGI use a synchronous iterator. Close the file on completion,
+disconnect, or error. Conditional matches skip file generation entirely.
 
 Compute validators from indexed publication metadata, count, project/feed metadata,
 serializer version, retention configuration, and the eligible cancellation set.
@@ -154,6 +170,6 @@ TEXT escaping, VEVENT requirements, DATE/DATE-TIME, DTEND, UID, and SEQUENCE.
 
 ## Review boundary
 
-This document is the proposed design, pending user review. Product implementation
-has not started. After approval, write the implementation plan and execute it
-inline unless the user selects delegated execution.
+The user approved proceeding with detailed specifications, an implementation plan,
+and inline execution in the current checkout on 2026-10-14. The UI and temporary-file
+streaming refinements above are implementation decisions within that authorization.
