@@ -337,6 +337,7 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 
 
 CELERY_IMPORTS = (
+    "plane.bgtasks.calendar_feed_task",
     # scheduled tasks
     "plane.bgtasks.issue_automation_task",
     "plane.bgtasks.exporter_expired_task",
@@ -418,6 +419,10 @@ LIVE_URL = urljoin(LIVE_BASE_URL, LIVE_BASE_PATH) if LIVE_BASE_URL else None
 
 # WEB URL
 WEB_URL = os.environ.get("WEB_URL")
+
+CALENDAR_FEED_RETENTION_DAYS = int(os.environ.get("CALENDAR_FEED_RETENTION_DAYS", "30"))
+if not 1 <= CALENDAR_FEED_RETENTION_DAYS <= 3650:
+    raise ValueError("CALENDAR_FEED_RETENTION_DAYS must be between 1 and 3650")
 
 HARD_DELETE_AFTER_DAYS = int(os.environ.get("HARD_DELETE_AFTER_DAYS", 60))
 

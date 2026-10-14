@@ -1,4 +1,5 @@
 (plane_proxy) {
+	log_skip /ics/*
 	request_body {
 		max_size {$FILE_SIZE_LIMIT}
 	}
@@ -11,6 +12,9 @@
         reverse_proxy localhost:3005
     }
 	handle /api/* {
+        reverse_proxy localhost:3004
+    }
+	handle /ics/* {
         reverse_proxy localhost:3004
     }
 

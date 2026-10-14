@@ -1,4 +1,5 @@
 (plane_proxy) {
+	log_skip /ics/*
 	request_body {
 		max_size {$FILE_SIZE_LIMIT}
 	}
@@ -109,6 +110,7 @@
 	reverse_proxy /forms/* api:8000
 
 	reverse_proxy /api/* api:8000
+	reverse_proxy /ics/* api:8000
 
 	reverse_proxy /auth/* api:8000
 

@@ -32,7 +32,7 @@ class RequestLoggerMiddleware:
         Determines whether a route should be logged based on the request and status code.
         """
         # Don't log health checks
-        if request.path == "/" and request.method == "GET":
+        if request.path.startswith("/ics/") or (request.path == "/" and request.method == "GET"):
             return False
         return True
 
@@ -86,6 +86,9 @@ class APITokenLogMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Feed URLs and management response bodies contain bearer secrets.
+        if request.path.startswith("/ics/") or "/calendar-feed/" in request.path:
+            return self.get_response(request)
         request_body = request.body
         response = self.get_response(request)
         self.process_request(request, response, request_body)

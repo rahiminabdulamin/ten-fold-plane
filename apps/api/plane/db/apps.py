@@ -7,3 +7,7 @@ from django.apps import AppConfig
 
 class DbConfig(AppConfig):
     name = "plane.db"
+
+    def ready(self):
+        from plane.utils.calendar_feed_logging import install_feed_log_filters
+        install_feed_log_filters()

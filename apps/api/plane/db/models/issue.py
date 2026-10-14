@@ -183,7 +183,12 @@ class Issue(ChangeTrackerMixin, ProjectBaseModel):
         verbose_name_plural = "Issues"
         db_table = "issues"
         ordering = ("-created_at",)
-        indexes = [models.Index(fields=["project", "ical_changed_at"], name="issue_calendar_changes")]
+        indexes = [
+            models.Index(fields=["project", "ical_changed_at"], name="issue_calendar_changes"),
+            models.Index(fields=["project", "ical_uid"], name="issue_calendar_identity"),
+            models.Index(fields=["updated_at"], name="issue_calendar_updated"),
+            models.Index(fields=["deleted_at"], name="issue_calendar_deleted"),
+        ]
 
     def save(self, *args, **kwargs):
         self._ensure_default_state()

@@ -13,10 +13,12 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from plane.api.views.spreadsheet import published_spreadsheet_form
+from plane.app.views.project.calendar_feed import project_calendar_feed_async
 
 handler404 = "plane.app.views.error_404.custom_404_view"
 
 urlpatterns = [
+    path("ics/<str:token>.ics", project_calendar_feed_async, name="project-icalendar"),
     path("forms/<uuid:publication_id>", published_spreadsheet_form, name="spreadsheet-public-form"),
     path("api/", include("plane.app.urls")),
     path("api/public/", include("plane.space.urls")),

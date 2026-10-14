@@ -7,8 +7,22 @@ from django.db import DatabaseError, transaction
 pytestmark = pytest.mark.django_db(transaction=True)
 
 
+@pytest.fixture(scope="session")
+def calendar_publication_triggers(django_db_setup, django_db_blocker):
+    # The repository's default --nomigrations builds tables but omits RunSQL.
+    # Exercise the actual migration SQL even in that mode; full migration tests
+    # separately cover the existing-row backfill and rollback.
+    import importlib
+    from django.db import connection
+    with django_db_blocker.unblock(), connection.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM pg_trigger WHERE tgname = 'tenfold_ical_issue_tracking'")
+        if cursor.fetchone() is None:
+            migration = importlib.import_module("plane.db.migrations.0132_calendar_publication_tracking")
+            cursor.execute(migration.FORWARD_SQL)
+
+
 @pytest.fixture
-def calendar_project():
+def calendar_project(calendar_publication_triggers):
     from plane.db.models import CalendarFeed, Issue, Project, ProjectMember, State, User, Workspace, WorkspaceMember
 
     user = User.objects.create(email=f"ical-{uuid4()}@example.com", username=str(uuid4()))
@@ -115,3 +129,36 @@ def test_update_fields_and_existing_issue_identifier_are_preserved(calendar_proj
     assert issue.name == "Planning"
     assert issue.ical_sequence == seq
     assert issue.sequence_id == number
+
+
+def test_project_move_cancels_old_calendar_with_same_uid(calendar_project):
+    from plane.db.models import CalendarFeed, CalendarFeedCancellation, Issue, Project, State
+    user, workspace, project, state, feed, issue = calendar_project
+    destination = Project.objects.create(name="Destination", identifier="DST", workspace=workspace)
+    new_state = State.objects.create(project=destination, workspace=workspace, name="Todo", group="unstarted")
+    CalendarFeed.objects.create(project=destination, created_by=user)
+    Issue.all_objects.filter(pk=issue.pk).update(project=destination, state=new_state)
+    snapshot = CalendarFeedCancellation.objects.get(project=project, uid=issue.ical_uid)
+    issue.refresh_from_db()
+    assert issue.ical_uid == snapshot.uid
+    assert issue.ical_sequence == snapshot.sequence
+    Issue.all_objects.filter(pk=issue.pk).update(project=project, state=state)
+    assert not CalendarFeedCancellation.objects.filter(project=project, uid=issue.ical_uid).exists()
+    assert CalendarFeedCancellation.objects.filter(project=destination, uid=issue.ical_uid).exists()
+
+
+def test_concurrent_writes_cannot_lose_sequence_increments(calendar_project):
+    from concurrent.futures import ThreadPoolExecutor
+    from django.db import connections
+    from plane.db.models import Issue
+    issue = calendar_project[-1]
+    def edit(index):
+        try:
+            Issue.all_objects.filter(pk=issue.pk).update(name=f"Concurrent title {index}")
+        finally:
+            connections.close_all()
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(edit, range(8)))
+    seq = issue.ical_sequence
+    issue.refresh_from_db()
+    assert issue.ical_sequence == seq + 8

@@ -3,6 +3,7 @@
 # See the LICENSE file for details.
 
 from django.urls import path
+from plane.app.views.project.calendar_feed import ProjectCalendarFeedEndpoint
 
 from plane.app.views import (
     ProjectViewSet,
@@ -22,6 +23,14 @@ from plane.app.views import (
 
 
 urlpatterns = [
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/calendar-feed/",
+        ProjectCalendarFeedEndpoint.as_view(), name="project-calendar-feed",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/calendar-feed/rotate/",
+        ProjectCalendarFeedEndpoint.as_view(http_method_names=["post", "options"]), {"rotate": True}, name="project-calendar-feed-rotate",
+    ),
     path(
         "workspaces/<str:slug>/projects/",
         ProjectViewSet.as_view({"get": "list", "post": "create"}),
