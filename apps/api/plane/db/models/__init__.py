@@ -96,3 +96,4 @@ from .spreadsheet import (
 )
 
 from .description import Description, DescriptionVersion
+from .calendar_feed import CalendarFeed, CalendarFeedCancellation

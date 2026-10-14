@@ -24,6 +24,7 @@ from .project import ProjectBaseModel
 from plane.utils.uuid import convert_uuid_to_integer
 from .description import Description
 from .state import StateGroup
+from .calendar_feed import event_uid
 
 
 def get_default_properties():
@@ -146,6 +147,12 @@ class Issue(ChangeTrackerMixin, ProjectBaseModel):
     )
     start_date = models.DateField(null=True, blank=True)
     target_date = models.DateField(null=True, blank=True)
+    ical_uid = models.CharField(max_length=255, unique=True, default=event_uid, editable=False)
+    ical_sequence = models.PositiveIntegerField(default=0, editable=False, db_index=True)
+    ical_changed_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)
+    ical_cancelled_at = models.DateTimeField(null=True, editable=False, db_index=True)
+    ical_state_group = models.CharField(max_length=20, default="", editable=False)
+    last_published_at = models.DateTimeField(null=True, editable=False)
     assignees = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         blank=True,
@@ -176,6 +183,7 @@ class Issue(ChangeTrackerMixin, ProjectBaseModel):
         verbose_name_plural = "Issues"
         db_table = "issues"
         ordering = ("-created_at",)
+        indexes = [models.Index(fields=["project", "ical_changed_at"], name="issue_calendar_changes")]
 
     def save(self, *args, **kwargs):
         self._ensure_default_state()
