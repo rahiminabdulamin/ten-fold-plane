@@ -19,6 +19,26 @@ import {
 } from "./tool-contracts";
 
 describe("work-item tool contracts", () => {
+  it("rejects state names before sending an API mutation and explains how to resolve them", () => {
+    let failure: unknown;
+    try {
+      toWorkItemPayload({ title: "Event", stateId: "backlog" });
+    } catch (error) {
+      failure = error;
+    }
+    expect(failure).toBeInstanceOf(Error);
+    expect(toolError("create_work_item", failure, { mutation: true })).toMatchObject({
+      errorCategory: "validation",
+      retryable: false,
+      message: expect.stringContaining("get_work_item_schema"),
+    });
+  });
+
+  it("leaves the default state to the API and preserves canonical state UUIDs", () => {
+    expect(toWorkItemPayload({ title: "Event" })).not.toHaveProperty("state_id");
+    const stateId = "8fd2a982-478c-479c-aeac-820e97299186";
+    expect(toWorkItemPayload({ title: "Event", stateId })).toHaveProperty("state_id", stateId);
+  });
   it("distinguishes verified, partial, and uncertain outcomes", () => {
     expect(toolResult("create_work_item", "Created.")).toMatchObject({
       ok: true,
@@ -180,7 +200,7 @@ describe("work-item tool contracts", () => {
         priority: "high",
         startDate: "2026-09-07",
         targetDate: "2026-09-10",
-        stateId: "state-1",
+        stateId: "8fd2a982-478c-479c-aeac-820e97299186",
         labelIds: ["label-1"],
         assigneeIds: ["member-1"],
         parentId: "issue-1",
@@ -194,7 +214,7 @@ describe("work-item tool contracts", () => {
       priority: "high",
       start_date: "2026-09-07",
       target_date: "2026-09-10",
-      state_id: "state-1",
+      state_id: "8fd2a982-478c-479c-aeac-820e97299186",
       labels: ["label-1"],
       assignees: ["member-1"],
       parent_id: "issue-1",

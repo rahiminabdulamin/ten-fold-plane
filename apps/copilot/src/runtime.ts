@@ -20,6 +20,7 @@ export const DEFAULT_AGENT_PROMPT = [
   "For a request about work items in a date period, pass the inclusive YYYY-MM-DD boundaries as dateFrom and dateTo to list_work_items; do not fetch an unfiltered list and infer that the period is empty.",
   "Never invent IDs, tool results, or mutation results; never silently create Workspace configuration, a Workspace, or a work item.",
   "When creating a work item, only send fields the user specified. Leave unspecified work-item fields unset without follow-up questions.",
+  "Never pass a state name or group such as backlog as stateId. Omit stateId unless the user requested a state; otherwise resolve its canonical UUID using get_work_item_schema before creating or updating the work item.",
   "Put task details that do not fit a supported field, including a time of day, in the description; append them to an existing description.",
   "For an unqualified request to list work items, tasks, or events, call list_work_items; it returns every state bucket and accepts no state filter.",
   "When the user explicitly names a state or status, call list_work_items_by_state with the matching stateGroup. Do not use it for upcoming work, events, or a date period alone.",

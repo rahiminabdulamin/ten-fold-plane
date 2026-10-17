@@ -1,3 +1,7 @@
+import { z } from "zod";
+
+class WorkItemInputError extends Error {}
+
 export interface ProjectLookupRecord {
   id: string;
   name: string;
@@ -168,6 +172,7 @@ export function toolValidationError(operation: string, message: string, affected
 type StructuredError = { code?: unknown; response?: { status?: unknown } };
 
 export function classifyToolError(error: unknown): { category: ToolErrorCategory; retryable: boolean } {
+  if (error instanceof WorkItemInputError) return { category: "validation", retryable: false };
   const structured = error && typeof error === "object" ? (error as StructuredError) : {};
   const status = structured.response?.status;
   if (status === 400) return { category: "validation", retryable: false };
@@ -190,7 +195,7 @@ export function toolError(operation: string, error: unknown, options: { mutation
     status: "failure",
     operation,
     affectedIds: [],
-    message: `Unable to ${label} right now.`,
+    message: error instanceof WorkItemInputError ? error.message : `Unable to ${label} right now.`,
     retryable: options.mutation ? false : retryable,
     errorCategory: category,
   };
@@ -328,6 +333,10 @@ export function toWorkItemPayload({
   estimatePointId,
   workItemTypeId,
 }: WorkItemMutation) {
+  if (stateId !== undefined && stateId !== null && !z.string().uuid().safeParse(stateId).success)
+    throw new WorkItemInputError(
+      "stateId must be a canonical UUID from get_work_item_schema, not a state name or group. Omit stateId when the user did not specify a state so the default is used."
+    );
   return {
     ...(title !== undefined ? { name: title } : {}),
     ...(description !== undefined ? { description_html: toDescriptionHtml(description) } : {}),
