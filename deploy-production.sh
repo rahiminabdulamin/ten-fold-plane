@@ -75,10 +75,75 @@ command -v curl >/dev/null || {
   exit 1
 }
 
-[[ -f .env && -f apps/api/.env ]] || {
+[[ -f .env && -f apps/api/.env && -f apps/live/.env ]] || {
   echo "Missing preserved production .env files in $DEPLOY_PATH" >&2
   exit 1
 }
+
+docker compose config --quiet
+tls_directory="${CADDY_TLS_DIRECTORY:-/etc/tenfold/tls}"
+[[ -r "$tls_directory/origin.pem" && -r "$tls_directory/origin.key" ]] || {
+  echo "Missing readable origin.pem/origin.key in $tls_directory" >&2
+  exit 1
+}
+
+# Keep recovery files outside the rsync --delete destination; they contain secrets.
+umask 077
+mkdir -p ../deployment-backups
+backup_directory="$(mktemp -d "../deployment-backups/$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX")"
+echo "Recovery files: $(cd "$backup_directory" && pwd)"
+cp .env "$backup_directory/root.env"
+cp apps/api/.env "$backup_directory/api.env"
+cp apps/live/.env "$backup_directory/live.env"
+printf 'services:\n' > "$backup_directory/rollback.yml"
+for service in grist admin web space live copilot api worker beat-worker proxy; do
+  container_id="$(docker compose ps -aq "$service")"
+  if [[ -n "$container_id" ]]; then
+    previous_image="$(docker inspect --format '{{.Image}}' "$container_id")"
+    rollback_image="tenfold-rollback/$service:$(basename "$backup_directory")"
+    docker image tag "$previous_image" "$rollback_image"
+    printf '  %s:\n    image: %s\n' "$service" "$rollback_image" >> "$backup_directory/rollback.yml"
+    # Older beat images do not create the PID file required by the new probe.
+    if [[ "$service" == beat-worker ]]; then
+      printf '    healthcheck:\n      disable: true\n' >> "$backup_directory/rollback.yml"
+    fi
+  fi
+done
+
+deployment_stage="application image builds"
+docker compose build migrator
+for service in admin web space live copilot api worker beat-worker proxy; do
+  docker compose build "$service"
+done
+
+deployment_stage="infrastructure readiness"
+docker compose up -d --wait --wait-timeout 180 plane-db plane-redis plane-mq plane-minio
+
+deployment_stage="migration consistency check"
+docker compose run --rm --no-deps -T migrator python manage.py makemigrations --check --dry-run
+
+deployment_stage="database backup"
+# Derive the target from Django, so the backup covers the database the API uses.
+backup_connection="$(docker compose run --rm --no-deps -T migrator python - <<'PYTHON'
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "plane.settings.production")
+from django.conf import settings
+from psycopg.conninfo import make_conninfo
+config = settings.DATABASES["default"]
+parameters = {key: config.get(source) for key, source in (
+    ("host", "HOST"), ("port", "PORT"), ("dbname", "NAME"),
+    ("user", "USER"), ("password", "PASSWORD"),
+) if config.get(source)}
+for key in ("sslmode", "sslrootcert", "sslcert", "sslkey", "options", "target_session_attrs"):
+    if key in config.get("OPTIONS", {}):
+        parameters[key] = config["OPTIONS"][key]
+print(make_conninfo(**parameters, connect_timeout=10))
+PYTHON
+)"
+docker compose exec -T plane-db pg_dump --dbname="$backup_connection" -Fc > "$backup_directory/database.dump.partial"
+unset backup_connection
+[[ -s "$backup_directory/database.dump.partial" ]]
+mv "$backup_directory/database.dump.partial" "$backup_directory/database.dump"
 
 set_env() {
   local file="$1" key="$2" value="$3"
@@ -92,7 +157,7 @@ if [[ -z "$grist_session_secret" ]]; then
 fi
 set_env .env GRIST_PUBLIC_URL "$PRODUCTION_URL/grist"
 set_env .env GRIST_PUBLIC_ORIGIN "$PRODUCTION_URL"
-set_env .env CADDY_TLS_DIRECTORY "/etc/tenfold/tls"
+set_env .env CADDY_TLS_DIRECTORY "$tls_directory"
 set_env .env CADDY_TLS_CERT_FILE "/etc/caddy/tls/origin.pem"
 set_env .env CADDY_TLS_KEY_FILE "/etc/caddy/tls/origin.key"
 set_env apps/api/.env GRIST_INTERNAL_URL "http://grist:8484"
@@ -101,7 +166,7 @@ set_env apps/api/.env GRIST_PUBLIC_BASE_PATH "/o/ten-fold"
 deployment_stage="Grist setup"
 docker compose pull grist
 # rsync replaces files atomically; recreate Grist to refresh its single-file CSS mount.
-docker compose up -d --wait --force-recreate grist
+docker compose up -d --wait --wait-timeout 180 --force-recreate grist
 grist_css_expected="$(sha256sum apps/proxy/grist-custom.css | cut -d ' ' -f 1)"
 grist_css_actual="$(docker compose exec -T grist sha256sum /grist/static/custom.css | cut -d ' ' -f 1)"
 [[ "$grist_css_actual" == "$grist_css_expected" ]] || {
@@ -139,12 +204,9 @@ NODE
 set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"
 
 deployment_stage="database migrations"
-docker compose run --rm --build migrator
-deployment_stage="application build and replacement"
-for service in admin web space live copilot api worker beat-worker proxy; do
-  docker compose build "$service"
-done
-if ! docker compose up -d --no-build --wait grist api worker beat-worker copilot web admin space live proxy; then
+docker compose run --rm --no-deps -T migrator python manage.py migrate
+deployment_stage="application replacement"
+if ! docker compose up -d --no-build --wait --wait-timeout 300 grist api worker beat-worker copilot web admin space live proxy; then
   docker compose ps
   grist_container_id="$(docker compose ps -q grist)"
   if [[ -n "$grist_container_id" ]]; then
@@ -153,6 +215,41 @@ if ! docker compose up -d --no-build --wait grist api worker beat-worker copilot
   docker compose logs --tail=100 grist api worker beat-worker copilot web admin space live proxy
   exit 1
 fi
+
+deployment_stage="backend dependency verification"
+docker compose exec -T api python <<'PYTHON'
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "plane.settings.production")
+import django
+django.setup()
+import boto3
+from botocore.config import Config
+from django.conf import settings
+from django.db import connection
+from plane.celery import app
+from plane.settings.redis import redis_instance
+
+with connection.cursor() as cursor:
+    cursor.execute("SELECT 1")
+assert redis_instance().ping(), "Redis ping failed"
+with app.connection_for_write() as broker:
+    broker.ensure_connection(max_retries=0)
+boto3.client(
+    "s3",
+    endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_REGION or None,
+    config=Config(connect_timeout=10, read_timeout=10, retries={"max_attempts": 1}),
+).head_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
+print("Verified database, Redis, task broker, and upload bucket")
+PYTHON
+
+deployment_stage="public service verification"
+for route in /api/instances/ /live/health/ /god-mode/ /spaces/; do
+  curl --fail --silent --show-error --location --connect-timeout 10 --max-time 30 \
+    "${PRODUCTION_URL%/}$route" > /dev/null
+done
 
 deployment_stage="frontend source verification"
 image_source="$(docker compose exec -T web cat /usr/share/caddy/html/deployment-source.txt)"

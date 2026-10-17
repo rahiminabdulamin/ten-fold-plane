@@ -87,6 +87,12 @@ services:
       args:
         DOCKER_BUILDKIT: 1
     restart: always
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os, urllib.request; host = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')[0].strip().lstrip('.'); request = urllib.request.Request('http://127.0.0.1:' + os.environ.get('PORT', '8000') + '/', headers={'Host': 'localhost' if host == '*' else host}); urllib.request.urlopen(request, timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 6
     command: ./bin/docker-entrypoint-api.sh
     env_file:
       - ./apps/api/.env
@@ -103,6 +109,12 @@ services:
       args:
         DOCKER_BUILDKIT: 1
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A plane inspect ping --destination celery@$$HOSTNAME --timeout 10"]
+      interval: 30s
+      timeout: 20s
+      start_period: 120s
+      retries: 6
     command: ./bin/docker-entrypoint-worker.sh
     env_file:
       - ./apps/api/.env
@@ -119,6 +131,13 @@ services:
       args:
         DOCKER_BUILDKIT: 1
     restart: always
+    healthcheck:
+      # Beat has no ping API: verify its explicitly configured scheduler PID.
+      test: ["CMD", "python", "-c", "import os; os.kill(int(open('/tmp/celerybeat.pid').read()), 0)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 6
     command: ./bin/docker-entrypoint-beat.sh
     env_file:
       - ./apps/api/.env
@@ -144,6 +163,12 @@ services:
 
   live:
     container_name: plane-live
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || '3000') + (process.env.LIVE_BASE_PATH || '/live') + '/health/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 6
     build:
       context: .
       dockerfile: ./apps/live/Dockerfile.live
@@ -156,6 +181,11 @@ services:
   plane-db:
     container_name: plane-db
     image: postgres:15.7-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     restart: always
     command: postgres -c 'max_connections=1000'
     volumes:
@@ -171,6 +201,11 @@ services:
   plane-redis:
     container_name: plane-redis
     image: valkey/valkey:7.2.11-alpine
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     restart: always
     volumes:
       - redisdata:/data
@@ -178,6 +213,12 @@ services:
   plane-mq:
     container_name: plane-mq
     image: rabbitmq:3.13.6-management-alpine
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 12
     restart: always
     env_file:
       - .env
@@ -202,6 +243,12 @@ services:
   # Comment this if you already have a reverse proxy running
   proxy:
     container_name: proxy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 6
     build:
       context: ./apps/proxy
       dockerfile: Dockerfile.ce

@@ -16,7 +16,7 @@ grep -Fq 'deployment_started_at=$SECONDS' "$script_path"
 grep -Fq 'Deployment complete: $PRODUCTION_URL (elapsed:' "$script_path"
 grep -Fq -- '--exclude .env' "$script_path"
 grep -Fq -- '--exclude .ruff_cache' "$script_path"
-grep -Fq 'docker compose run --rm --build migrator' "$script_path"
+# Migration ordering and failures are exercised below.
 grep -Fq 'GRIST_SESSION_SECRET' "$script_path"
 grep -Fq 'GRIST_PUBLIC_URL' "$script_path"
 grep -Fq 'CADDY_TLS_CERT_FILE' "$script_path"
@@ -27,12 +27,12 @@ grep -Fq 'GRIST_WORKSPACE_ID' "$script_path"
 grep -Fq 'GRIST_IN_SERVICE: "true"' "$compose_path"
 grep -Fq 'GRIST_ADMIN_EMAIL: spreadsheet-system@tenfold.internal' "$compose_path"
 grep -Fq 'docker compose pull grist' "$script_path"
-grep -Fq 'docker compose up -d --wait --force-recreate grist' "$script_path"
+grep -Fq 'docker compose up -d --wait --wait-timeout 180 --force-recreate grist' "$script_path"
 grep -Fq 'api/orgs/current/workspaces' "$script_path"
 grep -Fq 'workspace.access === "owners"' "$script_path"
 grep -Fq 'body: JSON.stringify({name: "Ten-Fold"})' "$script_path"
 grep -Fq 'set_env apps/api/.env GRIST_WORKSPACE_ID "$grist_workspace_id"' "$script_path"
-grep -Fq 'docker compose up -d --no-build --wait grist api worker beat-worker copilot web admin space live proxy' "$script_path"
+grep -Fq 'docker compose up -d --no-build --wait --wait-timeout 300 grist api worker beat-worker copilot web admin space live proxy' "$script_path"
 grep -Fq "docker inspect --format '{{json .State.Health}}'" "$script_path"
 grep -Fq 'docker compose logs --tail=100 grist api worker beat-worker copilot web admin space live proxy' "$script_path"
 grep -Fq '178.128.104.112' "$script_path"
@@ -82,11 +82,55 @@ if grep -Fq 'request_header -X-Ten-Fold-User' "$proxy_path"; then
   exit 1
 fi
 
+# Exercise the actual API probe against HTTP, including restricted Django hosts.
+# Inline Compose command arrays are JSON, so no YAML dependency is needed here.
+python3 - "$compose_path" <<'PYTHON'
+import json
+import os
+import subprocess
+import sys
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
+
+api_section = Path(sys.argv[1]).read_text().split("\n  api:\n", 1)[1].split("\n  worker:\n", 1)[0]
+probe = next(json.loads(line.split("test:", 1)[1]) for line in api_section.splitlines() if line.strip().startswith("test:"))
+assert probe[0] == "CMD" and probe[1] == "python"
+probe[1] = sys.executable
+
+class Handler(BaseHTTPRequestHandler):
+    status = 200
+    allowed_host = "ten-fold.test"
+
+    def do_GET(self):
+        self.send_response(self.status if self.headers.get("Host") == self.allowed_host else 400)
+        self.end_headers()
+
+    def log_message(self, *args):
+        pass
+
+server = HTTPServer(("127.0.0.1", 0), Handler)
+threading.Thread(target=server.serve_forever, daemon=True).start()
+try:
+    for allowed_hosts, expected_host in (("ten-fold.test", "ten-fold.test"), (".ten-fold.test", "ten-fold.test"), ("ten-fold.test,other.test", "ten-fold.test"), ("*", "localhost")):
+        Handler.allowed_host = expected_host
+        for status in (200, 503):
+            Handler.status = status
+            result = subprocess.run(probe[1:], env={**os.environ, "PORT": str(server.server_port), "ALLOWED_HOSTS": allowed_hosts}, capture_output=True, timeout=10)
+            assert (result.returncode == 0) == (status == 200), (allowed_hosts, status, result.stderr)
+finally:
+    server.shutdown()
+print("PASS: API probe respects allowed hosts and rejects HTTP failures")
+PYTHON
+
 # Execute the real remote body with mocked external commands. No SSH, containers,
 # or public requests are used; environment writes stay inside this temporary tree.
-test_root="$(mktemp -d)"
-trap 'rm -rf -- "$test_root"' EXIT
-mkdir -p "$test_root/apps/api" "$test_root/apps/proxy"
+test_parent="$(mktemp -d)"
+test_root="$test_parent/checkout"
+trap 'rm -rf -- "$test_parent"' EXIT
+mkdir -p "$test_root/apps/api" "$test_root/apps/live" "$test_root/apps/proxy" "$test_root/tls"
+touch "$test_root/apps/live/.env" "$test_root/tls/origin.pem" "$test_root/tls/origin.key"
+export CADDY_TLS_DIRECTORY="$test_root/tls"
 touch "$test_root/.env" "$test_root/apps/api/.env" "$test_root/apps/proxy/grist-custom.css"
 export DEPLOY_PATH="$test_root" PRODUCTION_URL="https://deployment.test"
 export DEPLOY_SOURCE_SHA="test-source"
@@ -104,7 +148,19 @@ docker() {
     cat >/dev/null
   fi
   case "$*" in
-    "compose run --rm --build migrator") return "${MIGRATION_EXIT:-0}" ;;
+    "compose run --rm --no-deps -T migrator python manage.py migrate") return "${MIGRATION_EXIT:-0}" ;;
+    "compose build web") return "${BUILD_EXIT:-0}" ;;
+    "compose run --rm --no-deps -T migrator python manage.py makemigrations --check --dry-run") return "${DRIFT_EXIT:-0}" ;;
+    "compose run --rm --no-deps -T migrator python -") printf 'host=plane-db dbname=production' ;;
+    "compose exec -T plane-db pg_dump --dbname=host=plane-db dbname=production -Fc")
+      [[ "${BACKUP_EXIT:-0}" == 0 ]] || return "$BACKUP_EXIT"
+      printf 'database-backup' ;;
+    "compose exec -T api python") return "${DEPENDENCY_EXIT:-0}" ;;
+    "compose up -d --no-build --wait --wait-timeout 300 "*) return "${HEALTH_EXIT:-0}" ;;
+    "compose ps -aq "*) printf 'old-container\n' ;;
+    "inspect --format {{.Image}} old-container") printf 'sha256:old-image\n' ;;
+    "compose up -d --wait --wait-timeout 180 plane-db plane-redis plane-mq plane-minio") return "${INFRA_EXIT:-0}" ;;
+
     "compose exec -T grist sha256sum /grist/static/custom.css")
       sha256sum "$DEPLOY_PATH/apps/proxy/grist-custom.css" ;;
     "compose exec -T grist node --input-type=module") cat >/dev/null; printf '1\n' ;;
@@ -116,6 +172,7 @@ docker() {
   esac
 }
 curl() {
+  if [[ -n "${FAILED_ROUTE:-}" && "${*: -1}" == *"$FAILED_ROUTE" ]]; then return 22; fi
   if [[ "${PUBLIC_STATE:-current}" == "unreachable" ]]; then return 22; fi
   if [[ "${*: -1}" == */grist/form-base.css ]]; then
     case "${CSS_STATE:-current}" in
@@ -145,14 +202,49 @@ run_remote_case() {
 
 run_remote_case "successful deployment verifies matching manifest" 0 current 0
 grep -Fq 'Verified public frontend: manifest-current.js' "$test_root/result"
+recovery_directory="$(find "$test_parent/deployment-backups" -mindepth 1 -maxdepth 1 -type d | head -1)"
+[[ -f "$recovery_directory/root.env" && -f "$recovery_directory/api.env" && -f "$recovery_directory/live.env" ]]
+grep -Fq 'image: tenfold-rollback/web:' "$recovery_directory/rollback.yml"
+grep -A3 '^  beat-worker:' "$recovery_directory/rollback.yml" | grep -Fq 'disable: true'
+grep -Fq 'plane-db plane-redis plane-mq plane-minio' "$test_root/commands" || { echo 'FAIL: required infrastructure was not started' >&2; exit 1; }
+backup_file="$(find "$test_root/../deployment-backups" -name database.dump -type f 2>/dev/null | head -1)"
+[[ -n "$backup_file" && "$(cat "$backup_file")" == database-backup ]] || {
+  echo "FAIL: successful deployment did not preserve a database backup" >&2
+  exit 1
+}
+
 expected_builds=$'compose build admin\ncompose build web\ncompose build space\ncompose build live\ncompose build copilot\ncompose build api\ncompose build worker\ncompose build beat-worker\ncompose build proxy'
-actual_builds="$(grep '^compose build ' "$test_root/commands")"
+actual_builds="$(grep '^compose build ' "$test_root/commands" | grep -v '^compose build migrator$')"
 [[ "$actual_builds" == "$expected_builds" ]] || {
   echo "Application images were not built sequentially in the expected order" >&2
   printf 'Expected:\n%s\nActual:\n%s\n' "$expected_builds" "$actual_builds" >&2
   exit 1
 }
-grep -Fq 'compose up -d --no-build --wait grist api worker beat-worker copilot web admin space live proxy' "$test_root/commands"
+grep -Fq 'compose up -d --no-build --wait --wait-timeout 300 grist api worker beat-worker copilot web admin space live proxy' "$test_root/commands"
+# Removing the build/drift/backup gates must allow these failures to reach
+# migration, making the assertions below fail against the original script.
+for failure in BUILD DRIFT BACKUP INFRA; do
+  export "${failure}_EXIT=9"
+  run_remote_case "$failure failure aborts before migrations" 0 current 9
+  if grep -Eq 'compose (run .*python manage.py migrate|up -d --no-build)' "$test_root/commands"; then
+    echo "FAIL: $failure failure reached migration or app replacement" >&2
+    exit 1
+  fi
+  unset "${failure}_EXIT"
+done
+export HEALTH_EXIT=9
+run_remote_case "unhealthy application rejects deployment" 0 current 1
+unset HEALTH_EXIT
+export DEPENDENCY_EXIT=9
+run_remote_case "broken backend dependencies reject deployment" 0 current 9
+unset DEPENDENCY_EXIT
+
+for route in /api/instances/ /live/health/ /god-mode/ /spaces/; do
+  export FAILED_ROUTE="$route"
+  run_remote_case "public $route failure rejects deployment" 0 current 22
+done
+unset FAILED_ROUTE
+
 run_remote_case "migration failure stops before app replacement" 7 current 7
 if grep -Fq 'compose up -d --no-build' "$test_root/commands"; then
   echo "Apps were replaced after migration failure" >&2
