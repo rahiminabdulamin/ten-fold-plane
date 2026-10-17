@@ -62,10 +62,13 @@ export const TabNavigationRoot = observer(function TabNavigationRoot(props: TTab
   } = useIssueDetail();
 
   // Tab preferences hook
-  const { tabPreferences, handleToggleDefaultTab, handleHideTab, handleShowTab } = useTabPreferences(
-    workspaceSlug,
-    projectId
-  );
+  const {
+    tabPreferences,
+    isLoading: isTabPreferencesLoading,
+    handleToggleDefaultTab,
+    handleHideTab,
+    handleShowTab,
+  } = useTabPreferences(workspaceSlug, projectId);
 
   // Derived values
   const workItemId = workItemIdentifierFromRoute
@@ -133,7 +136,7 @@ export const TabNavigationRoot = observer(function TabNavigationRoot(props: TTab
     const projectRootPath = `/${workspaceSlug}/projects/${projectId}`;
     const isProjectRoot = pathname === projectRootPath || pathname === `${projectRootPath}/`;
 
-    if (isProjectRoot && allNavigationItems.length > 0) {
+    if (isProjectRoot && !isTabPreferencesLoading && allNavigationItems.length > 0) {
       // Find the default tab in available items
       const defaultTabItem = allNavigationItems.find((item: TNavigationItem) => item.key === tabPreferences.defaultTab);
 
@@ -145,7 +148,15 @@ export const TabNavigationRoot = observer(function TabNavigationRoot(props: TTab
         navigate(targetItem.href, { replace: true });
       }
     }
-  }, [pathname, workspaceSlug, projectId, tabPreferences.defaultTab, allNavigationItems, navigate]);
+  }, [
+    pathname,
+    workspaceSlug,
+    projectId,
+    tabPreferences.defaultTab,
+    isTabPreferencesLoading,
+    allNavigationItems,
+    navigate,
+  ]);
 
   if (allNavigationItems.length === 0) return null;
   if (!project) return null;

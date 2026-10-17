@@ -5,10 +5,13 @@
  */
 
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
+import useSWR from "swr";
+import { PROJECT_MEMBER_PREFERENCES } from "@plane/constants";
 import { setToast, TOAST_TYPE } from "@plane/propel/toast";
 import { useMember } from "@/hooks/store/use-member";
-import { useUser } from "@/hooks/store/user";
-import { DEFAULT_TAB_KEY } from "./tab-navigation-utils";
+import { useUser, useUserPermissions } from "@/hooks/store/user";
+import { DEFAULT_TAB_KEY, getTabUrl } from "./tab-navigation-utils";
 import type { TTabPreferences } from "./tab-navigation-utils";
 
 export type TTabPreferencesHook = {
@@ -29,29 +32,32 @@ export type TTabPreferencesHook = {
  */
 export const useTabPreferences = (workspaceSlug: string, projectId: string): TTabPreferencesHook => {
   const {
-    project: { getProjectUserProperties, updateProjectUserProperties },
+    project: { getProjectUserProperties, fetchProjectUserProperties, updateProjectUserProperties },
   } = useMember();
-  // const { projectUserInfo } = useUserPermissions();
+  const navigate = useNavigate();
   const { data } = useUser();
-
-  // Get member ID from projectUserInfo
-  // const projectMemberInfo = projectUserInfo[workspaceSlug]?.[projectId];
-  const memberId = data?.id || null;
+  const { getProjectRoleByWorkspaceSlugAndProjectId } = useUserPermissions();
+  const projectRole = getProjectRoleByWorkspaceSlugAndProjectId(workspaceSlug, projectId);
+  const { error: preferencesError } = useSWR(
+    data?.id ? PROJECT_MEMBER_PREFERENCES(projectId, projectRole) : null,
+    () => fetchProjectUserProperties(workspaceSlug, projectId),
+    { revalidateIfStale: false, revalidateOnFocus: false }
+  );
 
   // Get preferences from store
   const storePreferences = getProjectUserProperties(projectId);
   const defaultTab = storePreferences?.preferences?.navigation?.default_tab || DEFAULT_TAB_KEY;
-  const hideInMoreMenu = storePreferences?.preferences?.navigation?.hide_in_more_menu || [];
+  const hideInMoreMenu = storePreferences?.preferences?.navigation?.hide_in_more_menu;
 
   // Convert store preferences to component format
   const tabPreferences: TTabPreferences = useMemo(() => {
     return {
       defaultTab,
-      hiddenTabs: hideInMoreMenu,
+      hiddenTabs: hideInMoreMenu || [],
     };
   }, [defaultTab, hideInMoreMenu]);
 
-  const isLoading = !storePreferences && memberId !== null;
+  const isLoading = !storePreferences && !preferencesError;
 
   /**
    * Update preferences via store
@@ -77,6 +83,9 @@ export const useTabPreferences = (workspaceSlug: string, projectId: string): TTa
     const newPreferences = { ...tabPreferences, defaultTab: newDefaultTab };
     updatePreferences(newPreferences)
       .then(() => {
+        if (tabKey !== tabPreferences.defaultTab) {
+          navigate(getTabUrl(workspaceSlug, projectId, newDefaultTab));
+        }
         setToast({
           type: TOAST_TYPE.SUCCESS,
           title: "Success!",
